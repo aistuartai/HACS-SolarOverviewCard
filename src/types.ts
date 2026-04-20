@@ -58,6 +58,7 @@ export interface SolarCardConfig {
   devices?: DeviceConfig[];
   watt_threshold?: number;
   show_sparklines?: boolean;
+  sparkline_hours?: number;
   theme?: 'auto' | 'light' | 'dark';
   show_flow?: boolean;
   show_stats?: boolean;
