@@ -43,7 +43,7 @@ export class SolarOverviewCard extends LitElement {
   @state() private _gridToBattery = 0;
   @state() private _flows: FlowData = {
     solarToHome: 0, solarToBattery: 0, solarToGrid: 0,
-    gridToHome: 0, batteryToHome: 0, gridToBattery: 0,
+    gridToHome: 0, batteryToHome: 0, gridToBattery: 0, batteryToGrid: 0,
   };
   @state() private _sparklines: Record<string, SparklinePoint[]> = {};
   @state() private _error: string | null = null;
@@ -67,8 +67,10 @@ export class SolarOverviewCard extends LitElement {
   public setConfig(config: SolarCardConfig): void {
     if (!config.solar?.entity)   throw new Error('solar-overview-card: "solar.entity" required');
     if (!config.battery?.entity) throw new Error('solar-overview-card: "battery.entity" required');
-    if (!config.grid?.entity)    throw new Error('solar-overview-card: "grid.entity" required');
     if (!config.load?.entity)    throw new Error('solar-overview-card: "load.entity" required');
+    const g = config.grid;
+    if (!g?.entity && !g?.import_entity && !g?.export_entity)
+      throw new Error('solar-overview-card: at least one grid entity required');
 
     this._config = {
       watt_threshold: 1000,
@@ -89,38 +91,42 @@ export class SolarOverviewCard extends LitElement {
     if (!this._config) return;
 
     try {
+      const g = this._config.grid;
+
       const rawSolar   = this._readEntity(this._config.solar.entity);
       const rawBattery = this._readEntity(this._config.battery.entity);
-      const rawGrid    = this._readEntity(this._config.grid.entity);
       const rawLoad    = this._readEntity(this._config.load.entity);
+      const rawGrid    = g.entity ? this._readEntity(g.entity) : 0;
 
-      // Apply invert flags
       this._solar   = this._config.solar.invert   ? -rawSolar   : rawSolar;
       this._battery = this._config.battery.invert ? -rawBattery : rawBattery;
-      this._grid    = this._config.grid.invert    ? -rawGrid    : rawGrid;
-      this._load    = this._config.load.invert    ? -rawLoad    : rawLoad;
+      this._grid    = g.invert ? -rawGrid : rawGrid;
+      this._load    = this._config.load.invert ? -rawLoad : rawLoad;
 
       if (this._config.battery.soc_entity) {
         this._soc = this._readEntity(this._config.battery.soc_entity);
       }
 
-      // Optional explicit export / grid-charge entities
-      this._solarExport = this._config.solar.export_entity
-        ? this._readEntity(this._config.solar.export_entity)
-        : 0;
+      // Resolve all grid flow entities
+      const gridImport     = g.import_entity       ? this._readEntity(g.import_entity)       : undefined;
+      const gridExport     = g.export_entity        ? this._readEntity(g.export_entity)        :
+                             this._config.solar.export_entity ? this._readEntity(this._config.solar.export_entity) : undefined;
+      const gridToBattery  = g.to_battery_entity    ? this._readEntity(g.to_battery_entity)    :
+                             this._config.battery.grid_charge_entity ? this._readEntity(this._config.battery.grid_charge_entity) : undefined;
+      const batteryToGrid  = g.from_battery_entity  ? this._readEntity(g.from_battery_entity)  : undefined;
+      const gridBatteryCombined = g.battery_entity  ? this._readEntity(g.battery_entity)        : undefined;
 
-      this._gridToBattery = this._config.battery.grid_charge_entity
-        ? this._readEntity(this._config.battery.grid_charge_entity)
-        : 0;
-
-      this._flows = calculateFlows(
-        this._solar,
-        this._battery,
-        this._grid,
-        this._load,
-        this._config.solar.export_entity ? this._solarExport : undefined,
-        this._config.battery.grid_charge_entity ? this._gridToBattery : undefined,
-      );
+      this._flows = calculateFlows({
+        solar: this._solar,
+        battery: this._battery,
+        load: this._load,
+        gridCombined: this._grid,
+        gridImport,
+        gridExport,
+        gridToBattery,
+        batteryToGrid,
+        gridBatteryCombined,
+      });
 
       const now = Date.now();
       if (
@@ -148,9 +154,9 @@ export class SolarOverviewCard extends LitElement {
     const entities = [
       this._config.solar.entity,
       this._config.battery.entity,
-      this._config.grid.entity,
+      this._config.grid.entity ?? this._config.grid.import_entity,
       this._config.load.entity,
-    ];
+    ].filter((e): e is string => !!e);
 
     const end = new Date();
     const start = new Date(end.getTime() - 2 * 60 * 60 * 1000);
@@ -242,7 +248,7 @@ export class SolarOverviewCard extends LitElement {
 
     const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity);
     const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity);
-    const grid    = this._panelProps('grid',    this._grid,    'Grid',    MDI_GRID,    '#8b5cf6', this._config.grid.entity);
+    const grid    = this._panelProps('grid',    this._grid,    'Grid',    MDI_GRID,    '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
     // Home shows total power delivered: battery discharge + grid import
     const homeDelivered = this._flows.batteryToHome + this._flows.gridToHome;
     const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity);
@@ -561,16 +567,25 @@ export class SolarOverviewCardEditor extends LitElement {
     const c = this._config;
     return html`
       <div class="row">
-        <div class="section-title">Power flow entities</div>
-        ${this._entityPicker('Solar → Home / Battery / Grid  (generation, W ≥ 0)',    'solar.entity',   c.solar?.entity ?? '')}
-        ${this._entityPicker('Battery ← charge / → Home  (+ charging, − discharging)', 'battery.entity', c.battery?.entity ?? '')}
-        ${this._entityPicker('Battery SOC  (0–100 %)',                                  'battery.soc_entity', c.battery?.soc_entity ?? '')}
-        ${this._entityPicker('Grid → Home  /  Solar → Grid  (+ import, − export)',     'grid.entity',    c.grid?.entity ?? '')}
-        ${this._entityPicker('Home load  (used for Solar → Home calc, W ≥ 0)',         'load.entity',    c.load?.entity ?? '')}
+        <div class="section-title">☀️ Solar</div>
+        ${this._entityPicker('Solar generation  (W ≥ 0)',  'solar.entity',  c.solar?.entity ?? '')}
 
-        <div class="section-title">Optional — explicit flow sensors</div>
-        ${this._entityPicker('Solar → Grid  export sensor  (W ≥ 0, overrides grid sign)', 'solar.export_entity',        c.solar?.export_entity ?? '')}
-        ${this._entityPicker('Grid → Battery  charge sensor  (W ≥ 0)',                    'battery.grid_charge_entity', c.battery?.grid_charge_entity ?? '')}
+        <div class="section-title">🏠 Home load</div>
+        ${this._entityPicker('Home consumption  (W ≥ 0, used for Solar → Home calc)',  'load.entity',  c.load?.entity ?? '')}
+
+        <div class="section-title">🔋 Battery</div>
+        ${this._entityPicker('Battery power  (+ = charging ← grid/solar,  − = discharging → home/grid)',  'battery.entity',     c.battery?.entity ?? '')}
+        ${this._entityPicker('Battery state of charge  (0–100 %)',                                         'battery.soc_entity', c.battery?.soc_entity ?? '')}
+
+        <div class="section-title">⚡ Grid — combined fallback</div>
+        ${this._entityPicker('Grid combined  (+ = importing → home,  − = exporting ← solar/battery)',  'grid.entity',  c.grid?.entity ?? '')}
+
+        <div class="section-title">⚡ Grid — individual flow sensors (override combined)</div>
+        ${this._entityPicker('Grid → Home  import sensor  (W ≥ 0)',                           'grid.import_entity',        c.grid?.import_entity        ?? '')}
+        ${this._entityPicker('Solar / Battery → Grid  export sensor  (W ≥ 0)',                'grid.export_entity',        c.grid?.export_entity        ?? '')}
+        ${this._entityPicker('Grid ↔ Battery combined  (+ = grid charges battery,  − = battery discharges to grid)', 'grid.battery_entity', c.grid?.battery_entity ?? '')}
+        ${this._entityPicker('Grid → Battery only  (W ≥ 0, overrides combined)',              'grid.to_battery_entity',    c.grid?.to_battery_entity    ?? '')}
+        ${this._entityPicker('Battery → Grid only  (W ≥ 0, overrides combined)',              'grid.from_battery_entity',  c.grid?.from_battery_entity  ?? '')}
 
         ${this._renderDeviceEditor()}
 

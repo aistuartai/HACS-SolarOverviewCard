@@ -51,7 +51,7 @@ export class FlowDiagram extends LitElement {
   @property({ type: Number }) wattThreshold = 1000;
   @property({ type: Object }) flows: FlowData = {
     solarToHome: 0, solarToBattery: 0, solarToGrid: 0,
-    gridToHome: 0, batteryToHome: 0, gridToBattery: 0,
+    gridToHome: 0, batteryToHome: 0, gridToBattery: 0, batteryToGrid: 0,
   };
   @property({ type: Array }) diagramDevices: DiagramDevice[] = [];
 
@@ -260,8 +260,10 @@ export class FlowDiagram extends LitElement {
         ${this._flowLine(GRID_X, GRID_Y, HOME_X, HOME_Y, f.gridToHome, '#8b5cf6')}
         <!-- Battery → Home (discharge) -->
         ${this._flowLine(BATTERY_X, BATTERY_Y, HOME_X, HOME_Y, f.batteryToHome, battColor)}
-        <!-- Grid → Battery (grid charging) -->
-        ${this._flowLine(GRID_X, GRID_Y, BATTERY_X, BATTERY_Y, f.gridToBattery, '#8b5cf6')}
+        <!-- Grid ↔ Battery: grid charging OR battery discharging to grid -->
+        ${f.batteryToGrid > f.gridToBattery
+          ? this._flowLine(BATTERY_X, BATTERY_Y, GRID_X, GRID_Y, f.batteryToGrid, '#10b981')
+          : this._flowLine(GRID_X, GRID_Y, BATTERY_X, BATTERY_Y, f.gridToBattery, '#8b5cf6')}
 
         <!-- Device lines (Home → Device) -->
         ${devicePositions.map(({ d, x, y }) =>

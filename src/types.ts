@@ -2,42 +2,65 @@ export interface EntityConfig {
   entity: string;
   name?: string;
   icon?: string;
-  /** If true, flip the sign of the entity value (positive ↔ negative). */
   invert?: boolean;
 }
 
 export interface SolarEntityConfig extends EntityConfig {
-  /** Explicit sensor for solar→grid export (always positive watts). */
+  /** Explicit Solar → Grid export sensor (W ≥ 0). Overrides deriving from grid sign. */
   export_entity?: string;
 }
 
 export interface BatteryConfig extends EntityConfig {
   soc_entity?: string;
-  /** Explicit sensor for grid→battery charging (always positive watts). */
+  /** @deprecated Use grid.to_battery_entity instead. */
   grid_charge_entity?: string;
 }
 
+/**
+ * Grid config supports a combined fallback entity plus up to four specific
+ * flow sensors. Any specific sensor takes priority over the combined entity
+ * for its respective flow.
+ *
+ * Priority for each flow:
+ *   Grid → Home      : import_entity  >  entity (when positive)
+ *   Any  → Grid      : export_entity  >  solar.export_entity  >  entity (when negative, solar > 0)
+ *   Grid → Battery   : to_battery_entity  >  battery_entity (when positive)
+ *   Battery → Grid   : from_battery_entity  >  battery_entity (when negative)
+ */
+export interface GridConfig {
+  /** Combined fallback: positive = importing, negative = exporting. */
+  entity?: string;
+  name?: string;
+  icon?: string;
+  invert?: boolean;
+  /** Grid → Home import sensor (W ≥ 0). */
+  import_entity?: string;
+  /** Solar / Battery → Grid export sensor (W ≥ 0). */
+  export_entity?: string;
+  /** Grid ↔ Battery combined sensor: positive = grid charging battery, negative = battery discharging to grid. */
+  battery_entity?: string;
+  /** Grid → Battery only sensor (W ≥ 0). Overrides battery_entity positive side. */
+  to_battery_entity?: string;
+  /** Battery → Grid only sensor (W ≥ 0). Overrides battery_entity negative side. */
+  from_battery_entity?: string;
+}
+
 export interface DeviceConfig extends EntityConfig {
-  /** Hex color for the chip icon, e.g. "#f59e0b". */
   color?: string;
-  /** If true, render this device as a satellite node on the flow diagram. */
   show_on_diagram?: boolean;
 }
 
 export interface SolarCardConfig {
   solar: SolarEntityConfig;
   battery: BatteryConfig;
-  grid: EntityConfig;
+  grid: GridConfig;
   load: EntityConfig;
   devices?: DeviceConfig[];
   watt_threshold?: number;
   show_sparklines?: boolean;
   theme?: 'auto' | 'light' | 'dark';
-  /** Show/hide the SVG power flow diagram. Default: true */
   show_flow?: boolean;
-  /** Show/hide the 2×2 stat panels. Default: true */
   show_stats?: boolean;
-  /** Show/hide the devices chip row. Default: true */
   show_devices?: boolean;
 }
 
@@ -57,8 +80,8 @@ export interface FlowData {
   solarToGrid: number;
   gridToHome: number;
   batteryToHome: number;
-  /** Grid energy flowing into the battery (charging from grid). */
   gridToBattery: number;
+  batteryToGrid: number;
 }
 
 export interface SparklinePoint {
