@@ -318,53 +318,42 @@ export class SolarOverviewCardEditor extends LitElement {
     this._config = config;
   }
 
-  private _valueChanged(ev: CustomEvent): void {
+  private _setValue(configValue: string, value: string): void {
     if (!this._config) return;
-    const target = ev.target as HTMLElement & { configValue?: string; value?: string };
-    if (!target.configValue) return;
-
-    const parts = target.configValue.split('.');
+    const parts = configValue.split('.');
     const updated: SolarCardConfig = JSON.parse(JSON.stringify(this._config));
     const updatedAny = updated as unknown as Record<string, unknown>;
-
     if (parts.length === 2) {
       const [section, field] = parts;
       const current = ((updatedAny[section] as Record<string, unknown>) ?? {});
-      current[field] = target.value ?? '';
+      current[field] = value;
       updatedAny[section] = current;
     } else {
-      updatedAny[parts[0]] = target.value ?? '';
+      updatedAny[parts[0]] = value;
     }
-
     this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: updated } }));
   }
 
   private _entityPicker(label: string, configValue: string, currentValue: string) {
     return html`
-      <ha-entity-picker
+      <ha-selector
         .hass="${this.hass}"
         .label="${label}"
-        .value="${currentValue}"
-        .configValue="${configValue}"
-        allow-custom-entity
-        @value-changed="${this._valueChanged}"
-      ></ha-entity-picker>
+        .selector=${{ entity: {} }}
+        .value="${currentValue || ''}"
+        @value-changed="${(e: CustomEvent) => this._setValue(configValue, e.detail.value ?? '')}"
+      ></ha-selector>
     `;
   }
 
-  private _toggle(label: string, key: keyof SolarCardConfig, checked: boolean) {
+  private _toggle(label: string, configValue: string, checked: boolean) {
     return html`
-      <ha-formfield label="${label}">
-        <ha-switch
-          .checked="${checked}"
-          @change="${(e: Event) => {
-            const sw = e.target as HTMLElement & { checked?: boolean };
-            if (!this._config) return;
-            const updated = { ...this._config, [key]: sw.checked };
-            this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: updated } }));
-          }}"
-        ></ha-switch>
-      </ha-formfield>
+      <ha-selector
+        .label="${label}"
+        .selector=${{ boolean: {} }}
+        .value="${checked}"
+        @value-changed="${(e: CustomEvent) => this._setValue(configValue, e.detail.value)}"
+      ></ha-selector>
     `;
   }
 
@@ -385,13 +374,13 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._entityPicker('Grid charging battery',  'battery.grid_charge_entity', c.battery?.grid_charge_entity ?? '')}
 
         <div class="section-title">Sign conventions</div>
-        ${this._toggle('Invert battery (positive = discharging)', 'battery', c.battery?.invert ?? false)}
-        ${this._toggle('Invert grid (positive = exporting)',      'grid',    c.grid?.invert ?? false)}
+        ${this._toggle('Invert battery (positive = discharging)', 'battery.invert', c.battery?.invert ?? false)}
+        ${this._toggle('Invert grid (positive = exporting)',      'grid.invert',    c.grid?.invert ?? false)}
 
         <div class="section-title">Visibility</div>
-        ${this._toggle('Show flow diagram',   'show_flow',    c.show_flow    !== false)}
-        ${this._toggle('Show stat panels',    'show_stats',   c.show_stats   !== false)}
-        ${this._toggle('Show devices row',    'show_devices', c.show_devices !== false)}
+        ${this._toggle('Show flow diagram',   'show_flow',       c.show_flow    !== false)}
+        ${this._toggle('Show stat panels',    'show_stats',      c.show_stats   !== false)}
+        ${this._toggle('Show devices row',    'show_devices',    c.show_devices !== false)}
         ${this._toggle('Show sparklines',     'show_sparklines', c.show_sparklines !== false)}
 
         <p class="hint">Sign convention (default): battery positive = charging, grid positive = importing.</p>
