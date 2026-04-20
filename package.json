@@ -1,0 +1,26 @@
+{
+  "name": "solar-overview-card",
+  "version": "1.0.0",
+  "description": "Solar energy overview card for Home Assistant",
+  "type": "module",
+  "main": "dist/solar-overview-card.js",
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rollup -c",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "rollup": "^3.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "tslib": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "lit": "^3.0.0"
+  }
+}
