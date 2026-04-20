@@ -303,6 +303,10 @@ export class SolarOverviewCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: SolarCardConfig;
 
+  @state() private _newDevice: { entity: string; name: string; icon: string; color: string } = {
+    entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1',
+  };
+
   static styles = css`
     :host { display: block; padding: 16px; }
     .row { display: flex; flex-direction: column; gap: 12px; }
@@ -312,6 +316,40 @@ export class SolarOverviewCardEditor extends LitElement {
       margin: 8px 0 4px;
     }
     .hint { font-size: 0.75rem; color: var(--secondary-text-color, #9ca3af); margin-top: 4px; }
+    .device-list { display: flex; flex-direction: column; gap: 6px; }
+    .device-item {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .device-item-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .device-item-name { flex: 1; font-size: 0.85rem; }
+    .device-item-entity { font-size: 0.72rem; color: var(--secondary-text-color, #9ca3af); }
+    .device-delete {
+      background: none; border: none; cursor: pointer; padding: 4px;
+      color: var(--secondary-text-color, #9ca3af); border-radius: 4px;
+      font-size: 1rem; line-height: 1;
+    }
+    .device-delete:hover { color: #ef4444; }
+    .add-device-form {
+      display: flex; flex-direction: column; gap: 8px;
+      background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px;
+      border: 1px dashed rgba(255,255,255,0.12);
+    }
+    .add-device-row { display: flex; gap: 8px; align-items: center; }
+    .add-device-row ha-selector { flex: 1; }
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    .color-row label { font-size: 0.8rem; color: var(--secondary-text-color, #9ca3af); }
+    .color-row input[type=color] {
+      width: 36px; height: 28px; border: none; border-radius: 4px;
+      background: none; cursor: pointer; padding: 0;
+    }
+    .add-btn {
+      background: var(--primary-color, #3b82f6); color: white; border: none;
+      border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.85rem;
+      font-weight: 600; align-self: flex-end;
+    }
+    .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   `;
 
   public setConfig(config: SolarCardConfig): void {
@@ -346,6 +384,84 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
+  private _deleteDevice(index: number): void {
+    if (!this._config) return;
+    const devices = [...(this._config.devices ?? [])];
+    devices.splice(index, 1);
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: { ...this._config, devices } },
+    }));
+  }
+
+  private _addDevice(): void {
+    if (!this._config || !this._newDevice.entity) return;
+    const devices = [...(this._config.devices ?? []), { ...this._newDevice }];
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: { ...this._config, devices } },
+    }));
+    this._newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1' };
+  }
+
+  private _renderDeviceEditor() {
+    const devices = this._config?.devices ?? [];
+    return html`
+      <div class="section-title">Devices</div>
+
+      ${devices.length > 0 ? html`
+        <div class="device-list">
+          ${devices.map((d, i) => html`
+            <div class="device-item">
+              <div class="device-item-color" style="background:${d.color ?? '#6366f1'}"></div>
+              <div style="flex:1;min-width:0;">
+                <div class="device-item-name">${d.name ?? d.entity}</div>
+                <div class="device-item-entity">${d.entity}</div>
+              </div>
+              <button class="device-delete" @click="${() => this._deleteDevice(i)}" title="Remove">✕</button>
+            </div>
+          `)}
+        </div>
+      ` : ''}
+
+      <div class="add-device-form">
+        <ha-selector
+          .hass="${this.hass}"
+          .label="Entity"
+          .selector=${{ entity: {} }}
+          .value="${this._newDevice.entity}"
+          @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, entity: e.detail.value ?? '' }; this.requestUpdate(); }}"
+        ></ha-selector>
+
+        <div class="add-device-row">
+          <ha-selector
+            .label="Name"
+            .selector=${{ text: {} }}
+            .value="${this._newDevice.name}"
+            @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, name: e.detail.value ?? '' }; this.requestUpdate(); }}"
+          ></ha-selector>
+
+          <ha-selector
+            .label="Icon"
+            .selector=${{ icon: {} }}
+            .value="${this._newDevice.icon}"
+            @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, icon: e.detail.value ?? '' }; this.requestUpdate(); }}"
+          ></ha-selector>
+        </div>
+
+        <div class="color-row">
+          <label>Colour</label>
+          <input type="color" .value="${this._newDevice.color}"
+            @input="${(e: Event) => { this._newDevice = { ...this._newDevice, color: (e.target as HTMLInputElement).value }; this.requestUpdate(); }}"
+          />
+        </div>
+
+        <button class="add-btn" ?disabled="${!this._newDevice.entity}"
+          @click="${this._addDevice}">
+          Add Device
+        </button>
+      </div>
+    `;
+  }
+
   private _toggle(label: string, configValue: string, checked: boolean) {
     return html`
       <ha-selector
@@ -372,6 +488,8 @@ export class SolarOverviewCardEditor extends LitElement {
         <div class="section-title">Optional entities</div>
         ${this._entityPicker('Solar export to grid',   'solar.export_entity',       c.solar?.export_entity ?? '')}
         ${this._entityPicker('Grid charging battery',  'battery.grid_charge_entity', c.battery?.grid_charge_entity ?? '')}
+
+        ${this._renderDeviceEditor()}
 
         <div class="section-title">Sign conventions</div>
         ${this._toggle('Invert battery (positive = discharging)', 'battery.invert', c.battery?.invert ?? false)}

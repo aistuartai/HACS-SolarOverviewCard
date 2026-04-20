@@ -69,6 +69,11 @@ export class DeviceRow extends LitElement {
       fill: var(--secondary-text-color, #9ca3af);
     }
 
+    .chip ha-icon {
+      --mdc-icon-size: 14px;
+      flex-shrink: 0;
+    }
+
     .chip-name {
       font-size: 0.72rem;
       color: var(--secondary-text-color, #9ca3af);
@@ -109,10 +114,13 @@ export class DeviceRow extends LitElement {
               title="${d.name}: ${formatPower(d.watts, this.wattThreshold)}"
               style="${d.color ? `border-color: ${d.color}33;` : ''}"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true"
-                style="${d.color ? `fill: ${d.color};` : ''}">
-                <path d="${d.icon || this._defaultIconPath}" />
-              </svg>
+              ${d.icon?.startsWith('mdi:')
+                ? html`<ha-icon icon="${d.icon}" style="${d.color ? `color:${d.color};` : ''}"></ha-icon>`
+                : html`<svg viewBox="0 0 24 24" aria-hidden="true"
+                    style="${d.color ? `fill:${d.color};` : ''}">
+                    <path d="${d.icon || this._defaultIconPath}" />
+                  </svg>`
+              }
               <span class="chip-name">${d.name}</span>
               <span class="chip-value">${formatPower(d.watts, this.wattThreshold)}</span>
             </div>
