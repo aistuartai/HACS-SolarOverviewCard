@@ -50,12 +50,18 @@ export interface DeviceConfig extends EntityConfig {
   show_on_diagram?: boolean;
 }
 
+export interface PanelConfig {
+  key: 'solar' | 'battery' | 'grid' | 'load';
+  enabled: boolean;
+}
+
 export interface SolarCardConfig {
   solar: SolarEntityConfig;
   battery: BatteryConfig;
   grid: GridConfig;
   load: EntityConfig;
   devices?: DeviceConfig[];
+  panels?: PanelConfig[];
   watt_threshold?: number;
   show_sparklines?: boolean;
   sparkline_hours?: number;

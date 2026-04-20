@@ -49,6 +49,10 @@ export class FlowDiagram extends LitElement {
   @property({ type: Number }) load = 0;
   @property({ type: Number }) socPercent = 0;
   @property({ type: Number }) wattThreshold = 1000;
+  @property({ type: String }) solarName = 'Solar';
+  @property({ type: String }) gridName = 'Grid';
+  @property({ type: String }) homeName = 'Home';
+  @property({ type: String }) batteryName = 'Battery';
   @property({ type: Object }) flows: FlowData = {
     solarToHome: 0, solarToBattery: 0, solarToGrid: 0,
     gridToHome: 0, batteryToHome: 0, gridToBattery: 0, batteryToGrid: 0,
@@ -273,10 +277,10 @@ export class FlowDiagram extends LitElement {
         ${this._socRing()}
 
         <!-- Main nodes -->
-        ${this._node(SOLAR_X,   SOLAR_Y,   ICON_SOLAR,   'Solar',   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)')}
-        ${this._node(GRID_X,    GRID_Y,    ICON_GRID,    'Grid',    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)')}
-        ${this._node(HOME_X,    HOME_Y,    ICON_HOME,    'Home',    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)')}
-        ${this._node(BATTERY_X, BATTERY_Y, ICON_BATTERY, 'Battery', this.battery, battColor, battBg)}
+        ${this._node(SOLAR_X,   SOLAR_Y,   ICON_SOLAR,   this.solarName,   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)')}
+        ${this._node(GRID_X,    GRID_Y,    ICON_GRID,    this.gridName,    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)')}
+        ${this._node(HOME_X,    HOME_Y,    ICON_HOME,    this.homeName,    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)')}
+        ${this._node(BATTERY_X, BATTERY_Y, ICON_BATTERY, this.batteryName, this.battery, battColor, battBg)}
 
         <!-- Device satellite nodes -->
         ${devicePositions.map(({ d, x, y }) => this._deviceNode(x, y, d))}

@@ -2,7 +2,7 @@ import { LitElement, html, css, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { cardStyles } from './styles';
-import { FlowData, SolarCardConfig, HomeAssistant, SparklinePoint } from './types';
+import { FlowData, SolarCardConfig, PanelConfig, HomeAssistant, SparklinePoint } from './types';
 import { formatPower, parseFloat_safe, calculateFlows, getStateLabel } from './utils';
 
 import './components/flow-diagram';
@@ -18,6 +18,13 @@ const MDI_GRID =
   'M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z';
 const MDI_HOME =
   'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z';
+
+const DEFAULT_PANELS: PanelConfig[] = [
+  { key: 'solar',   enabled: true },
+  { key: 'battery', enabled: true },
+  { key: 'grid',    enabled: true },
+  { key: 'load',    enabled: true },
+];
 
 interface HassHistoryEntry {
   last_updated: string;
@@ -271,30 +278,36 @@ export class SolarOverviewCard extends LitElement {
                 .wattThreshold="${thr}"
                 .flows="${this._flows}"
                 .diagramDevices="${this._diagramDevices()}"
+                .solarName="${this._config.solar.name ?? 'Solar'}"
+                .gridName="${this._config.grid.name ?? 'Grid'}"
+                .homeName="${this._config.load.name ?? 'Home'}"
+                .batteryName="${this._config.battery.name ?? 'Battery'}"
               ></flow-diagram>
             </div>
           ` : ''}
 
           ${showStats ? html`
             <div class="stat-grid">
-              ${(['solar', 'battery', 'grid', 'load'] as const).map((key) => {
-                const p = { solar, battery, grid, load }[key];
-                return html`
-                  <stat-panel
-                    .entityId="${p.entityId}"
-                    .name="${p.name}"
-                    .icon="${p.icon}"
-                    .value="${p.value}"
-                    .displayValue="${p.displayValue}"
-                    .stateLabel="${p.stateLabel}"
-                    .stateColor="${p.stateColor}"
-                    .showSparkline="${p.showSparkline}"
-                    .sparklineHistory="${p.sparklineHistory}"
-                    .panelClass="${p.panelClass}"
-                    .badgeClass="${p.badgeClass}"
-                  ></stat-panel>
-                `;
-              })}
+              ${(this._config.panels ?? DEFAULT_PANELS)
+                .filter(p => p.enabled !== false)
+                .map(({ key }) => {
+                  const p = { solar, battery, grid, load }[key];
+                  return html`
+                    <stat-panel
+                      .entityId="${p.entityId}"
+                      .name="${p.name}"
+                      .icon="${p.icon}"
+                      .value="${p.value}"
+                      .displayValue="${p.displayValue}"
+                      .stateLabel="${p.stateLabel}"
+                      .stateColor="${p.stateColor}"
+                      .showSparkline="${p.showSparkline}"
+                      .sparklineHistory="${p.sparklineHistory}"
+                      .panelClass="${p.panelClass}"
+                      .badgeClass="${p.badgeClass}"
+                    ></stat-panel>
+                  `;
+                })}
             </div>
           ` : ''}
 
@@ -320,7 +333,8 @@ export class SolarOverviewCard extends LitElement {
 
 // ─── Visual config editor ────────────────────────────────────────────────────
 
-type EditorPage = 'main' | 'setup' | 'solar' | 'battery' | 'grid' | 'house' | 'outlets';
+type EditorPage = 'main' | 'setup' | 'solar' | 'battery' | 'grid' | 'house' | 'panels' | 'outlets';
+type EFOpts = { invertPath?: string; invertValue?: boolean; namePath?: string; nameValue?: string; hint?: string };
 
 @customElement('solar-overview-card-editor')
 export class SolarOverviewCardEditor extends LitElement {
@@ -409,6 +423,23 @@ export class SolarOverviewCardEditor extends LitElement {
     }
     .flow-stat-label { font-size: 0.82rem; color: var(--secondary-text-color, #9ca3af); }
     .flow-stat-value { font-size: 0.87rem; font-weight: 700; color: var(--primary-text-color); }
+
+    /* ── Stat panel order/toggle ── */
+    .panel-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--card-background-color, rgba(255,255,255,0.04));
+      border: 1px solid var(--divider-color, rgba(255,255,255,0.08));
+    }
+    .panel-move { display: flex; flex-direction: column; gap: 2px; }
+    .move-btn {
+      background: none; border: none; cursor: pointer; padding: 2px 6px;
+      color: var(--secondary-text-color, #9ca3af); border-radius: 4px;
+      font-size: 0.75rem; line-height: 1;
+    }
+    .move-btn:hover:not([disabled]) { background: rgba(255,255,255,0.1); color: var(--primary-text-color); }
+    .move-btn[disabled] { opacity: 0.2; cursor: not-allowed; }
+    .panel-label { flex: 1; font-size: 0.875rem; color: var(--primary-text-color); }
 
     /* ── Device list ── */
     .device-list { display: flex; flex-direction: column; gap: 6px; }
@@ -537,10 +568,7 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
-  private _entityField(
-    label: string, path: string, value: string | undefined,
-    invertPath?: string, invertValue?: boolean,
-  ) {
+  private _entityField(label: string, path: string, value: string | undefined, opts?: EFOpts) {
     return html`
       <div class="field-wrap">
         <div class="field-row">
@@ -555,8 +583,22 @@ export class SolarOverviewCardEditor extends LitElement {
             <button class="clear-btn" title="Clear" @click="${() => this._setValue(path, '')}">✕</button>
           ` : ''}
         </div>
-        ${invertPath !== undefined
-          ? this._boolField('Invert sign (flip +/−)', invertPath, invertValue ?? false)
+        ${opts?.namePath !== undefined ? html`
+          <div class="field-row" style="margin-top:4px;">
+            <ha-selector
+              .label="Display name"
+              .selector=${{ text: {} }}
+              .value="${opts.nameValue ?? ''}"
+              @value-changed="${(e: CustomEvent) => this._setValue(opts!.namePath!, e.detail.value ?? '')}"
+            ></ha-selector>
+            ${opts.nameValue ? html`
+              <button class="clear-btn" title="Clear" @click="${() => this._setValue(opts!.namePath!, '')}">✕</button>
+            ` : ''}
+          </div>
+        ` : ''}
+        ${opts?.hint ? html`<p class="hint" style="margin:3px 0 0;">${opts.hint}</p>` : ''}
+        ${opts?.invertPath !== undefined
+          ? this._boolField('Invert sign (flip +/−)', opts.invertPath, opts.invertValue ?? false)
           : ''}
       </div>
     `;
@@ -596,6 +638,7 @@ export class SolarOverviewCardEditor extends LitElement {
       </div>
     `;
 
+    const activePanels = (c.panels ?? DEFAULT_PANELS).filter(p => p.enabled !== false).length;
     return html`
       <div class="nav-list">
         ${navItem('setup',   '⚙️', 'Setup',   'Visibility & sparklines',                                    'rgba(107,114,128,0.18)')}
@@ -603,6 +646,7 @@ export class SolarOverviewCardEditor extends LitElement {
         ${navItem('battery', '🔋', 'Battery', c.battery?.entity ?? 'Not configured',                        'rgba(16,185,129,0.18)')}
         ${navItem('grid',    '⚡', 'Grid',    c.grid?.entity ?? c.grid?.import_entity ?? 'Not configured',   'rgba(139,92,246,0.18)')}
         ${navItem('house',   '🏠', 'House',   c.load?.entity    ?? 'Not configured',                        'rgba(59,130,246,0.18)')}
+        ${navItem('panels',  '📊', 'Panels',  `${activePanels} of 4 shown`,                                 'rgba(6,182,212,0.18)')}
         ${navItem('outlets', '🔌', 'Outlets', deviceCount > 0 ? `${deviceCount} device${deviceCount !== 1 ? 's' : ''}` : 'No devices added', 'rgba(99,102,241,0.18)')}
       </div>
     `;
@@ -636,10 +680,13 @@ export class SolarOverviewCardEditor extends LitElement {
     return html`
       ${this._pageHeader('☀️', 'Solar Config')}
       <div class="form-col">
-        ${this._entityField('Solar generation  (W ≥ 0)', 'solar.entity', s?.entity, 'solar.invert', s?.invert)}
-        <div class="section-label">Optional</div>
-        ${this._entityField('Solar → Grid export sensor  (W ≥ 0)', 'solar.export_entity', s?.export_entity)}
-        ${this._textField('Display name', 'solar.name', s?.name)}
+        ${this._entityField('Solar generation  (W ≥ 0)', 'solar.entity', s?.entity, {
+          invertPath: 'solar.invert', invertValue: s?.invert,
+          namePath: 'solar.name', nameValue: s?.name,
+        })}
+        ${this._entityField('Solar → Grid export  (W ≥ 0)', 'solar.export_entity', s?.export_entity, {
+          hint: 'overrides grid.export_entity for Solar → Grid flow',
+        })}
       </div>
     `;
   }
@@ -650,13 +697,11 @@ export class SolarOverviewCardEditor extends LitElement {
     return html`
       ${this._pageHeader('🔋', 'Battery Config')}
       <div class="form-col">
-        ${this._entityField(
-          'Battery power  (+ = charging,  − = discharging)',
-          'battery.entity', b?.entity, 'battery.invert', b?.invert,
-        )}
-        <div class="section-label">Optional</div>
+        ${this._entityField('Battery power  (+ = charging,  − = discharging)', 'battery.entity', b?.entity, {
+          invertPath: 'battery.invert', invertValue: b?.invert,
+          namePath: 'battery.name', nameValue: b?.name,
+        })}
         ${this._entityField('State of charge  (0–100 %)', 'battery.soc_entity', b?.soc_entity)}
-        ${this._textField('Display name', 'battery.name', b?.name)}
       </div>
     `;
   }
@@ -668,17 +713,25 @@ export class SolarOverviewCardEditor extends LitElement {
       ${this._pageHeader('⚡', 'Grid Config')}
       <div class="form-col">
         <div class="section-label" style="margin-top:0;">Combined sensor (fallback)</div>
-        ${this._entityField(
-          'Grid power  (+ = importing,  − = exporting)',
-          'grid.entity', g?.entity, 'grid.invert', g?.invert,
-        )}
-        <div class="section-label">Individual flow sensors (override combined)</div>
-        ${this._entityField('Grid → Home  import  (W ≥ 0)',                        'grid.import_entity',       g?.import_entity)}
-        ${this._entityField('Solar / Battery → Grid  export  (W ≥ 0)',             'grid.export_entity',       g?.export_entity)}
+        ${this._entityField('Grid power  (+ = importing,  − = exporting)', 'grid.entity', g?.entity, {
+          invertPath: 'grid.invert', invertValue: g?.invert,
+          namePath: 'grid.name', nameValue: g?.name,
+        })}
+        <div class="section-label">Individual flow sensors</div>
+        ${this._entityField('Grid → Home  import  (W ≥ 0)', 'grid.import_entity', g?.import_entity, {
+          hint: 'overrides combined for Grid → Home',
+        })}
+        ${this._entityField('Solar/Battery → Grid  export  (W ≥ 0)', 'grid.export_entity', g?.export_entity, {
+          hint: 'overrides combined for Solar → Grid',
+        })}
         <div class="section-label">Battery ↔ Grid sensors</div>
         ${this._entityField('Grid ↔ Battery combined  (+ = charges,  − = discharges to grid)', 'grid.battery_entity', g?.battery_entity)}
-        ${this._entityField('Grid → Battery only  (W ≥ 0)',                        'grid.to_battery_entity',   g?.to_battery_entity)}
-        ${this._entityField('Battery → Grid only  (W ≥ 0)',                        'grid.from_battery_entity', g?.from_battery_entity)}
+        ${this._entityField('Grid → Battery only  (W ≥ 0)', 'grid.to_battery_entity', g?.to_battery_entity, {
+          hint: 'overrides battery_entity positive side',
+        })}
+        ${this._entityField('Battery → Grid only  (W ≥ 0)', 'grid.from_battery_entity', g?.from_battery_entity, {
+          hint: 'overrides battery_entity negative side',
+        })}
       </div>
     `;
   }
@@ -692,10 +745,10 @@ export class SolarOverviewCardEditor extends LitElement {
     return html`
       ${this._pageHeader('🏠', 'House Config')}
       <div class="form-col">
-        ${this._entityField('Home consumption  (W ≥ 0)', 'load.entity', l?.entity, 'load.invert', l?.invert)}
-        <div class="section-label">Optional</div>
-        ${this._textField('Display name', 'load.name', l?.name)}
-
+        ${this._entityField('Home consumption  (W ≥ 0)', 'load.entity', l?.entity, {
+          invertPath: 'load.invert', invertValue: l?.invert,
+          namePath: 'load.name', nameValue: l?.name,
+        })}
         ${flows ? html`
           <div class="section-label">Current flows into house</div>
           <div class="flow-stats">
@@ -715,6 +768,66 @@ export class SolarOverviewCardEditor extends LitElement {
         ` : ''}
       </div>
     `;
+  }
+
+  private _renderPanelsPage() {
+    if (!this._config) return html``;
+    const panels = this._config.panels ?? DEFAULT_PANELS;
+    const meta: Record<string, { icon: string; label: string }> = {
+      solar:   { icon: '☀️', label: 'Solar' },
+      battery: { icon: '🔋', label: 'Battery' },
+      grid:    { icon: '⚡', label: 'Grid' },
+      load:    { icon: '🏠', label: 'House' },
+    };
+    return html`
+      ${this._pageHeader('📊', 'Stat Panels')}
+      <div class="form-col">
+        ${panels.map((p, i) => {
+          const m = meta[p.key];
+          return html`
+            <div class="panel-item">
+              <div class="panel-move">
+                <button class="move-btn" ?disabled="${i === 0}"
+                  @click="${() => this._movePanel(i, -1)}">▲</button>
+                <button class="move-btn" ?disabled="${i === panels.length - 1}"
+                  @click="${() => this._movePanel(i, 1)}">▼</button>
+              </div>
+              <span style="font-size:1.1rem;">${m.icon}</span>
+              <span class="panel-label">${m.label}</span>
+              <ha-selector
+                .selector=${{ boolean: {} }}
+                .value="${p.enabled}"
+                @value-changed="${(e: CustomEvent) => this._togglePanel(i, e.detail.value)}"
+              ></ha-selector>
+            </div>
+          `;
+        })}
+        <p class="hint">Toggle panels on/off and reorder with ▲▼ arrows.</p>
+      </div>
+    `;
+  }
+
+  // ── Panels helpers ───────────────────────────────────────────────────────────
+
+  private _setPanels(panels: PanelConfig[]): void {
+    if (!this._config) return;
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: { ...this._config, panels } },
+    }));
+  }
+
+  private _togglePanel(index: number, value: boolean): void {
+    const panels = [...(this._config?.panels ?? DEFAULT_PANELS)];
+    panels[index] = { ...panels[index], enabled: value };
+    this._setPanels(panels);
+  }
+
+  private _movePanel(index: number, dir: -1 | 1): void {
+    const panels = [...(this._config?.panels ?? DEFAULT_PANELS)];
+    const newIdx = index + dir;
+    if (newIdx < 0 || newIdx >= panels.length) return;
+    [panels[index], panels[newIdx]] = [panels[newIdx], panels[index]];
+    this._setPanels(panels);
   }
 
   // ── Device form helpers ──────────────────────────────────────────────────────
@@ -864,6 +977,7 @@ export class SolarOverviewCardEditor extends LitElement {
       case 'battery': return this._renderBatteryPage();
       case 'grid':    return this._renderGridPage();
       case 'house':   return this._renderHousePage();
+      case 'panels':  return this._renderPanelsPage();
       case 'outlets': return this._renderOutletsPage();
       default:        return this._renderMain();
     }
