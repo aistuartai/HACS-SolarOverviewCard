@@ -11,19 +11,35 @@ const ICON_GRID =
   'M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z';
 const ICON_HOME =
   'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z';
+const ICON_DEVICE =
+  'M7,2V13H10V22L17,10H13L17,2H7Z'; // lightning bolt
 
-const VB = 300;
-const CX = VB / 2;
-const CY = VB / 2;
+// ─── Layout constants ────────────────────────────────────────────────────────
+
+const VB_BASE   = 300;
+const CX = VB_BASE / 2;
+const CY = VB_BASE / 2;
 const ARM = 100;
 
-const SOLAR_X   = CX;       const SOLAR_Y   = CY - ARM;
-const GRID_X    = CX - ARM; const GRID_Y    = CY;
-const HOME_X    = CX + ARM; const HOME_Y    = CY;
-const BATTERY_X = CX;       const BATTERY_Y = CY + ARM;
+const SOLAR_X   = CX;           const SOLAR_Y   = CY - ARM;
+const GRID_X    = CX - ARM;     const GRID_Y    = CY;
+const HOME_X    = CX + ARM;     const HOME_Y    = CY;
+const BATTERY_X = CX;           const BATTERY_Y = CY + ARM;
 
 const NODE_R = 32;
 const ICON_S = 18;
+
+// Device satellite layout
+const DEVICE_ARM  = 82;   // horizontal offset from HOME_X
+const DEVICE_R    = 17;
+const DEVICE_ICON = 9;
+const DEVICE_GAP  = 52;   // vertical gap between device nodes
+
+export interface DiagramDevice {
+  name: string;
+  watts: number;
+  color: string;
+}
 
 @customElement('flow-diagram')
 export class FlowDiagram extends LitElement {
@@ -37,6 +53,7 @@ export class FlowDiagram extends LitElement {
     solarToHome: 0, solarToBattery: 0, solarToGrid: 0,
     gridToHome: 0, batteryToHome: 0, gridToBattery: 0,
   };
+  @property({ type: Array }) diagramDevices: DiagramDevice[] = [];
 
   static styles = css`
     :host { display: block; }
@@ -46,17 +63,17 @@ export class FlowDiagram extends LitElement {
     .flow-active-rev { animation: flow-anim-rev 0.8s linear infinite; }
   `;
 
-  /** Smooth RGB interpolation: green (100%) → amber (50%) → red (0%) */
+  /** Smooth green→amber→red interpolation based on SOC% */
   private _batteryColor(): string {
     const soc = Math.max(0, Math.min(100, this.socPercent));
     let r: number, g: number, b: number;
     if (soc >= 50) {
-      const t = (soc - 50) / 50;           // 1 at 100%, 0 at 50%
+      const t = (soc - 50) / 50;
       r = Math.round(16  + t * (245 - 16));
       g = Math.round(185 + t * (158 - 185));
       b = Math.round(129 + t * (11  - 129));
     } else {
-      const t = soc / 50;                   // 1 at 50%, 0 at 0%
+      const t = soc / 50;
       r = Math.round(239 + t * (245 - 239));
       g = Math.round(68  + t * (158 - 68));
       b = Math.round(68  + t * (11  - 68));
@@ -65,30 +82,33 @@ export class FlowDiagram extends LitElement {
   }
 
   private _lineWidth(watts: number): number {
-    const abs = Math.abs(watts);
-    return abs <= 0 ? 2 : Math.min(8, Math.max(2, (abs / 1000) * 4 + 2));
+    return watts <= 0 ? 2 : Math.min(8, Math.max(2, (watts / 1000) * 4 + 2));
   }
 
   private _trim(ax: number, ay: number, bx: number, by: number, margin = NODE_R + 4) {
     const dx = bx - ax, dy = by - ay;
     const len = Math.sqrt(dx * dx + dy * dy);
-    const ux = dx / len, uy = dy / len;
-    return { x1: ax + ux * margin, y1: ay + uy * margin, x2: bx - ux * margin, y2: by - uy * margin };
+    if (len === 0) return { x1: ax, y1: ay, x2: bx, y2: by };
+    return {
+      x1: ax + (dx / len) * margin,
+      y1: ay + (dy / len) * margin,
+      x2: bx - (dx / len) * margin,
+      y2: by - (dy / len) * margin,
+    };
   }
 
-  /**
-   * Draw a flow line from A→B.
-   * `reverse=true` only when the line is drawn B→A in the SVG but power
-   * flows A→B (so we flip the animation direction).
-   */
   private _flowLine(
     ax: number, ay: number, bx: number, by: number,
     watts: number, stroke: string, reverse = false,
+    marginA = NODE_R + 4, marginB = NODE_R + 4,
   ) {
     const active = watts > 1;
-    const { x1, y1, x2, y2 } = this._trim(ax, ay, bx, by);
+    const { x1, y1, x2, y2 } = this._trim(ax, ay, bx, by,
+      // Asymmetric trim: use marginA from source, marginB from dest
+      // Trick: trim full then adjust — easier to just use uniform trim here
+      Math.min(marginA, marginB),
+    );
     const sw = this._lineWidth(watts);
-    const op = active ? clampOpacity(watts, 5000) : 1;
     const dashClass = active ? (reverse ? 'flow-active-rev' : 'flow-active') : '';
 
     return svg`
@@ -99,8 +119,32 @@ export class FlowDiagram extends LitElement {
         stroke-linecap="round"
         stroke-dasharray="${active ? '8 6' : '4 6'}"
         stroke-dashoffset="0"
-        opacity="${active ? op : 0.13}"
+        opacity="${active ? clampOpacity(watts, 5000) : 0.13}"
         class="${dashClass}"
+      />
+    `;
+  }
+
+  /** Thin line from Home edge to device edge */
+  private _deviceLine(dx: number, dy: number, watts: number, color: string) {
+    const active = watts > 5;
+    const { x1, y1, x2, y2 } = this._trim(HOME_X, HOME_Y, dx, dy, NODE_R + 3);
+    // Re-trim dest side for device radius
+    const ddx = x2 - x1, ddy = y2 - y1;
+    const dlen = Math.sqrt(ddx * ddx + ddy * ddy);
+    const fx2 = dlen > 0 ? x2 - (ddx / dlen) * (DEVICE_R + 3) : x2;
+    const fy2 = dlen > 0 ? y2 - (ddy / dlen) * (DEVICE_R + 3) : y2;
+
+    return svg`
+      <line
+        x1="${x1}" y1="${y1}" x2="${fx2}" y2="${fy2}"
+        stroke="${color}"
+        stroke-width="${active ? 2 : 1.5}"
+        stroke-linecap="round"
+        stroke-dasharray="${active ? '6 5' : '3 5'}"
+        stroke-dashoffset="0"
+        opacity="${active ? 0.85 : 0.2}"
+        class="${active ? 'flow-active' : ''}"
       />
     `;
   }
@@ -109,7 +153,6 @@ export class FlowDiagram extends LitElement {
     cx: number, cy: number, iconPath: string, label: string,
     watts: number, fill: string, bgFill: string,
   ) {
-    const valStr = formatPower(watts, this.wattThreshold);
     return svg`
       <g class="node">
         <circle cx="${cx}" cy="${cy}" r="${NODE_R}"
@@ -122,77 +165,119 @@ export class FlowDiagram extends LitElement {
           fill="var(--secondary-text-color, #9ca3af)">${label}</text>
         <text x="${cx}" y="${cy + NODE_R + 26}" text-anchor="middle"
           font-size="11" font-weight="700" font-family="Roboto, sans-serif"
-          fill="var(--primary-text-color, #e5e7eb)">${valStr}</text>
+          fill="var(--primary-text-color, #e5e7eb)">${formatPower(watts, this.wattThreshold)}</text>
+      </g>
+    `;
+  }
+
+  private _deviceNode(cx: number, cy: number, d: DiagramDevice) {
+    const color = d.color || '#6366f1';
+    const bg = color.startsWith('rgb')
+      ? color.replace('rgb(', 'rgba(').replace(')', ', 0.15)')
+      : `${color}26`;
+    const label = d.name.length > 10 ? d.name.slice(0, 9) + '…' : d.name;
+    const active = d.watts > 5;
+
+    return svg`
+      <g class="device-node" opacity="${active ? 1 : 0.45}">
+        <circle cx="${cx}" cy="${cy}" r="${DEVICE_R}"
+          fill="${bg}" stroke="${color}" stroke-width="${active ? 2 : 1}" />
+        <g transform="translate(${cx - DEVICE_ICON}, ${cy - DEVICE_ICON}) scale(${DEVICE_ICON * 2 / 24})">
+          <path d="${ICON_DEVICE}" fill="${color}" />
+        </g>
+        <text x="${cx}" y="${cy + DEVICE_R + 11}" text-anchor="middle"
+          font-size="8.5" font-family="Roboto, sans-serif"
+          fill="var(--secondary-text-color, #9ca3af)">${label}</text>
+        <text x="${cx}" y="${cy + DEVICE_R + 21}" text-anchor="middle"
+          font-size="9" font-weight="700" font-family="Roboto, sans-serif"
+          fill="var(--primary-text-color, #e5e7eb)">${formatPower(d.watts, this.wattThreshold)}</text>
       </g>
     `;
   }
 
   private _socRing() {
     const r = NODE_R + 5;
-    const circumference = 2 * Math.PI * r;
-    const filled = (this.socPercent / 100) * circumference;
-    const empty = circumference - filled;
+    const circ = 2 * Math.PI * r;
+    const filled = (this.socPercent / 100) * circ;
     const color = this._batteryColor();
-
     return svg`
       <circle
         cx="${BATTERY_X}" cy="${BATTERY_Y}" r="${r}"
-        fill="none"
-        stroke="${color}"
-        stroke-width="3"
-        stroke-dasharray="${filled} ${empty}"
+        fill="none" stroke="${color}" stroke-width="3"
+        stroke-dasharray="${filled} ${circ - filled}"
         stroke-dashoffset="0"
         transform="rotate(-90 ${BATTERY_X} ${BATTERY_Y})"
-        opacity="0.85"
-        stroke-linecap="round"
+        opacity="0.85" stroke-linecap="round"
       />
-      <text
-        x="${BATTERY_X}" y="${BATTERY_Y + NODE_R + 38}"
+      <text x="${BATTERY_X}" y="${BATTERY_Y + NODE_R + 38}"
         text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
-        fill="${color}" font-weight="600"
-      >${this.socPercent.toFixed(0)}%</text>
+        fill="${color}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
     `;
   }
 
   protected render() {
     const f = this.flows;
     const battColor = this._batteryColor();
-    const battBg = `${battColor.replace('rgb(', 'rgba(').replace(')', ', 0.15)')}`;
+    const battBg = battColor.replace('rgb(', 'rgba(').replace(')', ', 0.15)');
+
+    // ── Device satellite layout ──────────────────────────────────────────
+    const devs = this.diagramDevices ?? [];
+    const N = devs.length;
+    const hasDevices = N > 0;
+    const DEVICE_X = HOME_X + DEVICE_ARM;
+    const totalSpan = (N - 1) * DEVICE_GAP;
+    const devStartY = HOME_Y - totalSpan / 2;
+    const devicePositions = devs.map((d, i) => ({
+      d, x: DEVICE_X, y: devStartY + i * DEVICE_GAP,
+    }));
+
+    // ── Dynamic viewBox ──────────────────────────────────────────────────
+    const vbW = hasDevices ? VB_BASE + DEVICE_ARM + DEVICE_R * 2 + 44 : VB_BASE;
+    const minY = hasDevices ? Math.min(0, devStartY - DEVICE_R - 20) : 0;
+    const maxY = hasDevices
+      ? Math.max(VB_BASE + 20, devStartY + totalSpan + DEVICE_R + 35)
+      : VB_BASE + 20;
+    const vbH = maxY - minY;
+    const vbStr = `${0} ${minY} ${vbW} ${vbH}`;
 
     return html`
       <svg
-        viewBox="0 0 ${VB} ${VB + 20}"
+        viewBox="${vbStr}"
         xmlns="http://www.w3.org/2000/svg"
         aria-label="Solar power flow diagram"
         role="img"
         style="width:100%;height:auto;display:block;"
       >
-        <defs>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
+        <!-- Flow lines drawn under nodes -->
 
         <!-- Solar → Home -->
-        ${this._flowLine(SOLAR_X, SOLAR_Y, HOME_X, HOME_Y,    f.solarToHome,    '#f59e0b')}
+        ${this._flowLine(SOLAR_X, SOLAR_Y, HOME_X, HOME_Y, f.solarToHome, '#f59e0b')}
         <!-- Solar → Battery -->
         ${this._flowLine(SOLAR_X, SOLAR_Y, BATTERY_X, BATTERY_Y, f.solarToBattery, '#f59e0b')}
-        <!-- Solar → Grid (export) — no reverse, animation goes solar→grid -->
-        ${this._flowLine(SOLAR_X, SOLAR_Y, GRID_X, GRID_Y,    f.solarToGrid,    '#f59e0b')}
+        <!-- Solar → Grid (export) -->
+        ${this._flowLine(SOLAR_X, SOLAR_Y, GRID_X, GRID_Y, f.solarToGrid, '#f59e0b')}
         <!-- Grid → Home (import) -->
-        ${this._flowLine(GRID_X, GRID_Y, HOME_X, HOME_Y,      f.gridToHome,     '#8b5cf6')}
+        ${this._flowLine(GRID_X, GRID_Y, HOME_X, HOME_Y, f.gridToHome, '#8b5cf6')}
         <!-- Battery → Home (discharge) -->
         ${this._flowLine(BATTERY_X, BATTERY_Y, HOME_X, HOME_Y, f.batteryToHome, battColor)}
         <!-- Grid → Battery (grid charging) -->
         ${this._flowLine(GRID_X, GRID_Y, BATTERY_X, BATTERY_Y, f.gridToBattery, '#8b5cf6')}
 
+        <!-- Device lines (Home → Device) -->
+        ${devicePositions.map(({ d, x, y }) =>
+          this._deviceLine(x, y, d.watts, d.color || '#6366f1')
+        )}
+
         ${this._socRing()}
 
+        <!-- Main nodes -->
         ${this._node(SOLAR_X,   SOLAR_Y,   ICON_SOLAR,   'Solar',   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)')}
         ${this._node(GRID_X,    GRID_Y,    ICON_GRID,    'Grid',    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)')}
         ${this._node(HOME_X,    HOME_Y,    ICON_HOME,    'Home',    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)')}
         ${this._node(BATTERY_X, BATTERY_Y, ICON_BATTERY, 'Battery', this.battery, battColor, battBg)}
+
+        <!-- Device satellite nodes -->
+        ${devicePositions.map(({ d, x, y }) => this._deviceNode(x, y, d))}
       </svg>
     `;
   }

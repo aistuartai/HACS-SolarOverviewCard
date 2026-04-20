@@ -6,6 +6,7 @@ import { FlowData, SolarCardConfig, HomeAssistant, SparklinePoint } from './type
 import { formatPower, parseFloat_safe, calculateFlows, getStateLabel } from './utils';
 
 import './components/flow-diagram';
+import type { DiagramDevice } from './components/flow-diagram';
 import './components/stat-panel';
 import './components/device-row';
 
@@ -189,6 +190,17 @@ export class SolarOverviewCard extends LitElement {
     }));
   }
 
+  private _diagramDevices(): DiagramDevice[] {
+    if (!this._config?.devices || !this._hass?.states) return [];
+    return this._config.devices
+      .filter((d) => d.show_on_diagram)
+      .map((d) => ({
+        name: d.name ?? d.entity,
+        watts: this._readEntity(d.entity),
+        color: d.color ?? '#6366f1',
+      }));
+  }
+
   private _panelProps(
     key: 'solar' | 'battery' | 'grid' | 'load',
     watts: number,
@@ -251,6 +263,7 @@ export class SolarOverviewCard extends LitElement {
                 .socPercent="${this._soc}"
                 .wattThreshold="${thr}"
                 .flows="${this._flows}"
+                .diagramDevices="${this._diagramDevices()}"
               ></flow-diagram>
             </div>
           ` : ''}
@@ -305,9 +318,9 @@ export class SolarOverviewCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: SolarCardConfig;
 
-  @state() private _newDevice: { entity: string; name: string; icon: string; color: string } = {
-    entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1',
-  };
+  @state() private _newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1', show_on_diagram: false };
+  @state() private _editingIndex: number | null = null;
+  @state() private _editingDevice = { entity: '', name: '', icon: '', color: '#6366f1', show_on_diagram: false };
 
   static styles = css`
     :host { display: block; padding: 16px; }
@@ -327,12 +340,25 @@ export class SolarOverviewCardEditor extends LitElement {
     .device-item-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
     .device-item-name { flex: 1; font-size: 0.85rem; }
     .device-item-entity { font-size: 0.72rem; color: var(--secondary-text-color, #9ca3af); }
-    .device-delete {
-      background: none; border: none; cursor: pointer; padding: 4px;
+    .device-actions { display: flex; gap: 4px; }
+    .device-btn {
+      background: none; border: none; cursor: pointer; padding: 4px 7px;
       color: var(--secondary-text-color, #9ca3af); border-radius: 4px;
-      font-size: 1rem; line-height: 1;
+      font-size: 0.78rem; font-weight: 600; line-height: 1;
     }
-    .device-delete:hover { color: #ef4444; }
+    .device-btn:hover { background: rgba(255,255,255,0.08); }
+    .device-btn.danger:hover { color: #ef4444; }
+    .device-edit-form {
+      display: flex; flex-direction: column; gap: 8px;
+      background: rgba(255,255,255,0.04); border-radius: 8px;
+      padding: 10px; margin-top: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .diagram-badge {
+      font-size: 0.65rem; font-weight: 600; padding: 1px 5px;
+      border-radius: 99px; background: rgba(99,102,241,0.2); color: #818cf8;
+      margin-left: 4px;
+    }
     .add-device-form {
       display: flex; flex-direction: column; gap: 8px;
       background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px;
@@ -386,6 +412,27 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
+  private _startEdit(index: number): void {
+    const d = this._config!.devices![index];
+    this._editingDevice = {
+      entity: d.entity, name: d.name ?? '', icon: d.icon ?? '',
+      color: d.color ?? '#6366f1', show_on_diagram: d.show_on_diagram ?? false,
+    };
+    this._editingIndex = index;
+  }
+
+  private _saveEdit(): void {
+    if (this._editingIndex === null || !this._config) return;
+    const devices = [...(this._config.devices ?? [])];
+    devices[this._editingIndex] = { ...this._editingDevice };
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: { ...this._config, devices } },
+    }));
+    this._editingIndex = null;
+  }
+
+  private _cancelEdit(): void { this._editingIndex = null; }
+
   private _deleteDevice(index: number): void {
     if (!this._config) return;
     const devices = [...(this._config.devices ?? [])];
@@ -401,7 +448,48 @@ export class SolarOverviewCardEditor extends LitElement {
     this.dispatchEvent(new CustomEvent('config-changed', {
       detail: { config: { ...this._config, devices } },
     }));
-    this._newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1' };
+    this._newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1', show_on_diagram: false };
+  }
+
+  private _deviceForm(
+    vals: typeof this._newDevice,
+    onChange: (patch: Partial<typeof this._newDevice>) => void,
+    submitLabel: string,
+    onSubmit: () => void,
+    onCancel?: () => void,
+  ) {
+    return html`
+      <ha-selector .hass="${this.hass}" .label="Entity"
+        .selector=${{ entity: {} }} .value="${vals.entity}"
+        @value-changed="${(e: CustomEvent) => onChange({ entity: e.detail.value ?? '' })}"
+      ></ha-selector>
+
+      <div class="add-device-row">
+        <ha-selector .label="Name" .selector=${{ text: {} }} .value="${vals.name}"
+          @value-changed="${(e: CustomEvent) => onChange({ name: e.detail.value ?? '' })}"
+        ></ha-selector>
+        <ha-selector .label="Icon" .selector=${{ icon: {} }} .value="${vals.icon}"
+          @value-changed="${(e: CustomEvent) => onChange({ icon: e.detail.value ?? '' })}"
+        ></ha-selector>
+      </div>
+
+      <div class="color-row">
+        <label>Colour</label>
+        <input type="color" .value="${vals.color}"
+          @input="${(e: Event) => onChange({ color: (e.target as HTMLInputElement).value })}"
+        />
+      </div>
+
+      <ha-selector .label="Show on flow diagram"
+        .selector=${{ boolean: {} }} .value="${vals.show_on_diagram}"
+        @value-changed="${(e: CustomEvent) => onChange({ show_on_diagram: e.detail.value })}"
+      ></ha-selector>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        ${onCancel ? html`<button class="add-btn" style="background:rgba(255,255,255,0.1);color:var(--primary-text-color);" @click="${onCancel}">Cancel</button>` : ''}
+        <button class="add-btn" ?disabled="${!vals.entity}" @click="${onSubmit}">${submitLabel}</button>
+      </div>
+    `;
   }
 
   private _renderDeviceEditor() {
@@ -412,54 +500,47 @@ export class SolarOverviewCardEditor extends LitElement {
       ${devices.length > 0 ? html`
         <div class="device-list">
           ${devices.map((d, i) => html`
-            <div class="device-item">
-              <div class="device-item-color" style="background:${d.color ?? '#6366f1'}"></div>
-              <div style="flex:1;min-width:0;">
-                <div class="device-item-name">${d.name ?? d.entity}</div>
-                <div class="device-item-entity">${d.entity}</div>
+            <div>
+              <div class="device-item">
+                <div class="device-item-color" style="background:${d.color ?? '#6366f1'}"></div>
+                <div style="flex:1;min-width:0;">
+                  <div class="device-item-name">
+                    ${d.name ?? d.entity}
+                    ${d.show_on_diagram ? html`<span class="diagram-badge">diagram</span>` : ''}
+                  </div>
+                  <div class="device-item-entity">${d.entity}</div>
+                </div>
+                <div class="device-actions">
+                  <button class="device-btn" @click="${() => this._editingIndex === i ? this._cancelEdit() : this._startEdit(i)}">
+                    ${this._editingIndex === i ? 'Cancel' : 'Edit'}
+                  </button>
+                  <button class="device-btn danger" @click="${() => this._deleteDevice(i)}">✕</button>
+                </div>
               </div>
-              <button class="device-delete" @click="${() => this._deleteDevice(i)}" title="Remove">✕</button>
+
+              ${this._editingIndex === i ? html`
+                <div class="device-edit-form">
+                  ${this._deviceForm(
+                    this._editingDevice,
+                    (patch) => { this._editingDevice = { ...this._editingDevice, ...patch }; this.requestUpdate(); },
+                    'Save',
+                    () => this._saveEdit(),
+                    () => this._cancelEdit(),
+                  )}
+                </div>
+              ` : ''}
             </div>
           `)}
         </div>
       ` : ''}
 
       <div class="add-device-form">
-        <ha-selector
-          .hass="${this.hass}"
-          .label="Entity"
-          .selector=${{ entity: {} }}
-          .value="${this._newDevice.entity}"
-          @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, entity: e.detail.value ?? '' }; this.requestUpdate(); }}"
-        ></ha-selector>
-
-        <div class="add-device-row">
-          <ha-selector
-            .label="Name"
-            .selector=${{ text: {} }}
-            .value="${this._newDevice.name}"
-            @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, name: e.detail.value ?? '' }; this.requestUpdate(); }}"
-          ></ha-selector>
-
-          <ha-selector
-            .label="Icon"
-            .selector=${{ icon: {} }}
-            .value="${this._newDevice.icon}"
-            @value-changed="${(e: CustomEvent) => { this._newDevice = { ...this._newDevice, icon: e.detail.value ?? '' }; this.requestUpdate(); }}"
-          ></ha-selector>
-        </div>
-
-        <div class="color-row">
-          <label>Colour</label>
-          <input type="color" .value="${this._newDevice.color}"
-            @input="${(e: Event) => { this._newDevice = { ...this._newDevice, color: (e.target as HTMLInputElement).value }; this.requestUpdate(); }}"
-          />
-        </div>
-
-        <button class="add-btn" ?disabled="${!this._newDevice.entity}"
-          @click="${this._addDevice}">
-          Add Device
-        </button>
+        ${this._deviceForm(
+          this._newDevice,
+          (patch) => { this._newDevice = { ...this._newDevice, ...patch }; this.requestUpdate(); },
+          'Add Device',
+          () => this._addDevice(),
+        )}
       </div>
     `;
   }

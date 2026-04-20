@@ -20,6 +20,8 @@ export interface BatteryConfig extends EntityConfig {
 export interface DeviceConfig extends EntityConfig {
   /** Hex color for the chip icon, e.g. "#f59e0b". */
   color?: string;
+  /** If true, render this device as a satellite node on the flow diagram. */
+  show_on_diagram?: boolean;
 }
 
 export interface SolarCardConfig {
