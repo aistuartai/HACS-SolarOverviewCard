@@ -1,79 +1,65 @@
-/**
- * Configuration for a single Home Assistant entity reference.
- */
 export interface EntityConfig {
   entity: string;
   name?: string;
   icon?: string;
+  /** If true, flip the sign of the entity value (positive ↔ negative). */
+  invert?: boolean;
 }
 
-/**
- * Battery entity config — includes an optional state-of-charge entity.
- */
+export interface SolarEntityConfig extends EntityConfig {
+  /** Explicit sensor for solar→grid export (always positive watts). */
+  export_entity?: string;
+}
+
 export interface BatteryConfig extends EntityConfig {
   soc_entity?: string;
+  /** Explicit sensor for grid→battery charging (always positive watts). */
+  grid_charge_entity?: string;
 }
 
-/**
- * Device entity config (no additions beyond EntityConfig for now).
- */
-export interface DeviceConfig extends EntityConfig {}
+export interface DeviceConfig extends EntityConfig {
+  /** Hex color for the chip icon, e.g. "#f59e0b". */
+  color?: string;
+}
 
-/**
- * Top-level card configuration as set by the user in Lovelace YAML.
- */
 export interface SolarCardConfig {
-  solar: EntityConfig;
+  solar: SolarEntityConfig;
   battery: BatteryConfig;
   grid: EntityConfig;
   load: EntityConfig;
   devices?: DeviceConfig[];
-  /** Threshold in watts above which values display as kW. Default: 1000 */
   watt_threshold?: number;
-  /** Whether to render sparkline history graphs. Default: true */
   show_sparklines?: boolean;
   theme?: 'auto' | 'light' | 'dark';
+  /** Show/hide the SVG power flow diagram. Default: true */
+  show_flow?: boolean;
+  /** Show/hide the 2×2 stat panels. Default: true */
+  show_stats?: boolean;
+  /** Show/hide the devices chip row. Default: true */
+  show_devices?: boolean;
 }
 
-/**
- * Minimal Home Assistant interface used by the card.
- */
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
   callApi: (method: string, path: string) => Promise<unknown>;
 }
 
-/**
- * A single Home Assistant entity state object.
- */
 export interface HassEntity {
   state: string;
   attributes: Record<string, unknown>;
 }
 
-/**
- * Calculated power-flow values between the four nodes (watts).
- * Positive values indicate active flow.
- */
 export interface FlowData {
-  /** Solar energy flowing directly to home loads */
   solarToHome: number;
-  /** Solar energy flowing into the battery (charging) */
   solarToBattery: number;
-  /** Solar energy being exported to the grid */
   solarToGrid: number;
-  /** Grid energy being imported for home loads */
   gridToHome: number;
-  /** Battery energy discharging to home loads */
   batteryToHome: number;
+  /** Grid energy flowing into the battery (charging from grid). */
+  gridToBattery: number;
 }
 
-/**
- * A single data-point for sparkline history charts.
- */
 export interface SparklinePoint {
-  /** Unix timestamp (ms) */
   time: number;
-  /** Power value in watts */
   value: number;
 }

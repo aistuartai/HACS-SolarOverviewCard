@@ -7,6 +7,7 @@ export interface DeviceItem {
   icon: string;
   watts: number;
   entityId: string;
+  color?: string;
 }
 
 /**
@@ -106,8 +107,10 @@ export class DeviceRow extends LitElement {
               class="chip ${d.watts < 5 ? 'dim' : ''}"
               role="listitem"
               title="${d.name}: ${formatPower(d.watts, this.wattThreshold)}"
+              style="${d.color ? `border-color: ${d.color}33;` : ''}"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"
+                style="${d.color ? `fill: ${d.color};` : ''}">
                 <path d="${d.icon || this._defaultIconPath}" />
               </svg>
               <span class="chip-name">${d.name}</span>

@@ -75,15 +75,14 @@ export const cardStyles = css`
   /* ─── Flow diagram container ──────────────────────────────────── */
   .flow-diagram {
     width: 100%;
-    aspect-ratio: 1 / 1;
-    max-height: 320px;
     margin: 0 auto 16px;
     display: block;
+    overflow: visible;
   }
 
   .flow-diagram svg {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
   }
 

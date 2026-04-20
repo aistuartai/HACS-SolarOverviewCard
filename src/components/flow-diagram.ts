@@ -51,6 +51,7 @@ export class FlowDiagram extends LitElement {
     solarToGrid: 0,
     gridToHome: 0,
     batteryToHome: 0,
+    gridToBattery: 0,
   };
 
   static styles = css`
@@ -233,7 +234,7 @@ export class FlowDiagram extends LitElement {
         xmlns="http://www.w3.org/2000/svg"
         aria-label="Solar power flow diagram"
         role="img"
-        style="width:100%;height:100%;display:block;"
+        style="width:100%;height:auto;display:block;"
       >
         <defs>
           <!-- Glow filter for active lines -->
@@ -264,6 +265,10 @@ export class FlowDiagram extends LitElement {
         <!-- Battery → Home (discharge) -->
         ${this._flowLine(BATTERY_X, BATTERY_Y, HOME_X, HOME_Y,
           f.batteryToHome, '#10b981')}
+
+        <!-- Grid → Battery (grid charging) -->
+        ${this._flowLine(GRID_X, GRID_Y, BATTERY_X, BATTERY_Y,
+          f.gridToBattery, '#8b5cf6')}
 
         <!-- ── Battery SOC ring ── -->
         ${this._socRing()}
