@@ -231,7 +231,9 @@ export class SolarOverviewCard extends LitElement {
     const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity);
     const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity);
     const grid    = this._panelProps('grid',    this._grid,    'Grid',    MDI_GRID,    '#8b5cf6', this._config.grid.entity);
-    const load    = this._panelProps('load',    this._load,    'Home',    MDI_HOME,    '#3b82f6', this._config.load.entity);
+    // Home shows total power delivered: battery discharge + grid import
+    const homeDelivered = this._flows.batteryToHome + this._flows.gridToHome;
+    const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity);
 
     const devices = this._deviceItems();
 
@@ -245,7 +247,7 @@ export class SolarOverviewCard extends LitElement {
                 .solar="${this._solar}"
                 .battery="${this._battery}"
                 .grid="${this._grid}"
-                .load="${this._load}"
+                .load="${homeDelivered}"
                 .socPercent="${this._soc}"
                 .wattThreshold="${thr}"
                 .flows="${this._flows}"
@@ -478,16 +480,16 @@ export class SolarOverviewCardEditor extends LitElement {
     const c = this._config;
     return html`
       <div class="row">
-        <div class="section-title">Required entities</div>
-        ${this._entityPicker('Solar power',            'solar.entity',              c.solar?.entity ?? '')}
-        ${this._entityPicker('Battery power',          'battery.entity',            c.battery?.entity ?? '')}
-        ${this._entityPicker('Battery SOC (%)',        'battery.soc_entity',        c.battery?.soc_entity ?? '')}
-        ${this._entityPicker('Grid power',             'grid.entity',               c.grid?.entity ?? '')}
-        ${this._entityPicker('Home load',              'load.entity',               c.load?.entity ?? '')}
+        <div class="section-title">Power flow entities</div>
+        ${this._entityPicker('Solar → Home / Battery / Grid  (generation, W ≥ 0)',    'solar.entity',   c.solar?.entity ?? '')}
+        ${this._entityPicker('Battery ← charge / → Home  (+ charging, − discharging)', 'battery.entity', c.battery?.entity ?? '')}
+        ${this._entityPicker('Battery SOC  (0–100 %)',                                  'battery.soc_entity', c.battery?.soc_entity ?? '')}
+        ${this._entityPicker('Grid → Home  /  Solar → Grid  (+ import, − export)',     'grid.entity',    c.grid?.entity ?? '')}
+        ${this._entityPicker('Home load  (used for Solar → Home calc, W ≥ 0)',         'load.entity',    c.load?.entity ?? '')}
 
-        <div class="section-title">Optional entities</div>
-        ${this._entityPicker('Solar export to grid',   'solar.export_entity',       c.solar?.export_entity ?? '')}
-        ${this._entityPicker('Grid charging battery',  'battery.grid_charge_entity', c.battery?.grid_charge_entity ?? '')}
+        <div class="section-title">Optional — explicit flow sensors</div>
+        ${this._entityPicker('Solar → Grid  export sensor  (W ≥ 0, overrides grid sign)', 'solar.export_entity',        c.solar?.export_entity ?? '')}
+        ${this._entityPicker('Grid → Battery  charge sensor  (W ≥ 0)',                    'battery.grid_charge_entity', c.battery?.grid_charge_entity ?? '')}
 
         ${this._renderDeviceEditor()}
 

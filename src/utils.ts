@@ -40,10 +40,13 @@ export function calculateFlows(
   const solarToBattery =
     battery > 0 && solar > 0 ? Math.min(battery, solar) : 0;
 
+  // Only export to grid when solar is actually generating
   const solarToGrid =
-    solarExportWatts !== undefined
-      ? Math.max(0, solarExportWatts)
-      : grid < 0 ? Math.abs(grid) : 0;
+    solar > 0
+      ? (solarExportWatts !== undefined
+          ? Math.max(0, solarExportWatts)
+          : grid < 0 ? Math.abs(grid) : 0)
+      : 0;
 
   const gridToHome = grid > 0 ? grid : 0;
 
