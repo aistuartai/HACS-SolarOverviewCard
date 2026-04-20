@@ -319,10 +319,13 @@ export class SolarOverviewCard extends LitElement {
 
 // ─── Visual config editor ────────────────────────────────────────────────────
 
+type EditorPage = 'main' | 'solar' | 'battery' | 'grid' | 'house' | 'outlets';
+
 @customElement('solar-overview-card-editor')
 export class SolarOverviewCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: SolarCardConfig;
+  @state() private _page: EditorPage = 'main';
 
   @state() private _newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1', show_on_diagram: false };
   @state() private _editingIndex: number | null = null;
@@ -330,13 +333,63 @@ export class SolarOverviewCardEditor extends LitElement {
 
   static styles = css`
     :host { display: block; padding: 16px; }
-    .row { display: flex; flex-direction: column; gap: 12px; }
-    .section-title {
-      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--secondary-text-color, #9ca3af);
-      margin: 8px 0 4px;
+
+    /* ── Navigation cards ── */
+    .nav-list { display: flex; flex-direction: column; gap: 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 14px; border-radius: 10px; cursor: pointer;
+      background: var(--card-background-color, rgba(255,255,255,0.04));
+      border: 1px solid var(--divider-color, rgba(255,255,255,0.08));
+      transition: background 0.12s;
     }
-    .hint { font-size: 0.75rem; color: var(--secondary-text-color, #9ca3af); margin-top: 4px; }
+    .nav-item:hover { background: rgba(255,255,255,0.09); }
+    .nav-icon {
+      width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .nav-text { flex: 1; min-width: 0; }
+    .nav-title { font-size: 0.88rem; font-weight: 600; color: var(--primary-text-color); }
+    .nav-sub {
+      font-size: 0.73rem; color: var(--secondary-text-color, #9ca3af);
+      margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nav-arrow { color: var(--secondary-text-color, #9ca3af); font-size: 1.1rem; padding-right: 2px; }
+
+    /* ── Page layout ── */
+    .page-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+    }
+    .back-btn {
+      background: none; border: none; cursor: pointer; padding: 4px 8px;
+      color: var(--primary-color, #3b82f6); font-size: 1.3rem; border-radius: 6px;
+      display: flex; align-items: center; line-height: 1;
+    }
+    .back-btn:hover { background: rgba(59,130,246,0.1); }
+    .page-title { font-size: 1rem; font-weight: 700; color: var(--primary-text-color); }
+    .page-icon  { font-size: 1.15rem; }
+
+    /* ── Form fields ── */
+    .form-col { display: flex; flex-direction: column; gap: 12px; }
+    .field-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .field-row { display: flex; align-items: flex-end; gap: 6px; }
+    .field-row ha-selector { flex: 1; min-width: 0; }
+    .clear-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--secondary-text-color, #9ca3af);
+      padding: 8px 7px; border-radius: 6px; font-size: 0.95rem;
+      line-height: 1; flex-shrink: 0; margin-bottom: 2px;
+    }
+    .clear-btn:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+    .section-label {
+      font-size: 0.73rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--secondary-text-color, #9ca3af);
+      margin: 6px 0 0;
+    }
+    .divider { height: 1px; background: var(--divider-color, rgba(255,255,255,0.08)); margin: 10px 0; }
+    .hint { font-size: 0.75rem; color: var(--secondary-text-color, #9ca3af); margin: 4px 0 0; }
+
+    /* ── Device list ── */
     .device-list { display: flex; flex-direction: column; gap: 6px; }
     .device-item {
       display: flex; align-items: center; gap: 8px;
@@ -344,7 +397,7 @@ export class SolarOverviewCardEditor extends LitElement {
       border: 1px solid rgba(255,255,255,0.08);
     }
     .device-item-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-    .device-item-name { flex: 1; font-size: 0.85rem; }
+    .device-item-name  { flex: 1; font-size: 0.85rem; }
     .device-item-entity { font-size: 0.72rem; color: var(--secondary-text-color, #9ca3af); }
     .device-actions { display: flex; gap: 4px; }
     .device-btn {
@@ -368,7 +421,7 @@ export class SolarOverviewCardEditor extends LitElement {
     .add-device-form {
       display: flex; flex-direction: column; gap: 8px;
       background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px;
-      border: 1px dashed rgba(255,255,255,0.12);
+      border: 1px dashed rgba(255,255,255,0.12); margin-top: 8px;
     }
     .add-device-row { display: flex; gap: 8px; align-items: center; }
     .add-device-row ha-selector { flex: 1; }
@@ -390,33 +443,203 @@ export class SolarOverviewCardEditor extends LitElement {
     this._config = config;
   }
 
-  private _setValue(configValue: string, value: string): void {
+  private _setValue(path: string, value: unknown): void {
     if (!this._config) return;
-    const parts = configValue.split('.');
+    const parts = path.split('.');
     const updated: SolarCardConfig = JSON.parse(JSON.stringify(this._config));
     const updatedAny = updated as unknown as Record<string, unknown>;
     if (parts.length === 2) {
       const [section, field] = parts;
-      const current = ((updatedAny[section] as Record<string, unknown>) ?? {});
-      current[field] = value;
+      const current = { ...((updatedAny[section] as Record<string, unknown>) ?? {}) };
+      if (value === '' || value === undefined || value === null) {
+        delete current[field];
+      } else {
+        current[field] = value;
+      }
       updatedAny[section] = current;
     } else {
-      updatedAny[parts[0]] = value;
+      if (value === '' || value === undefined || value === null) {
+        delete updatedAny[parts[0]];
+      } else {
+        updatedAny[parts[0]] = value;
+      }
     }
     this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: updated } }));
   }
 
-  private _entityPicker(label: string, configValue: string, currentValue: string) {
+  // ── Shared field helpers ─────────────────────────────────────────────────────
+
+  private _pageHeader(emoji: string, title: string) {
+    return html`
+      <div class="page-header">
+        <button class="back-btn" @click="${() => { this._page = 'main'; this._editingIndex = null; }}">‹</button>
+        <span class="page-icon">${emoji}</span>
+        <span class="page-title">${title}</span>
+      </div>
+    `;
+  }
+
+  private _entityField(
+    label: string, path: string, value: string | undefined,
+    invertPath?: string, invertValue?: boolean,
+  ) {
+    return html`
+      <div class="field-wrap">
+        <div class="field-row">
+          <ha-selector
+            .hass="${this.hass}"
+            .label="${label}"
+            .selector=${{ entity: {} }}
+            .value="${value ?? ''}"
+            @value-changed="${(e: CustomEvent) => this._setValue(path, e.detail.value ?? '')}"
+          ></ha-selector>
+          ${value ? html`
+            <button class="clear-btn" title="Clear" @click="${() => this._setValue(path, '')}">✕</button>
+          ` : ''}
+        </div>
+        ${invertPath !== undefined ? html`
+          <ha-selector
+            .label="Invert sign (flip +/−)"
+            .selector=${{ boolean: {} }}
+            .value="${invertValue ?? false}"
+            @value-changed="${(e: CustomEvent) => this._setValue(invertPath, e.detail.value)}"
+          ></ha-selector>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  private _textField(label: string, path: string, value: string | undefined) {
+    return html`
+      <div class="field-row">
+        <ha-selector
+          .label="${label}"
+          .selector=${{ text: {} }}
+          .value="${value ?? ''}"
+          @value-changed="${(e: CustomEvent) => this._setValue(path, e.detail.value ?? '')}"
+        ></ha-selector>
+        ${value ? html`
+          <button class="clear-btn" title="Clear" @click="${() => this._setValue(path, '')}">✕</button>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  private _toggle(label: string, path: string, checked: boolean) {
     return html`
       <ha-selector
-        .hass="${this.hass}"
         .label="${label}"
-        .selector=${{ entity: {} }}
-        .value="${currentValue || ''}"
-        @value-changed="${(e: CustomEvent) => this._setValue(configValue, e.detail.value ?? '')}"
+        .selector=${{ boolean: {} }}
+        .value="${checked}"
+        @value-changed="${(e: CustomEvent) => this._setValue(path, e.detail.value)}"
       ></ha-selector>
     `;
   }
+
+  // ── Page renderers ───────────────────────────────────────────────────────────
+
+  private _renderMain() {
+    if (!this._config) return html``;
+    const c = this._config;
+    const deviceCount = c.devices?.length ?? 0;
+
+    const navItem = (page: EditorPage, emoji: string, title: string, sub: string, bg: string) => html`
+      <div class="nav-item" @click="${() => { this._page = page; }}">
+        <div class="nav-icon" style="background:${bg}">${emoji}</div>
+        <div class="nav-text">
+          <div class="nav-title">${title}</div>
+          <div class="nav-sub">${sub}</div>
+        </div>
+        <span class="nav-arrow">›</span>
+      </div>
+    `;
+
+    return html`
+      <div class="nav-list">
+        ${navItem('solar',   '☀️', 'Solar',   c.solar?.entity   ?? 'Not configured',            'rgba(245,158,11,0.18)')}
+        ${navItem('battery', '🔋', 'Battery', c.battery?.entity ?? 'Not configured',            'rgba(16,185,129,0.18)')}
+        ${navItem('grid',    '⚡', 'Grid',    c.grid?.entity ?? c.grid?.import_entity ?? 'Not configured', 'rgba(139,92,246,0.18)')}
+        ${navItem('house',   '🏠', 'House',   c.load?.entity    ?? 'Not configured',            'rgba(59,130,246,0.18)')}
+        ${navItem('outlets', '🔌', 'Outlets', deviceCount > 0 ? `${deviceCount} device${deviceCount !== 1 ? 's' : ''}` : 'No devices added', 'rgba(99,102,241,0.18)')}
+      </div>
+
+      <div class="divider" style="margin-top:18px;"></div>
+      <div class="section-label" style="margin-bottom:8px;">Visibility</div>
+      ${this._toggle('Show flow diagram',  'show_flow',       c.show_flow       !== false)}
+      ${this._toggle('Show stat panels',   'show_stats',      c.show_stats      !== false)}
+      ${this._toggle('Show devices row',   'show_devices',    c.show_devices    !== false)}
+      ${this._toggle('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
+    `;
+  }
+
+  private _renderSolarPage() {
+    if (!this._config) return html``;
+    const s = this._config.solar;
+    return html`
+      ${this._pageHeader('☀️', 'Solar Config')}
+      <div class="form-col">
+        ${this._entityField('Solar generation  (W ≥ 0)', 'solar.entity', s?.entity, 'solar.invert', s?.invert)}
+        <div class="section-label">Optional</div>
+        ${this._entityField('Solar → Grid export sensor  (W ≥ 0)', 'solar.export_entity', s?.export_entity)}
+        ${this._textField('Display name', 'solar.name', s?.name)}
+      </div>
+    `;
+  }
+
+  private _renderBatteryPage() {
+    if (!this._config) return html``;
+    const b = this._config.battery;
+    return html`
+      ${this._pageHeader('🔋', 'Battery Config')}
+      <div class="form-col">
+        ${this._entityField(
+          'Battery power  (+ = charging,  − = discharging)',
+          'battery.entity', b?.entity, 'battery.invert', b?.invert,
+        )}
+        <div class="section-label">Optional</div>
+        ${this._entityField('State of charge  (0–100 %)', 'battery.soc_entity', b?.soc_entity)}
+        ${this._textField('Display name', 'battery.name', b?.name)}
+      </div>
+    `;
+  }
+
+  private _renderGridPage() {
+    if (!this._config) return html``;
+    const g = this._config.grid;
+    return html`
+      ${this._pageHeader('⚡', 'Grid Config')}
+      <div class="form-col">
+        <div class="section-label" style="margin-top:0;">Combined sensor (fallback)</div>
+        ${this._entityField(
+          'Grid power  (+ = importing,  − = exporting)',
+          'grid.entity', g?.entity, 'grid.invert', g?.invert,
+        )}
+        <div class="section-label">Individual flow sensors (override combined)</div>
+        ${this._entityField('Grid → Home  import  (W ≥ 0)',                        'grid.import_entity',       g?.import_entity)}
+        ${this._entityField('Solar / Battery → Grid  export  (W ≥ 0)',             'grid.export_entity',       g?.export_entity)}
+        <div class="section-label">Battery ↔ Grid sensors</div>
+        ${this._entityField('Grid ↔ Battery combined  (+ = charges,  − = discharges to grid)', 'grid.battery_entity', g?.battery_entity)}
+        ${this._entityField('Grid → Battery only  (W ≥ 0)',                        'grid.to_battery_entity',   g?.to_battery_entity)}
+        ${this._entityField('Battery → Grid only  (W ≥ 0)',                        'grid.from_battery_entity', g?.from_battery_entity)}
+      </div>
+    `;
+  }
+
+  private _renderHousePage() {
+    if (!this._config) return html``;
+    const l = this._config.load;
+    return html`
+      ${this._pageHeader('🏠', 'House Config')}
+      <div class="form-col">
+        ${this._entityField('Home consumption  (W ≥ 0)', 'load.entity', l?.entity, 'load.invert', l?.invert)}
+        <div class="section-label">Optional</div>
+        ${this._textField('Display name', 'load.name', l?.name)}
+        <p class="hint">Home stat shows: battery discharge + grid import.</p>
+      </div>
+    `;
+  }
+
+  // ── Device form helpers ──────────────────────────────────────────────────────
 
   private _startEdit(index: number): void {
     const d = this._config!.devices![index];
@@ -498,10 +721,10 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
-  private _renderDeviceEditor() {
+  private _renderOutletsPage() {
     const devices = this._config?.devices ?? [];
     return html`
-      <div class="section-title">Devices</div>
+      ${this._pageHeader('🔌', 'Outlets / Devices')}
 
       ${devices.length > 0 ? html`
         <div class="device-list">
@@ -517,13 +740,13 @@ export class SolarOverviewCardEditor extends LitElement {
                   <div class="device-item-entity">${d.entity}</div>
                 </div>
                 <div class="device-actions">
-                  <button class="device-btn" @click="${() => this._editingIndex === i ? this._cancelEdit() : this._startEdit(i)}">
+                  <button class="device-btn"
+                    @click="${() => this._editingIndex === i ? this._cancelEdit() : this._startEdit(i)}">
                     ${this._editingIndex === i ? 'Cancel' : 'Edit'}
                   </button>
                   <button class="device-btn danger" @click="${() => this._deleteDevice(i)}">✕</button>
                 </div>
               </div>
-
               ${this._editingIndex === i ? html`
                 <div class="device-edit-form">
                   ${this._deviceForm(
@@ -538,9 +761,10 @@ export class SolarOverviewCardEditor extends LitElement {
             </div>
           `)}
         </div>
-      ` : ''}
+      ` : html`<p class="hint">No devices added yet.</p>`}
 
       <div class="add-device-form">
+        <div class="section-label" style="margin-top:0;">Add device</div>
         ${this._deviceForm(
           this._newDevice,
           (patch) => { this._newDevice = { ...this._newDevice, ...patch }; this.requestUpdate(); },
@@ -551,57 +775,16 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
-  private _toggle(label: string, configValue: string, checked: boolean) {
-    return html`
-      <ha-selector
-        .label="${label}"
-        .selector=${{ boolean: {} }}
-        .value="${checked}"
-        @value-changed="${(e: CustomEvent) => this._setValue(configValue, e.detail.value)}"
-      ></ha-selector>
-    `;
-  }
-
   protected render() {
     if (!this._config) return html``;
-    const c = this._config;
-    return html`
-      <div class="row">
-        <div class="section-title">☀️ Solar</div>
-        ${this._entityPicker('Solar generation  (W ≥ 0)',  'solar.entity',  c.solar?.entity ?? '')}
-
-        <div class="section-title">🏠 Home load</div>
-        ${this._entityPicker('Home consumption  (W ≥ 0, used for Solar → Home calc)',  'load.entity',  c.load?.entity ?? '')}
-
-        <div class="section-title">🔋 Battery</div>
-        ${this._entityPicker('Battery power  (+ = charging ← grid/solar,  − = discharging → home/grid)',  'battery.entity',     c.battery?.entity ?? '')}
-        ${this._entityPicker('Battery state of charge  (0–100 %)',                                         'battery.soc_entity', c.battery?.soc_entity ?? '')}
-
-        <div class="section-title">⚡ Grid — combined fallback</div>
-        ${this._entityPicker('Grid combined  (+ = importing → home,  − = exporting ← solar/battery)',  'grid.entity',  c.grid?.entity ?? '')}
-
-        <div class="section-title">⚡ Grid — individual flow sensors (override combined)</div>
-        ${this._entityPicker('Grid → Home  import sensor  (W ≥ 0)',                           'grid.import_entity',        c.grid?.import_entity        ?? '')}
-        ${this._entityPicker('Solar / Battery → Grid  export sensor  (W ≥ 0)',                'grid.export_entity',        c.grid?.export_entity        ?? '')}
-        ${this._entityPicker('Grid ↔ Battery combined  (+ = grid charges battery,  − = battery discharges to grid)', 'grid.battery_entity', c.grid?.battery_entity ?? '')}
-        ${this._entityPicker('Grid → Battery only  (W ≥ 0, overrides combined)',              'grid.to_battery_entity',    c.grid?.to_battery_entity    ?? '')}
-        ${this._entityPicker('Battery → Grid only  (W ≥ 0, overrides combined)',              'grid.from_battery_entity',  c.grid?.from_battery_entity  ?? '')}
-
-        ${this._renderDeviceEditor()}
-
-        <div class="section-title">Sign conventions</div>
-        ${this._toggle('Invert battery (positive = discharging)', 'battery.invert', c.battery?.invert ?? false)}
-        ${this._toggle('Invert grid (positive = exporting)',      'grid.invert',    c.grid?.invert ?? false)}
-
-        <div class="section-title">Visibility</div>
-        ${this._toggle('Show flow diagram',   'show_flow',       c.show_flow    !== false)}
-        ${this._toggle('Show stat panels',    'show_stats',      c.show_stats   !== false)}
-        ${this._toggle('Show devices row',    'show_devices',    c.show_devices !== false)}
-        ${this._toggle('Show sparklines',     'show_sparklines', c.show_sparklines !== false)}
-
-        <p class="hint">Sign convention (default): battery positive = charging, grid positive = importing.</p>
-      </div>
-    `;
+    switch (this._page) {
+      case 'solar':   return this._renderSolarPage();
+      case 'battery': return this._renderBatteryPage();
+      case 'grid':    return this._renderGridPage();
+      case 'house':   return this._renderHousePage();
+      case 'outlets': return this._renderOutletsPage();
+      default:        return this._renderMain();
+    }
   }
 }
 
