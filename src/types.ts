@@ -5,6 +5,13 @@ export interface EntityConfig {
   invert?: boolean;
 }
 
+export interface OptionalEntityConfig {
+  entity?: string;
+  name?: string;
+  icon?: string;
+  invert?: boolean;
+}
+
 export interface SolarEntityConfig extends EntityConfig {
   /** Explicit Solar → Grid export sensor (W ≥ 0). Overrides deriving from grid sign. */
   export_entity?: string;
@@ -59,7 +66,7 @@ export interface SolarCardConfig {
   solar: SolarEntityConfig;
   battery: BatteryConfig;
   grid: GridConfig;
-  load: EntityConfig;
+  load: OptionalEntityConfig;
   devices?: DeviceConfig[];
   panels?: PanelConfig[];
   watt_threshold?: number;

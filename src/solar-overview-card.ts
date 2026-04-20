@@ -74,10 +74,11 @@ export class SolarOverviewCard extends LitElement {
   public setConfig(config: SolarCardConfig): void {
     if (!config.solar?.entity)   throw new Error('solar-overview-card: "solar.entity" required');
     if (!config.battery?.entity) throw new Error('solar-overview-card: "battery.entity" required');
-    if (!config.load?.entity)    throw new Error('solar-overview-card: "load.entity" required');
     const g = config.grid;
-    if (!g?.entity && !g?.import_entity && !g?.export_entity)
-      throw new Error('solar-overview-card: at least one grid entity required');
+    const hasLoad = !!config.load?.entity;
+    const hasGrid = !!(g?.entity || g?.import_entity || g?.export_entity || g?.battery_entity);
+    if (!hasLoad && !hasGrid)
+      throw new Error('solar-overview-card: at least one of load.entity or a grid entity is required');
 
     this._config = {
       watt_threshold: 1000,
@@ -100,9 +101,9 @@ export class SolarOverviewCard extends LitElement {
     try {
       const g = this._config.grid;
 
-      const rawSolar   = this._readEntity(this._config.solar.entity);
-      const rawBattery = this._readEntity(this._config.battery.entity);
-      const rawLoad    = this._readEntity(this._config.load.entity);
+      const rawSolar   = this._readEntity(this._config.solar.entity!);
+      const rawBattery = this._readEntity(this._config.battery.entity!);
+      const rawLoad    = this._config.load.entity ? this._readEntity(this._config.load.entity) : 0;
       const rawGrid    = g.entity ? this._readEntity(g.entity) : 0;
 
       this._solar   = this._config.solar.invert   ? -rawSolar   : rawSolar;
@@ -254,12 +255,16 @@ export class SolarOverviewCard extends LitElement {
     const showStats   = this._config.show_stats   !== false;
     const showDevices = this._config.show_devices !== false;
 
-    const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity);
-    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity);
-    const grid    = this._panelProps('grid',    this._grid,    'Grid',    MDI_GRID,    '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
+    const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity!);
+    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity!);
+    // When no combined grid entity, derive net grid from flows (+ import, − export)
+    const gridNetDisplay = this._config.grid.entity
+      ? this._grid
+      : (this._flows.gridToHome + this._flows.gridToBattery) - (this._flows.solarToGrid + this._flows.batteryToGrid);
+    const grid    = this._panelProps('grid', gridNetDisplay, 'Grid', MDI_GRID, '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
     // Home shows total power delivered: battery discharge + grid import
     const homeDelivered = this._flows.batteryToHome + this._flows.gridToHome;
-    const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity);
+    const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity ?? '');
 
     const devices = this._deviceItems();
 
@@ -526,9 +531,9 @@ export class SolarOverviewCardEditor extends LitElement {
       const g = c.grid;
       const read = (id: string | undefined) =>
         id ? parseFloat_safe(this.hass!.states[id]?.state) : 0;
-      const solar   = read(c.solar.entity)   * (c.solar.invert   ? -1 : 1);
-      const battery = read(c.battery.entity) * (c.battery.invert ? -1 : 1);
-      const load    = read(c.load.entity)    * (c.load.invert    ? -1 : 1);
+      const solar   = read(c.solar.entity!)   * (c.solar.invert   ? -1 : 1);
+      const battery = read(c.battery.entity!) * (c.battery.invert ? -1 : 1);
+      const load    = read(c.load.entity)     * (c.load.invert    ? -1 : 1);
       const gridRaw = g.entity ? read(g.entity) * (g.invert ? -1 : 1) : 0;
       const gridImport    = g.import_entity       ? read(g.import_entity)       : undefined;
       const gridExport    = g.export_entity       ? read(g.export_entity)       :
@@ -665,11 +670,12 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._boolField('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
         <div class="section-label">Sparkline history</div>
         <ha-selector
-          .label="Duration (hours, default 2)"
+          .label="Hours of history to display (default: 2)"
           .selector=${{ number: { min: 1, max: 48, step: 1, mode: 'box' } }}
           .value="${c.sparkline_hours ?? 2}"
           @value-changed="${(e: CustomEvent) => this._setValue('sparkline_hours', e.detail.value)}"
         ></ha-selector>
+        <p class="hint">Applies to all sparklines. Larger values fetch more history from HA.</p>
       </div>
     `;
   }
