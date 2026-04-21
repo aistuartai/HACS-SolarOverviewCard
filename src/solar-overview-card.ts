@@ -159,11 +159,15 @@ export class SolarOverviewCard extends LitElement {
   private async _fetchSparklines(): Promise<void> {
     if (!this._config || !this._hass?.callApi) return;
 
+    const customEntities = (this._config.panels ?? [])
+      .filter(p => !p.key && p.entity)
+      .map(p => p.entity!);
     const entities = [
       this._config.solar.entity,
       this._config.battery.entity,
       this._config.grid.entity ?? this._config.grid.import_entity,
       this._config.load.entity,
+      ...customEntities,
     ].filter((e): e is string => !!e);
 
     const end = new Date();
@@ -193,6 +197,35 @@ export class SolarOverviewCard extends LitElement {
   }
 
   private _threshold(): number { return this._config?.watt_threshold ?? 1000; }
+
+  private _customPanel(panel: PanelConfig) {
+    const entity = panel.entity!;
+    const state = this._hass?.states[entity];
+    const val = parseFloat_safe(state?.state);
+    const unit = (state?.attributes?.unit_of_measurement as string) ?? '';
+    const thr = this._threshold();
+    const display = (unit === 'W' || unit === 'kW')
+      ? formatPower(val, thr)
+      : unit ? `${Number.isInteger(val) ? val : val.toFixed(1)} ${unit}` : `${Math.round(val)}`;
+    const color = panel.color ?? '#6366f1';
+    const name = panel.name ?? (state?.attributes?.friendly_name as string) ?? entity;
+    const icon = 'M7,2V13H10V22L17,10H13L17,2H7Z';
+    return html`
+      <stat-panel
+        .entityId="${entity}"
+        .name="${name}"
+        .icon="${icon}"
+        .value="${val}"
+        .displayValue="${display}"
+        .stateLabel="${val > 0 ? 'Active' : 'Idle'}"
+        .stateColor="${color}"
+        .showSparkline="${this._config?.show_sparklines !== false}"
+        .sparklineHistory="${this._sparklines[entity] ?? []}"
+        .panelClass="panel--custom"
+        .badgeClass="badge--custom"
+      ></stat-panel>
+    `;
+  }
 
   private _deviceItems() {
     if (!this._config?.devices || !this._hass?.states) return [];
@@ -277,7 +310,7 @@ export class SolarOverviewCard extends LitElement {
               <flow-diagram
                 .solar="${this._solar}"
                 .battery="${this._battery}"
-                .grid="${this._grid}"
+                .grid="${gridNetDisplay}"
                 .load="${homeDelivered}"
                 .socPercent="${this._soc}"
                 .wattThreshold="${thr}"
@@ -295,23 +328,27 @@ export class SolarOverviewCard extends LitElement {
             <div class="stat-grid">
               ${(this._config.panels ?? DEFAULT_PANELS)
                 .filter(p => p.enabled !== false)
-                .map(({ key }) => {
-                  const p = { solar, battery, grid, load }[key];
-                  return html`
-                    <stat-panel
-                      .entityId="${p.entityId}"
-                      .name="${p.name}"
-                      .icon="${p.icon}"
-                      .value="${p.value}"
-                      .displayValue="${p.displayValue}"
-                      .stateLabel="${p.stateLabel}"
-                      .stateColor="${p.stateColor}"
-                      .showSparkline="${p.showSparkline}"
-                      .sparklineHistory="${p.sparklineHistory}"
-                      .panelClass="${p.panelClass}"
-                      .badgeClass="${p.badgeClass}"
-                    ></stat-panel>
-                  `;
+                .map((panel) => {
+                  if (panel.key) {
+                    const p = { solar, battery, grid, load }[panel.key];
+                    return html`
+                      <stat-panel
+                        .entityId="${p.entityId}"
+                        .name="${p.name}"
+                        .icon="${p.icon}"
+                        .value="${p.value}"
+                        .displayValue="${p.displayValue}"
+                        .stateLabel="${p.stateLabel}"
+                        .stateColor="${p.stateColor}"
+                        .showSparkline="${p.showSparkline}"
+                        .sparklineHistory="${p.sparklineHistory}"
+                        .panelClass="${p.panelClass}"
+                        .badgeClass="${p.badgeClass}"
+                      ></stat-panel>
+                    `;
+                  }
+                  if (panel.entity) return this._customPanel(panel);
+                  return '';
                 })}
             </div>
           ` : ''}
@@ -350,6 +387,7 @@ export class SolarOverviewCardEditor extends LitElement {
   @state() private _newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1', show_on_diagram: false };
   @state() private _editingIndex: number | null = null;
   @state() private _editingDevice = { entity: '', name: '', icon: '', color: '#6366f1', show_on_diagram: false };
+  @state() private _newPanel = { entity: '', name: '', color: '#6366f1' };
 
   static styles = css`
     :host { display: block; padding: 16px; }
@@ -789,7 +827,10 @@ export class SolarOverviewCardEditor extends LitElement {
       ${this._pageHeader('📊', 'Stat Panels')}
       <div class="form-col">
         ${panels.map((p, i) => {
-          const m = meta[p.key];
+          const isBuiltin = !!p.key;
+          const icon  = isBuiltin ? meta[p.key!].icon : '📈';
+          const label = isBuiltin ? meta[p.key!].label : (p.name ?? p.entity ?? 'Custom');
+          const sub   = !isBuiltin && p.entity ? html`<span class="nav-sub" style="margin:0;">${p.entity}</span>` : '';
           return html`
             <div class="panel-item">
               <div class="panel-move">
@@ -798,8 +839,11 @@ export class SolarOverviewCardEditor extends LitElement {
                 <button class="move-btn" ?disabled="${i === panels.length - 1}"
                   @click="${() => this._movePanel(i, 1)}">▼</button>
               </div>
-              <span style="font-size:1.1rem;">${m.icon}</span>
-              <span class="panel-label">${m.label}</span>
+              ${!isBuiltin ? html`<span style="width:10px;height:10px;border-radius:50%;background:${p.color ?? '#6366f1'};flex-shrink:0;"></span>` : html`<span style="font-size:1.1rem;">${icon}</span>`}
+              <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${label}${sub}</span>
+              ${!isBuiltin ? html`
+                <button class="device-btn danger" title="Remove" @click="${() => this._removeCustomPanel(i)}">✕</button>
+              ` : ''}
               <ha-selector
                 .selector=${{ boolean: {} }}
                 .value="${p.enabled}"
@@ -808,12 +852,51 @@ export class SolarOverviewCardEditor extends LitElement {
             </div>
           `;
         })}
-        <p class="hint">Toggle panels on/off and reorder with ▲▼ arrows.</p>
+
+        <div class="section-label" style="margin-top:8px;">Add custom panel</div>
+        <div class="add-device-form">
+          <ha-selector .hass="${this.hass}" .label="Entity"
+            .selector=${{ entity: {} }} .value="${this._newPanel.entity}"
+            @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, entity: e.detail.value ?? '' }; this.requestUpdate(); }}"
+          ></ha-selector>
+          <ha-selector .label="Name (optional)" .selector=${{ text: {} }} .value="${this._newPanel.name}"
+            @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, name: e.detail.value ?? '' }; this.requestUpdate(); }}"
+          ></ha-selector>
+          <div class="color-row">
+            <label>Colour</label>
+            <input type="color" .value="${this._newPanel.color}"
+              @input="${(e: Event) => { this._newPanel = { ...this._newPanel, color: (e.target as HTMLInputElement).value }; this.requestUpdate(); }}"
+            />
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="add-btn" ?disabled="${!this._newPanel.entity}" @click="${() => this._addCustomPanel()}">Add Panel</button>
+          </div>
+        </div>
+
+        <p class="hint">Reorder with ▲▼. Custom panels support any HA entity.</p>
       </div>
     `;
   }
 
   // ── Panels helpers ───────────────────────────────────────────────────────────
+
+  private _addCustomPanel(): void {
+    if (!this._config || !this._newPanel.entity) return;
+    const panels = [...(this._config.panels ?? DEFAULT_PANELS), {
+      entity: this._newPanel.entity,
+      name:   this._newPanel.name  || undefined,
+      color:  this._newPanel.color || '#6366f1',
+      enabled: true,
+    }];
+    this._setPanels(panels);
+    this._newPanel = { entity: '', name: '', color: '#6366f1' };
+  }
+
+  private _removeCustomPanel(index: number): void {
+    const panels = [...(this._config?.panels ?? DEFAULT_PANELS)];
+    panels.splice(index, 1);
+    this._setPanels(panels);
+  }
 
   private _setPanels(panels: PanelConfig[]): void {
     if (!this._config) return;

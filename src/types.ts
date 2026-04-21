@@ -58,7 +58,10 @@ export interface DeviceConfig extends EntityConfig {
 }
 
 export interface PanelConfig {
-  key: 'solar' | 'battery' | 'grid' | 'load';
+  key?: 'solar' | 'battery' | 'grid' | 'load';  // built-in panel
+  entity?: string;   // custom panel entity
+  name?: string;
+  color?: string;
   enabled: boolean;
 }
 
