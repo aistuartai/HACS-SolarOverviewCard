@@ -198,6 +198,16 @@ export class SolarOverviewCard extends LitElement {
 
   private _threshold(): number { return this._config?.watt_threshold ?? 1000; }
 
+  private _secondaryLabel(entityId: string | undefined): string {
+    if (!entityId || !this._hass?.states) return '';
+    const s = this._hass.states[entityId];
+    if (!s) return '';
+    const unit = (s.attributes.unit_of_measurement as string) ?? '';
+    if (unit === 'W') return formatPower(parseFloat_safe(s.state), this._threshold());
+    if (unit === 'kW') return formatPower(parseFloat_safe(s.state) * 1000, this._threshold());
+    return unit ? `${s.state} ${unit}` : s.state;
+  }
+
   private _customPanel(panel: PanelConfig) {
     const entity = panel.entity!;
     const state = this._hass?.states[entity];
@@ -320,6 +330,10 @@ export class SolarOverviewCard extends LitElement {
                 .gridName="${this._config.grid.name ?? 'Grid'}"
                 .homeName="${this._config.load.name ?? 'Home'}"
                 .batteryName="${this._config.battery.name ?? 'Battery'}"
+                .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
+                .gridSecondary="${this._secondaryLabel(this._config.grid.secondary_entity)}"
+                .homeSecondary="${this._secondaryLabel(this._config.load.secondary_entity)}"
+                .batterySecondary="${this._secondaryLabel(this._config.battery.secondary_entity)}"
               ></flow-diagram>
             </div>
           ` : ''}
@@ -731,6 +745,10 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._entityField('Solar → Grid export  (W ≥ 0)', 'solar.export_entity', s?.export_entity, {
           hint: 'overrides grid.export_entity for Solar → Grid flow',
         })}
+        <div class="section-label">Diagram node</div>
+        ${this._entityField('Secondary entity (shown below value on Solar node)', 'solar.secondary_entity', s?.secondary_entity, {
+          hint: 'e.g. a second PV sensor or string total',
+        })}
       </div>
     `;
   }
@@ -746,6 +764,10 @@ export class SolarOverviewCardEditor extends LitElement {
           namePath: 'battery.name', nameValue: b?.name,
         })}
         ${this._entityField('State of charge  (0–100 %)', 'battery.soc_entity', b?.soc_entity)}
+        <div class="section-label">Diagram node</div>
+        ${this._entityField('Secondary entity (shown below value on Battery node)', 'battery.secondary_entity', b?.secondary_entity, {
+          hint: 'e.g. battery status or temperature',
+        })}
       </div>
     `;
   }
@@ -776,6 +798,10 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._entityField('Battery → Grid only  (W ≥ 0)', 'grid.from_battery_entity', g?.from_battery_entity, {
           hint: 'overrides battery_entity negative side',
         })}
+        <div class="section-label">Diagram node</div>
+        ${this._entityField('Secondary entity (shown below value on Grid node)', 'grid.secondary_entity', g?.secondary_entity, {
+          hint: 'e.g. frient meter or grid import sensor',
+        })}
       </div>
     `;
   }
@@ -792,6 +818,10 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._entityField('Home consumption  (W ≥ 0)', 'load.entity', l?.entity, {
           invertPath: 'load.invert', invertValue: l?.invert,
           namePath: 'load.name', nameValue: l?.name,
+        })}
+        <div class="section-label">Diagram node</div>
+        ${this._entityField('Secondary entity (shown below value on Home node)', 'load.secondary_entity', l?.secondary_entity, {
+          hint: 'e.g. a sub-metered consumption sensor',
         })}
         ${flows ? html`
           <div class="section-label">Live flows (solar + battery + grid → house)</div>

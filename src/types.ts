@@ -10,15 +10,21 @@ export interface OptionalEntityConfig {
   name?: string;
   icon?: string;
   invert?: boolean;
+  /** Secondary entity shown as a second line on the Home diagram node. */
+  secondary_entity?: string;
 }
 
 export interface SolarEntityConfig extends EntityConfig {
   /** Explicit Solar → Grid export sensor (W ≥ 0). Overrides deriving from grid sign. */
   export_entity?: string;
+  /** Secondary entity shown as a second line on the Solar diagram node. */
+  secondary_entity?: string;
 }
 
 export interface BatteryConfig extends EntityConfig {
   soc_entity?: string;
+  /** Secondary entity shown as a second line on the Battery diagram node. */
+  secondary_entity?: string;
   /** @deprecated Use grid.to_battery_entity instead. */
   grid_charge_entity?: string;
 }
@@ -40,6 +46,8 @@ export interface GridConfig {
   name?: string;
   icon?: string;
   invert?: boolean;
+  /** Secondary entity shown as a second line on the Grid diagram node. */
+  secondary_entity?: string;
   /** Grid → Home import sensor (W ≥ 0). */
   import_entity?: string;
   /** Solar / Battery → Grid export sensor (W ≥ 0). */

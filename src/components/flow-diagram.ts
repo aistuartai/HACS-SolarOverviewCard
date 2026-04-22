@@ -53,6 +53,10 @@ export class FlowDiagram extends LitElement {
   @property({ type: String }) gridName = 'Grid';
   @property({ type: String }) homeName = 'Home';
   @property({ type: String }) batteryName = 'Battery';
+  @property({ type: String }) solarSecondary = '';
+  @property({ type: String }) gridSecondary = '';
+  @property({ type: String }) homeSecondary = '';
+  @property({ type: String }) batterySecondary = '';
   @property({ type: Object }) flows: FlowData = {
     solarToHome: 0, solarToBattery: 0, solarToGrid: 0,
     gridToHome: 0, batteryToHome: 0, gridToBattery: 0, batteryToGrid: 0,
@@ -156,6 +160,7 @@ export class FlowDiagram extends LitElement {
   private _node(
     cx: number, cy: number, iconPath: string, label: string,
     watts: number, fill: string, bgFill: string,
+    secondary = '',
   ) {
     return svg`
       <g class="node">
@@ -170,6 +175,11 @@ export class FlowDiagram extends LitElement {
         <text x="${cx}" y="${cy + NODE_R + 26}" text-anchor="middle"
           font-size="11" font-weight="700" font-family="Roboto, sans-serif"
           fill="var(--primary-text-color, #e5e7eb)">${formatPower(watts, this.wattThreshold)}</text>
+        ${secondary ? svg`
+          <text x="${cx}" y="${cy + NODE_R + 38}" text-anchor="middle"
+            font-size="9" font-family="Roboto, sans-serif"
+            fill="var(--secondary-text-color, #9ca3af)">${secondary}</text>
+        ` : ''}
       </g>
     `;
   }
@@ -204,6 +214,8 @@ export class FlowDiagram extends LitElement {
     const circ = 2 * Math.PI * r;
     const filled = (this.socPercent / 100) * circ;
     const color = this._batteryColor();
+    // Shift SOC% text down when secondary entity occupies the +38 slot
+    const socTextY = BATTERY_Y + NODE_R + (this.batterySecondary ? 50 : 38);
     return svg`
       <circle
         cx="${BATTERY_X}" cy="${BATTERY_Y}" r="${r}"
@@ -213,7 +225,7 @@ export class FlowDiagram extends LitElement {
         transform="rotate(-90 ${BATTERY_X} ${BATTERY_Y})"
         opacity="0.85" stroke-linecap="round"
       />
-      <text x="${BATTERY_X}" y="${BATTERY_Y + NODE_R + 38}"
+      <text x="${BATTERY_X}" y="${socTextY}"
         text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
         fill="${color}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
     `;
@@ -277,10 +289,10 @@ export class FlowDiagram extends LitElement {
         ${this._socRing()}
 
         <!-- Main nodes -->
-        ${this._node(SOLAR_X,   SOLAR_Y,   ICON_SOLAR,   this.solarName,   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)')}
-        ${this._node(GRID_X,    GRID_Y,    ICON_GRID,    this.gridName,    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)')}
-        ${this._node(HOME_X,    HOME_Y,    ICON_HOME,    this.homeName,    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)')}
-        ${this._node(BATTERY_X, BATTERY_Y, ICON_BATTERY, this.batteryName, this.battery, battColor, battBg)}
+        ${this._node(SOLAR_X,   SOLAR_Y,   ICON_SOLAR,   this.solarName,   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)',  this.solarSecondary)}
+        ${this._node(GRID_X,    GRID_Y,    ICON_GRID,    this.gridName,    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)',  this.gridSecondary)}
+        ${this._node(HOME_X,    HOME_Y,    ICON_HOME,    this.homeName,    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)',  this.homeSecondary)}
+        ${this._node(BATTERY_X, BATTERY_Y, ICON_BATTERY, this.batteryName, this.battery, battColor, battBg,                  this.batterySecondary)}
 
         <!-- Device satellite nodes -->
         ${devicePositions.map(({ d, x, y }) => this._deviceNode(x, y, d))}
