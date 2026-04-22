@@ -47,11 +47,17 @@ export function calculateFlows(p: FlowParams): FlowData {
         : gridCombined < 0 ? Math.abs(gridCombined) : 0)
     : 0;
 
-  // ── Solar → Home ──────────────────────────────────────────────────────────
-  const solarToHome = solar > 0 ? Math.min(solar, load) : 0;
-
   // ── Solar → Battery ───────────────────────────────────────────────────────
   const solarToBattery = battery > 0 && solar > 0 ? Math.min(battery, solar) : 0;
+
+  // ── Solar → Home ──────────────────────────────────────────────────────────
+  // When load sensor is present use min(solar, load).
+  // When absent, derive from energy balance: whatever solar doesn't export or charge.
+  const solarToHome = solar > 0
+    ? (load > 0
+        ? Math.min(solar, load)
+        : Math.max(0, solar - solarToGrid - solarToBattery))
+    : 0;
 
   // ── Battery → Home ────────────────────────────────────────────────────────
   const batteryToHome = battery < 0 ? Math.abs(battery) : 0;

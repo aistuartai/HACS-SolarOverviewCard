@@ -295,8 +295,8 @@ export class SolarOverviewCard extends LitElement {
       ? this._grid
       : (this._flows.gridToHome + this._flows.gridToBattery) - (this._flows.solarToGrid + this._flows.batteryToGrid);
     const grid    = this._panelProps('grid', gridNetDisplay, 'Grid', MDI_GRID, '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
-    // Home shows total power delivered: battery discharge + grid import
-    const homeDelivered = this._flows.batteryToHome + this._flows.gridToHome;
+    // Total home consumption: solar direct + battery discharge + grid import
+    const homeDelivered = this._flows.solarToHome + this._flows.batteryToHome + this._flows.gridToHome;
     const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity ?? '');
 
     const devices = this._deviceItems();
@@ -794,7 +794,7 @@ export class SolarOverviewCardEditor extends LitElement {
           namePath: 'load.name', nameValue: l?.name,
         })}
         ${flows ? html`
-          <div class="section-label">Current flows into house</div>
+          <div class="section-label">Live flows (solar + battery + grid → house)</div>
           <div class="flow-stats">
             <div class="flow-stat">
               <span class="flow-stat-label">⚡ Grid → House</span>
