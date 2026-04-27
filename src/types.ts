@@ -89,6 +89,8 @@ export interface SolarCardConfig {
   show_devices?: boolean;
   flow_background?: string;
   diagram_text_color?: string;
+  node_style?: 'circle' | 'card';
+  show_flow_lines?: boolean;
   node_positions?: {
     solar?:   { x: number; y: number };
     grid?:    { x: number; y: number };

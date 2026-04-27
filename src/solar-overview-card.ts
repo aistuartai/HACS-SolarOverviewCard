@@ -332,6 +332,8 @@ export class SolarOverviewCard extends LitElement {
                 .batteryName="${this._config.battery.name ?? 'Battery'}"
                 .backgroundImage="${this._config.flow_background ?? ''}"
                 .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
+                .nodeStyle="${this._config.node_style ?? 'circle'}"
+                .showFlowLines="${this._config.show_flow_lines !== false}"
                 .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
                 .gridSecondary="${this._secondaryLabel(this._config.grid.secondary_entity)}"
@@ -724,6 +726,16 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._boolField('Show stat panels',   'show_stats',      c.show_stats      !== false)}
         ${this._boolField('Show devices row',   'show_devices',    c.show_devices    !== false)}
         ${this._boolField('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
+        <div class="section-label">Flow diagram style</div>
+        <div class="bool-row">
+          <span class="bool-label">Node style</span>
+          <ha-selector
+            .selector=${{ select: { options: ['circle', 'card'], mode: 'list' } }}
+            .value="${c.node_style ?? 'circle'}"
+            @value-changed="${(e: CustomEvent) => this._setValue('node_style', e.detail.value)}"
+          ></ha-selector>
+        </div>
+        ${this._boolField('Show animated flow lines', 'show_flow_lines', c.show_flow_lines !== false)}
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
@@ -907,6 +919,8 @@ export class SolarOverviewCardEditor extends LitElement {
             .homeName="${c.load?.name ?? 'Home'}"
             .batteryName="${c.battery.name ?? 'Battery'}"
             .textColor="${c.diagram_text_color ?? '#ffffff'}"
+            .nodeStyle="${c.node_style ?? 'circle'}"
+            .showFlowLines="${c.show_flow_lines !== false}"
             .nodePositions="${c.node_positions}"
             .backgroundImage="${c.flow_background ?? ''}"
             .editMode="${true}"

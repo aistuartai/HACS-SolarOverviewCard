@@ -15,7 +15,7 @@ const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const w=globalThis,k=t=>t,S=w.trustedTypes,H=S?S.createPolicy("lit-html",{createHTML:t=>t}):void 0,A="$lit$",C=`lit$${Math.random().toFixed(9).slice(2)}$`,P="?"+C,E=`<${P}>`,M=document,T=()=>M.createComment(""),V=t=>null===t||"object"!=typeof t&&"function"!=typeof t,N=Array.isArray,L="[ \t\n\f\r]",D=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,B=/-->/g,z=/>/g,I=RegExp(`>|${L}(?:([^\\s"'>=/]+)(${L}*=${L}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),R=/'/g,U=/"/g,O=/^(?:script|style|textarea|title)$/i,G=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),F=G(1),j=G(2),W=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),Z=new WeakMap,J=M.createTreeWalker(M,129);function Y(t,e){if(!N(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==H?H.createHTML(e):e}const K=(t,e)=>{const i=t.length-1,o=[];let r,s=2===e?"<svg>":3===e?"<math>":"",a=D;for(let e=0;e<i;e++){const i=t[e];let n,l,d=-1,c=0;for(;c<i.length&&(a.lastIndex=c,l=a.exec(i),null!==l);)c=a.lastIndex,a===D?"!--"===l[1]?a=B:void 0!==l[1]?a=z:void 0!==l[2]?(O.test(l[2])&&(r=RegExp("</"+l[2],"g")),a=I):void 0!==l[3]&&(a=I):a===I?">"===l[0]?(a=r??D,d=-1):void 0===l[1]?d=-2:(d=a.lastIndex-l[2].length,n=l[1],a=void 0===l[3]?I:'"'===l[3]?U:R):a===U||a===R?a=I:a===B||a===z?a=D:(a=I,r=void 0);const h=a===I&&t[e+1].startsWith("/>")?" ":"";s+=a===D?i+E:d>=0?(o.push(n),i.slice(0,d)+A+i.slice(d)+C+h):i+C+(-2===d?e:h)}return[Y(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),o]};class X{constructor({strings:t,_$litType$:e},i){let o;this.parts=[];let r=0,s=0;const a=t.length-1,n=this.parts,[l,d]=K(t,e);if(this.el=X.createElement(l,i),J.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(o=J.nextNode())&&n.length<a;){if(1===o.nodeType){if(o.hasAttributes())for(const t of o.getAttributeNames())if(t.endsWith(A)){const e=d[s++],i=o.getAttribute(t).split(C),a=/([.?@])?(.*)/.exec(e);n.push({type:1,index:r,name:a[2],strings:i,ctor:"."===a[1]?ot:"?"===a[1]?rt:"@"===a[1]?st:it}),o.removeAttribute(t)}else t.startsWith(C)&&(n.push({type:6,index:r}),o.removeAttribute(t));if(O.test(o.tagName)){const t=o.textContent.split(C),e=t.length-1;if(e>0){o.textContent=S?S.emptyScript:"";for(let i=0;i<e;i++)o.append(t[i],T()),J.nextNode(),n.push({type:2,index:++r});o.append(t[e],T())}}}else if(8===o.nodeType)if(o.data===P)n.push({type:2,index:r});else{let t=-1;for(;-1!==(t=o.data.indexOf(C,t+1));)n.push({type:7,index:r}),t+=C.length-1}r++}}static createElement(t,e){const i=M.createElement("template");return i.innerHTML=t,i}}function Q(t,e,i=t,o){if(e===W)return e;let r=void 0!==o?i._$Co?.[o]:i._$Cl;const s=V(e)?void 0:e._$litDirective$;return r?.constructor!==s&&(r?._$AO?.(!1),void 0===s?r=void 0:(r=new s(t),r._$AT(t,i,o)),void 0!==o?(i._$Co??=[])[o]=r:i._$Cl=r),void 0!==r&&(e=Q(t,r._$AS(t,e.values),r,o)),e}class tt{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,o=(t?.creationScope??M).importNode(e,!0);J.currentNode=o;let r=J.nextNode(),s=0,a=0,n=i[0];for(;void 0!==n;){if(s===n.index){let e;2===n.type?e=new et(r,r.nextSibling,this,t):1===n.type?e=new n.ctor(r,n.name,n.strings,this,t):6===n.type&&(e=new at(r,this,t)),this._$AV.push(e),n=i[++a]}s!==n?.index&&(r=J.nextNode(),s++)}return J.currentNode=M,o}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class et{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Q(this,t,e),V(t)?t===q||null==t||""===t?(this._$AH!==q&&this._$AR(),this._$AH=q):t!==this._$AH&&t!==W&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>N(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==q&&V(this._$AH)?this._$AA.nextSibling.data=t:this.T(M.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,o="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=X.createElement(Y(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(e);else{const t=new tt(o,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new X(t)),e}k(t){N(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,o=0;for(const r of t)o===e.length?e.push(i=new et(this.O(T()),this.O(T()),this,this.options)):i=e[o],i._$AI(r),o++;o<e.length&&(this._$AR(i&&i._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=k(t).nextSibling;k(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class it{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,o,r){this.type=1,this._$AH=q,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=q}_$AI(t,e=this,i,o){const r=this.strings;let s=!1;if(void 0===r)t=Q(this,t,e,0),s=!V(t)||t!==this._$AH&&t!==W,s&&(this._$AH=t);else{const o=t;let a,n;for(t=r[0],a=0;a<r.length-1;a++)n=Q(this,o[i+a],e,a),n===W&&(n=this._$AH[a]),s||=!V(n)||n!==this._$AH[a],n===q?t=q:t!==q&&(t+=(n??"")+r[a+1]),this._$AH[a]=n}s&&!o&&this.j(t)}j(t){t===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class ot extends it{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===q?void 0:t}}class rt extends it{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==q)}}class st extends it{constructor(t,e,i,o,r){super(t,e,i,o,r),this.type=5}_$AI(t,e=this){if((t=Q(this,t,e,0)??q)===W)return;const i=this._$AH,o=t===q&&i!==q||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,r=t!==q&&(i===q||o);o&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class at{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Q(this,t)}}const nt=w.litHtmlPolyfillSupport;nt?.(X,et),(w.litHtmlVersions??=[]).push("3.3.2");const lt=globalThis;
+const w=globalThis,k=t=>t,S=w.trustedTypes,H=S?S.createPolicy("lit-html",{createHTML:t=>t}):void 0,A="$lit$",C=`lit$${Math.random().toFixed(9).slice(2)}$`,P="?"+C,E=`<${P}>`,M=document,T=()=>M.createComment(""),V=t=>null===t||"object"!=typeof t&&"function"!=typeof t,L=Array.isArray,N="[ \t\n\f\r]",D=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,B=/-->/g,z=/>/g,I=RegExp(`>|${N}(?:([^\\s"'>=/]+)(${N}*=${N}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),R=/'/g,O=/"/g,U=/^(?:script|style|textarea|title)$/i,F=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),G=F(1),j=F(2),W=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),Z=new WeakMap,J=M.createTreeWalker(M,129);function Y(t,e){if(!L(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==H?H.createHTML(e):e}const K=(t,e)=>{const i=t.length-1,o=[];let r,s=2===e?"<svg>":3===e?"<math>":"",a=D;for(let e=0;e<i;e++){const i=t[e];let n,l,d=-1,c=0;for(;c<i.length&&(a.lastIndex=c,l=a.exec(i),null!==l);)c=a.lastIndex,a===D?"!--"===l[1]?a=B:void 0!==l[1]?a=z:void 0!==l[2]?(U.test(l[2])&&(r=RegExp("</"+l[2],"g")),a=I):void 0!==l[3]&&(a=I):a===I?">"===l[0]?(a=r??D,d=-1):void 0===l[1]?d=-2:(d=a.lastIndex-l[2].length,n=l[1],a=void 0===l[3]?I:'"'===l[3]?O:R):a===O||a===R?a=I:a===B||a===z?a=D:(a=I,r=void 0);const h=a===I&&t[e+1].startsWith("/>")?" ":"";s+=a===D?i+E:d>=0?(o.push(n),i.slice(0,d)+A+i.slice(d)+C+h):i+C+(-2===d?e:h)}return[Y(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),o]};class X{constructor({strings:t,_$litType$:e},i){let o;this.parts=[];let r=0,s=0;const a=t.length-1,n=this.parts,[l,d]=K(t,e);if(this.el=X.createElement(l,i),J.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(o=J.nextNode())&&n.length<a;){if(1===o.nodeType){if(o.hasAttributes())for(const t of o.getAttributeNames())if(t.endsWith(A)){const e=d[s++],i=o.getAttribute(t).split(C),a=/([.?@])?(.*)/.exec(e);n.push({type:1,index:r,name:a[2],strings:i,ctor:"."===a[1]?ot:"?"===a[1]?rt:"@"===a[1]?st:it}),o.removeAttribute(t)}else t.startsWith(C)&&(n.push({type:6,index:r}),o.removeAttribute(t));if(U.test(o.tagName)){const t=o.textContent.split(C),e=t.length-1;if(e>0){o.textContent=S?S.emptyScript:"";for(let i=0;i<e;i++)o.append(t[i],T()),J.nextNode(),n.push({type:2,index:++r});o.append(t[e],T())}}}else if(8===o.nodeType)if(o.data===P)n.push({type:2,index:r});else{let t=-1;for(;-1!==(t=o.data.indexOf(C,t+1));)n.push({type:7,index:r}),t+=C.length-1}r++}}static createElement(t,e){const i=M.createElement("template");return i.innerHTML=t,i}}function Q(t,e,i=t,o){if(e===W)return e;let r=void 0!==o?i._$Co?.[o]:i._$Cl;const s=V(e)?void 0:e._$litDirective$;return r?.constructor!==s&&(r?._$AO?.(!1),void 0===s?r=void 0:(r=new s(t),r._$AT(t,i,o)),void 0!==o?(i._$Co??=[])[o]=r:i._$Cl=r),void 0!==r&&(e=Q(t,r._$AS(t,e.values),r,o)),e}class tt{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,o=(t?.creationScope??M).importNode(e,!0);J.currentNode=o;let r=J.nextNode(),s=0,a=0,n=i[0];for(;void 0!==n;){if(s===n.index){let e;2===n.type?e=new et(r,r.nextSibling,this,t):1===n.type?e=new n.ctor(r,n.name,n.strings,this,t):6===n.type&&(e=new at(r,this,t)),this._$AV.push(e),n=i[++a]}s!==n?.index&&(r=J.nextNode(),s++)}return J.currentNode=M,o}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class et{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Q(this,t,e),V(t)?t===q||null==t||""===t?(this._$AH!==q&&this._$AR(),this._$AH=q):t!==this._$AH&&t!==W&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>L(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==q&&V(this._$AH)?this._$AA.nextSibling.data=t:this.T(M.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,o="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=X.createElement(Y(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(e);else{const t=new tt(o,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new X(t)),e}k(t){L(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,o=0;for(const r of t)o===e.length?e.push(i=new et(this.O(T()),this.O(T()),this,this.options)):i=e[o],i._$AI(r),o++;o<e.length&&(this._$AR(i&&i._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=k(t).nextSibling;k(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class it{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,o,r){this.type=1,this._$AH=q,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=q}_$AI(t,e=this,i,o){const r=this.strings;let s=!1;if(void 0===r)t=Q(this,t,e,0),s=!V(t)||t!==this._$AH&&t!==W,s&&(this._$AH=t);else{const o=t;let a,n;for(t=r[0],a=0;a<r.length-1;a++)n=Q(this,o[i+a],e,a),n===W&&(n=this._$AH[a]),s||=!V(n)||n!==this._$AH[a],n===q?t=q:t!==q&&(t+=(n??"")+r[a+1]),this._$AH[a]=n}s&&!o&&this.j(t)}j(t){t===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class ot extends it{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===q?void 0:t}}class rt extends it{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==q)}}class st extends it{constructor(t,e,i,o,r){super(t,e,i,o,r),this.type=5}_$AI(t,e=this){if((t=Q(this,t,e,0)??q)===W)return;const i=this._$AH,o=t===q&&i!==q||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,r=t!==q&&(i===q||o);o&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class at{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Q(this,t)}}const nt=w.litHtmlPolyfillSupport;nt?.(X,et),(w.litHtmlVersions??=[]).push("3.3.2");const lt=globalThis;
 /**
  * @license
  * Copyright 2017 Google LLC
@@ -324,7 +324,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
     font-size: 0.875rem;
     border-left: 3px solid #ef4444;
   }
-`;function ft(t,e){return Math.abs(t)>=e?`${(t/1e3).toFixed(1)} kW`:`${Math.round(t)} W`}function _t(t){if(null==t)return 0;const e="number"==typeof t?t:parseFloat(t);return isNaN(e)?0:e}function mt(t){const{solar:e,battery:i,load:o,gridCombined:r}=t,s=void 0!==t.gridImport?Math.max(0,t.gridImport):r>0?r:0,a=e>0?void 0!==t.gridExport?Math.max(0,t.gridExport):r<0?Math.abs(r):0:0,n=i>0&&e>0?Math.min(i,e):0;return{solarToHome:e>0?o>0?Math.min(e,o):Math.max(0,e-a-n):0,solarToBattery:n,solarToGrid:a,gridToHome:s,batteryToHome:i<0?Math.abs(i):0,gridToBattery:void 0!==t.gridToBattery?Math.max(0,t.gridToBattery):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined>0?t.gridBatteryCombined:0,batteryToGrid:void 0!==t.batteryToGrid?Math.max(0,t.batteryToGrid):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined<0?Math.abs(t.gridBatteryCombined):0}}function bt(t,e){const i=t.toLowerCase();return i.includes("solar")||i.includes("pv")?e>0?"Generating":"Idle":i.includes("battery")||i.includes("batt")?e>0?"Charging":e<0?"Discharging":"Idle":i.includes("grid")?e>0?"Importing":e<0?"Exporting":"Idle":i.includes("load")||i.includes("home")||i.includes("consumption")?e>0?"Consuming":"Idle":e>0?"Active":"Idle"}const $t=32,xt=17;let wt=class extends dt{constructor(){super(...arguments),this.solar=0,this.battery=0,this.grid=0,this.load=0,this.socPercent=0,this.wattThreshold=1e3,this.solarName="Solar",this.gridName="Grid",this.homeName="Home",this.batteryName="Battery",this.solarSecondary="",this.gridSecondary="",this.homeSecondary="",this.batterySecondary="",this.flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this.diagramDevices=[],this.backgroundImage="",this.editMode=!1,this.textColor="#ffffff",this._pos={solar:{x:150,y:50},grid:{x:50,y:150},home:{x:250,y:150},battery:{x:150,y:250}},this._dragging=null,this._dragStartClient={x:0,y:0},this._dragStartPos={x:0,y:0}}willUpdate(t){var e,i,o,r,s;if(t.has("nodePositions")){const t=null!==(e=this.nodePositions)&&void 0!==e?e:{};this._pos={solar:{x:150,y:50,...null!==(i=t.solar)&&void 0!==i?i:{}},grid:{x:50,y:150,...null!==(o=t.grid)&&void 0!==o?o:{}},home:{x:250,y:150,...null!==(r=t.home)&&void 0!==r?r:{}},battery:{x:150,y:250,...null!==(s=t.battery)&&void 0!==s?s:{}}}}}_onNodePointerDown(t,e){this.editMode&&(t.preventDefault(),t.stopPropagation(),this._dragging=e,this._dragStartClient={x:t.clientX,y:t.clientY},this._dragStartPos={...this._pos[e]},t.currentTarget.setPointerCapture(t.pointerId))}_onPointerMove(t){if(!this._dragging)return;const e=this.shadowRoot.querySelector("svg").getScreenCTM();if(!e)return;const i=(t.clientX-this._dragStartClient.x)/e.a,o=(t.clientY-this._dragStartClient.y)/e.d;this._pos={...this._pos,[this._dragging]:{x:Math.round(this._dragStartPos.x+i),y:Math.round(this._dragStartPos.y+o)}}}_onPointerUp(){this._dragging&&(this._dragging=null,this.dispatchEvent(new CustomEvent("nodes-moved",{detail:{positions:{...this._pos}},bubbles:!0,composed:!0})))}_batteryColor(){const t=Math.max(0,Math.min(100,this.socPercent));let e,i,o;if(t>=50){const r=(t-50)/50;e=Math.round(16+229*r),i=Math.round(185+-27*r),o=Math.round(129+-118*r)}else{const r=t/50;e=Math.round(239+6*r),i=Math.round(68+90*r),o=Math.round(68+-57*r)}return`rgb(${e},${i},${o})`}_lineWidth(t){return t<=0?2:Math.min(8,Math.max(2,t/1e3*4+2))}_trim(t,e,i,o,r=36){const s=i-t,a=o-e,n=Math.sqrt(s*s+a*a);return 0===n?{x1:t,y1:e,x2:i,y2:o}:{x1:t+s/n*r,y1:e+a/n*r,x2:i-s/n*r,y2:o-a/n*r}}_flowLine(t,e,i,o,r,s,a=!1){const n=r>1,{x1:l,y1:d,x2:c,y2:h}=this._trim(t,e,i,o),p=this._lineWidth(r),v=n?a?"flow-active-rev":"flow-active":"";return j`
+`;function ft(t,e){return Math.abs(t)>=e?`${(t/1e3).toFixed(1)} kW`:`${Math.round(t)} W`}function _t(t){if(null==t)return 0;const e="number"==typeof t?t:parseFloat(t);return isNaN(e)?0:e}function mt(t){const{solar:e,battery:i,load:o,gridCombined:r}=t,s=void 0!==t.gridImport?Math.max(0,t.gridImport):r>0?r:0,a=e>0?void 0!==t.gridExport?Math.max(0,t.gridExport):r<0?Math.abs(r):0:0,n=i>0&&e>0?Math.min(i,e):0;return{solarToHome:e>0?o>0?Math.min(e,o):Math.max(0,e-a-n):0,solarToBattery:n,solarToGrid:a,gridToHome:s,batteryToHome:i<0?Math.abs(i):0,gridToBattery:void 0!==t.gridToBattery?Math.max(0,t.gridToBattery):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined>0?t.gridBatteryCombined:0,batteryToGrid:void 0!==t.batteryToGrid?Math.max(0,t.batteryToGrid):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined<0?Math.abs(t.gridBatteryCombined):0}}function bt(t,e){const i=t.toLowerCase();return i.includes("solar")||i.includes("pv")?e>0?"Generating":"Idle":i.includes("battery")||i.includes("batt")?e>0?"Charging":e<0?"Discharging":"Idle":i.includes("grid")?e>0?"Importing":e<0?"Exporting":"Idle":i.includes("load")||i.includes("home")||i.includes("consumption")?e>0?"Consuming":"Idle":e>0?"Active":"Idle"}const $t=32,xt=17;let wt=class extends dt{constructor(){super(...arguments),this.solar=0,this.battery=0,this.grid=0,this.load=0,this.socPercent=0,this.wattThreshold=1e3,this.solarName="Solar",this.gridName="Grid",this.homeName="Home",this.batteryName="Battery",this.solarSecondary="",this.gridSecondary="",this.homeSecondary="",this.batterySecondary="",this.flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this.diagramDevices=[],this.backgroundImage="",this.editMode=!1,this.textColor="#ffffff",this.nodeStyle="circle",this.showFlowLines=!0,this._pos={solar:{x:150,y:50},grid:{x:50,y:150},home:{x:250,y:150},battery:{x:150,y:250}},this._dragging=null,this._dragStartClient={x:0,y:0},this._dragStartPos={x:0,y:0}}willUpdate(t){var e,i,o,r,s;if(t.has("nodePositions")){const t=null!==(e=this.nodePositions)&&void 0!==e?e:{};this._pos={solar:{x:150,y:50,...null!==(i=t.solar)&&void 0!==i?i:{}},grid:{x:50,y:150,...null!==(o=t.grid)&&void 0!==o?o:{}},home:{x:250,y:150,...null!==(r=t.home)&&void 0!==r?r:{}},battery:{x:150,y:250,...null!==(s=t.battery)&&void 0!==s?s:{}}}}}_onNodePointerDown(t,e){this.editMode&&(t.preventDefault(),t.stopPropagation(),this._dragging=e,this._dragStartClient={x:t.clientX,y:t.clientY},this._dragStartPos={...this._pos[e]},t.currentTarget.setPointerCapture(t.pointerId))}_onPointerMove(t){if(!this._dragging)return;const e=this.shadowRoot.querySelector("svg").getScreenCTM();if(!e)return;const i=(t.clientX-this._dragStartClient.x)/e.a,o=(t.clientY-this._dragStartClient.y)/e.d;this._pos={...this._pos,[this._dragging]:{x:Math.round(this._dragStartPos.x+i),y:Math.round(this._dragStartPos.y+o)}}}_onPointerUp(){this._dragging&&(this._dragging=null,this.dispatchEvent(new CustomEvent("nodes-moved",{detail:{positions:{...this._pos}},bubbles:!0,composed:!0})))}get _nodeMargin(){return"card"===this.nodeStyle?29:36}_batteryColor(){const t=Math.max(0,Math.min(100,this.socPercent));let e,i,o;if(t>=50){const r=(t-50)/50;e=Math.round(16+229*r),i=Math.round(185+-27*r),o=Math.round(129+-118*r)}else{const r=t/50;e=Math.round(239+6*r),i=Math.round(68+90*r),o=Math.round(68+-57*r)}return`rgb(${e},${i},${o})`}_lineWidth(t){return t<=0?2:Math.min(8,Math.max(2,t/1e3*4+2))}_trim(t,e,i,o,r=36){const s=i-t,a=o-e,n=Math.sqrt(s*s+a*a);return 0===n?{x1:t,y1:e,x2:i,y2:o}:{x1:t+s/n*r,y1:e+a/n*r,x2:i-s/n*r,y2:o-a/n*r}}_flowLine(t,e,i,o,r,s,a=!1){const n=r>1,{x1:l,y1:d,x2:c,y2:h}=this._trim(t,e,i,o,this._nodeMargin),p=this._lineWidth(r),v=n?a?"flow-active-rev":"flow-active":"";return j`
       <line
         x1="${l}" y1="${d}" x2="${c}" y2="${h}"
         stroke="${s}" stroke-width="${p}" stroke-linecap="round"
@@ -341,33 +341,38 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         opacity="${a?.85:.2}"
         class="${a?"flow-active":""}"
       />
-    `}_node(t,e,i,o,r,s,a,n,l){const d=this.textColor,c=this.editMode&&this._dragging===l;return j`
+    `}_node(t,e,i,o,r,s,a,n,l){const d=this.textColor,c=this.editMode&&this._dragging===l,h="card"===this.nodeStyle,p=h?23:$t,v=this.editMode?j`
+      ${h?j`<rect x="${t-41-6}" y="${e-p-6}"
+            width="${94}" height="${58}" rx="${14}"
+            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
+            stroke-dasharray="4 3" opacity="${c?1:.6}" />`:j`<circle cx="${t}" cy="${e}" r="${38}"
+            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
+            stroke-dasharray="4 3" opacity="${c?1:.6}" />`}
+    `:"",g=h?j`<rect x="${t-41}" y="${e-p}"
+          width="${82}" height="${46}" rx="${10}"
+          fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />`:j`<circle cx="${t}" cy="${e}" r="${$t}"
+          fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />`,u=j`
+      <g transform="translate(${t-18}, ${e-18}) scale(${1.5})">
+        <path d="${i}" fill="${s}" />
+      </g>
+    `;return j`
       <g
         class="${this.editMode?"draggable":""} node"
         @pointerdown="${t=>this._onNodePointerDown(t,l)}"
         @pointermove="${t=>this._onPointerMove(t)}"
         @pointerup="${()=>this._onPointerUp()}"
       >
-        ${this.editMode?j`
-          <circle cx="${t}" cy="${e}" r="${38}"
-            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
-            stroke-dasharray="4 3"
-            opacity="${c?1:.6}"
-          />
-        `:""}
-        <circle cx="${t}" cy="${e}" r="${$t}"
-          fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />
-        <g transform="translate(${t-18}, ${e-18}) scale(${1.5})">
-          <path d="${i}" fill="${s}" />
-        </g>
-        <text x="${t}" y="${e+$t+14}" text-anchor="middle"
+        ${v}
+        ${g}
+        ${u}
+        <text x="${t}" y="${e+p+14}" text-anchor="middle"
           font-size="10" font-family="Roboto, sans-serif"
           fill="${d}" opacity="0.65">${o}</text>
-        <text x="${t}" y="${e+$t+26}" text-anchor="middle"
+        <text x="${t}" y="${e+p+26}" text-anchor="middle"
           font-size="11" font-weight="700" font-family="Roboto, sans-serif"
           fill="${d}">${ft(r,this.wattThreshold)}</text>
         ${n?j`
-          <text x="${t}" y="${e+$t+38}" text-anchor="middle"
+          <text x="${t}" y="${e+p+38}" text-anchor="middle"
             font-size="9" font-family="Roboto, sans-serif"
             fill="${d}" opacity="0.65">${n}</text>
         `:""}
@@ -386,19 +391,23 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           font-size="9" font-weight="700" font-family="Roboto, sans-serif"
           fill="${n}">${ft(i.watts,this.wattThreshold)}</text>
       </g>
-    `}_socRing(t,e){const i=2*Math.PI*37,o=this.socPercent/100*i,r=this._batteryColor(),s=e+$t+(this.batterySecondary?50:38);return j`
+    `}_socRing(t,e){const i=this._batteryColor(),o=e+("card"===this.nodeStyle?23:$t)+(this.batterySecondary?50:38);if("card"===this.nodeStyle)return j`
+        <text x="${t}" y="${o}"
+          text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
+          fill="${i}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
+      `;const r=2*Math.PI*37,s=this.socPercent/100*r;return j`
       <circle
         cx="${t}" cy="${e}" r="${37}"
-        fill="none" stroke="${r}" stroke-width="3"
-        stroke-dasharray="${o} ${i-o}"
+        fill="none" stroke="${i}" stroke-width="3"
+        stroke-dasharray="${s} ${r-s}"
         stroke-dashoffset="0"
         transform="rotate(-90 ${t} ${e})"
         opacity="0.85" stroke-linecap="round"
       />
-      <text x="${t}" y="${s}"
+      <text x="${t}" y="${o}"
         text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
-        fill="${r}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
-    `}render(){var t;const e=this.flows,i=this._pos,o=this._batteryColor(),r=o.replace("rgb(","rgba(").replace(")",", 0.15)"),s=null!==(t=this.diagramDevices)&&void 0!==t?t:[],a=s.length,n=a>0,l=i.home.x+82,d=52*(a-1),c=i.home.y-d/2,h=s.map((t,e)=>({d:t,x:l,y:c+52*e})),p=[i.solar.x,i.grid.x,i.home.x,i.battery.x,...h.map(t=>t.x)],v=[i.solar.y,i.grid.y,i.home.y,i.battery.y,...h.map(t=>t.y)],g=Math.min(...p)-92,u=Math.min(...v)-92,y=Math.max(...p)+92+(n?47:0)-g,f=Math.max(...v)+92-u;return F`
+        fill="${i}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
+    `}render(){var t;const e=this.flows,i=this._pos,o=this._batteryColor(),r=o.replace("rgb(","rgba(").replace(")",", 0.15)"),s=null!==(t=this.diagramDevices)&&void 0!==t?t:[],a=s.length,n=a>0,l=i.home.x+82,d=52*(a-1),c=i.home.y-d/2,h=s.map((t,e)=>({d:t,x:l,y:c+52*e})),p=[i.solar.x,i.grid.x,i.home.x,i.battery.x,...h.map(t=>t.x)],v=[i.solar.y,i.grid.y,i.home.y,i.battery.y,...h.map(t=>t.y)],g=Math.min(...p)-92,u=Math.min(...v)-92,y=Math.max(...p)+92+(n?47:0)-g,f=Math.max(...v)+92-u;return G`
       <svg
         viewBox="${`${g} ${u} ${y} ${f}`}"
         xmlns="http://www.w3.org/2000/svg"
@@ -426,16 +435,17 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         `:""}
 
         <!-- Flow lines -->
-        ${this._flowLine(i.solar.x,i.solar.y,i.home.x,i.home.y,e.solarToHome,"#f59e0b")}
-        ${this._flowLine(i.solar.x,i.solar.y,i.battery.x,i.battery.y,e.solarToBattery,"#f59e0b")}
-        ${this._flowLine(i.solar.x,i.solar.y,i.grid.x,i.grid.y,e.solarToGrid,"#f59e0b")}
-        ${this._flowLine(i.grid.x,i.grid.y,i.home.x,i.home.y,e.gridToHome,"#8b5cf6")}
-        ${this._flowLine(i.battery.x,i.battery.y,i.home.x,i.home.y,e.batteryToHome,o)}
-        ${e.batteryToGrid>e.gridToBattery?this._flowLine(i.battery.x,i.battery.y,i.grid.x,i.grid.y,e.batteryToGrid,"#10b981"):this._flowLine(i.grid.x,i.grid.y,i.battery.x,i.battery.y,e.gridToBattery,"#8b5cf6")}
+        ${this.showFlowLines?j`
+          ${this._flowLine(i.solar.x,i.solar.y,i.home.x,i.home.y,e.solarToHome,"#f59e0b")}
+          ${this._flowLine(i.solar.x,i.solar.y,i.battery.x,i.battery.y,e.solarToBattery,"#f59e0b")}
+          ${this._flowLine(i.solar.x,i.solar.y,i.grid.x,i.grid.y,e.solarToGrid,"#f59e0b")}
+          ${this._flowLine(i.grid.x,i.grid.y,i.home.x,i.home.y,e.gridToHome,"#8b5cf6")}
+          ${this._flowLine(i.battery.x,i.battery.y,i.home.x,i.home.y,e.batteryToHome,o)}
+          ${e.batteryToGrid>e.gridToBattery?this._flowLine(i.battery.x,i.battery.y,i.grid.x,i.grid.y,e.batteryToGrid,"#10b981"):this._flowLine(i.grid.x,i.grid.y,i.battery.x,i.battery.y,e.gridToBattery,"#8b5cf6")}
+          ${h.map(({d:t,x:e,y:o})=>this._deviceLine(i.home.x,i.home.y,e,o,t.watts,t.color||"#6366f1"))}
+        `:""}
 
-        <!-- Device lines -->
-        ${h.map(({d:t,x:e,y:o})=>this._deviceLine(i.home.x,i.home.y,e,o,t.watts,t.color||"#6366f1"))}
-
+        <!-- SOC ring / text -->
         ${this._socRing(i.battery.x,i.battery.y)}
 
         <!-- Main nodes -->
@@ -455,7 +465,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
     .flow-active-rev { animation: flow-anim-rev 0.8s linear infinite; }
     .draggable { cursor: grab; }
     .draggable:active { cursor: grabbing; }
-  `,t([gt({type:Number})],wt.prototype,"solar",void 0),t([gt({type:Number})],wt.prototype,"battery",void 0),t([gt({type:Number})],wt.prototype,"grid",void 0),t([gt({type:Number})],wt.prototype,"load",void 0),t([gt({type:Number})],wt.prototype,"socPercent",void 0),t([gt({type:Number})],wt.prototype,"wattThreshold",void 0),t([gt({type:String})],wt.prototype,"solarName",void 0),t([gt({type:String})],wt.prototype,"gridName",void 0),t([gt({type:String})],wt.prototype,"homeName",void 0),t([gt({type:String})],wt.prototype,"batteryName",void 0),t([gt({type:String})],wt.prototype,"solarSecondary",void 0),t([gt({type:String})],wt.prototype,"gridSecondary",void 0),t([gt({type:String})],wt.prototype,"homeSecondary",void 0),t([gt({type:String})],wt.prototype,"batterySecondary",void 0),t([gt({type:Object})],wt.prototype,"flows",void 0),t([gt({type:Array})],wt.prototype,"diagramDevices",void 0),t([gt({type:String})],wt.prototype,"backgroundImage",void 0),t([gt({type:Boolean})],wt.prototype,"editMode",void 0),t([gt({type:Object})],wt.prototype,"nodePositions",void 0),t([gt({type:String})],wt.prototype,"textColor",void 0),t([ut()],wt.prototype,"_pos",void 0),t([ut()],wt.prototype,"_dragging",void 0),wt=t([ht("flow-diagram")],wt);let kt=class extends dt{constructor(){super(...arguments),this.entityId="",this.name="",this.icon="",this.value=0,this.unit="W",this.stateLabel="",this.stateColor="#3b82f6",this.panelClass="",this.badgeClass="",this.showSparkline=!0,this.sparklineHistory=[],this.displayValue="",this._canvasReady=!1}updated(t){super.updated(t),this.showSparkline&&t.has("sparklineHistory")&&this._drawSparkline(),t.has("showSparkline")&&this.showSparkline&&(this._canvasReady=!0,this.requestUpdate(),this.updateComplete.then(()=>this._drawSparkline()))}_drawSparkline(){var t;const e=null===(t=this.shadowRoot)||void 0===t?void 0:t.querySelector("canvas");if(!e)return;const i=this.sparklineHistory;if(!i||i.length<2)return;const o=window.devicePixelRatio||1,r=e.getBoundingClientRect(),s=r.width||200,a=r.height||48;e.width=s*o,e.height=a*o;const n=e.getContext("2d");if(!n)return;n.scale(o,o),n.clearRect(0,0,s,a);const l=i.slice(-60),d=l.map(t=>t.value),c=Math.min(...d),h=Math.max(...d)-c||1,p=t=>t/(l.length-1)*s,v=t=>a-4-(t-c)/h*(a-8),g=n.createLinearGradient(0,0,0,a);g.addColorStop(0,this.stateColor+"55"),g.addColorStop(1,this.stateColor+"00"),n.beginPath(),n.moveTo(p(0),a),l.forEach((t,e)=>n.lineTo(p(e),v(t.value))),n.lineTo(p(l.length-1),a),n.closePath(),n.fillStyle=g,n.fill(),n.beginPath(),n.strokeStyle=this.stateColor,n.lineWidth=1.5,n.lineJoin="round",n.lineCap="round",l.forEach((t,e)=>{0===e?n.moveTo(p(e),v(t.value)):n.lineTo(p(e),v(t.value))}),n.stroke()}render(){const t=this.displayValue||`${Math.round(Math.abs(this.value))} W`;return F`
+  `,t([gt({type:Number})],wt.prototype,"solar",void 0),t([gt({type:Number})],wt.prototype,"battery",void 0),t([gt({type:Number})],wt.prototype,"grid",void 0),t([gt({type:Number})],wt.prototype,"load",void 0),t([gt({type:Number})],wt.prototype,"socPercent",void 0),t([gt({type:Number})],wt.prototype,"wattThreshold",void 0),t([gt({type:String})],wt.prototype,"solarName",void 0),t([gt({type:String})],wt.prototype,"gridName",void 0),t([gt({type:String})],wt.prototype,"homeName",void 0),t([gt({type:String})],wt.prototype,"batteryName",void 0),t([gt({type:String})],wt.prototype,"solarSecondary",void 0),t([gt({type:String})],wt.prototype,"gridSecondary",void 0),t([gt({type:String})],wt.prototype,"homeSecondary",void 0),t([gt({type:String})],wt.prototype,"batterySecondary",void 0),t([gt({type:Object})],wt.prototype,"flows",void 0),t([gt({type:Array})],wt.prototype,"diagramDevices",void 0),t([gt({type:String})],wt.prototype,"backgroundImage",void 0),t([gt({type:Boolean})],wt.prototype,"editMode",void 0),t([gt({type:Object})],wt.prototype,"nodePositions",void 0),t([gt({type:String})],wt.prototype,"textColor",void 0),t([gt({type:String})],wt.prototype,"nodeStyle",void 0),t([gt({type:Boolean})],wt.prototype,"showFlowLines",void 0),t([ut()],wt.prototype,"_pos",void 0),t([ut()],wt.prototype,"_dragging",void 0),wt=t([ht("flow-diagram")],wt);let kt=class extends dt{constructor(){super(...arguments),this.entityId="",this.name="",this.icon="",this.value=0,this.unit="W",this.stateLabel="",this.stateColor="#3b82f6",this.panelClass="",this.badgeClass="",this.showSparkline=!0,this.sparklineHistory=[],this.displayValue="",this._canvasReady=!1}updated(t){super.updated(t),this.showSparkline&&t.has("sparklineHistory")&&this._drawSparkline(),t.has("showSparkline")&&this.showSparkline&&(this._canvasReady=!0,this.requestUpdate(),this.updateComplete.then(()=>this._drawSparkline()))}_drawSparkline(){var t;const e=null===(t=this.shadowRoot)||void 0===t?void 0:t.querySelector("canvas");if(!e)return;const i=this.sparklineHistory;if(!i||i.length<2)return;const o=window.devicePixelRatio||1,r=e.getBoundingClientRect(),s=r.width||200,a=r.height||48;e.width=s*o,e.height=a*o;const n=e.getContext("2d");if(!n)return;n.scale(o,o),n.clearRect(0,0,s,a);const l=i.slice(-60),d=l.map(t=>t.value),c=Math.min(...d),h=Math.max(...d)-c||1,p=t=>t/(l.length-1)*s,v=t=>a-4-(t-c)/h*(a-8),g=n.createLinearGradient(0,0,0,a);g.addColorStop(0,this.stateColor+"55"),g.addColorStop(1,this.stateColor+"00"),n.beginPath(),n.moveTo(p(0),a),l.forEach((t,e)=>n.lineTo(p(e),v(t.value))),n.lineTo(p(l.length-1),a),n.closePath(),n.fillStyle=g,n.fill(),n.beginPath(),n.strokeStyle=this.stateColor,n.lineWidth=1.5,n.lineJoin="round",n.lineCap="round",l.forEach((t,e)=>{0===e?n.moveTo(p(e),v(t.value)):n.lineTo(p(e),v(t.value))}),n.stroke()}render(){const t=this.displayValue||`${Math.round(Math.abs(this.value))} W`;return G`
       <div class="panel ${this.panelClass}">
         <div class="header">
           <div class="icon-wrap">
@@ -475,7 +485,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           style="background:${this.stateColor}22; color:${this.stateColor};"
         >${this.stateLabel}</span>
 
-        ${this.showSparkline?F`<canvas aria-hidden="true"></canvas>`:""}
+        ${this.showSparkline?G`<canvas aria-hidden="true"></canvas>`:""}
       </div>
     `}};kt.styles=a`
     :host { display: block; }
@@ -554,16 +564,16 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       border-radius: 4px;
       display: block;
     }
-  `,t([gt({type:String})],kt.prototype,"entityId",void 0),t([gt({type:String})],kt.prototype,"name",void 0),t([gt({type:String})],kt.prototype,"icon",void 0),t([gt({type:Number})],kt.prototype,"value",void 0),t([gt({type:String})],kt.prototype,"unit",void 0),t([gt({type:String})],kt.prototype,"stateLabel",void 0),t([gt({type:String})],kt.prototype,"stateColor",void 0),t([gt({type:String})],kt.prototype,"panelClass",void 0),t([gt({type:String})],kt.prototype,"badgeClass",void 0),t([gt({type:Boolean})],kt.prototype,"showSparkline",void 0),t([gt({type:Array})],kt.prototype,"sparklineHistory",void 0),t([gt({type:String})],kt.prototype,"displayValue",void 0),t([ut()],kt.prototype,"_canvasReady",void 0),kt=t([ht("stat-panel")],kt);let St=class extends dt{constructor(){super(...arguments),this.devices=[],this.wattThreshold=1e3,this._defaultIconPath="M7,2V13H10V22L17,10H13L17,2H7Z"}render(){if(!this.devices||0===this.devices.length)return F`<div class="row"><span class="empty">No devices configured</span></div>`;const t=[...this.devices].sort((t,e)=>e.watts-t.watts);return F`
+  `,t([gt({type:String})],kt.prototype,"entityId",void 0),t([gt({type:String})],kt.prototype,"name",void 0),t([gt({type:String})],kt.prototype,"icon",void 0),t([gt({type:Number})],kt.prototype,"value",void 0),t([gt({type:String})],kt.prototype,"unit",void 0),t([gt({type:String})],kt.prototype,"stateLabel",void 0),t([gt({type:String})],kt.prototype,"stateColor",void 0),t([gt({type:String})],kt.prototype,"panelClass",void 0),t([gt({type:String})],kt.prototype,"badgeClass",void 0),t([gt({type:Boolean})],kt.prototype,"showSparkline",void 0),t([gt({type:Array})],kt.prototype,"sparklineHistory",void 0),t([gt({type:String})],kt.prototype,"displayValue",void 0),t([ut()],kt.prototype,"_canvasReady",void 0),kt=t([ht("stat-panel")],kt);let St=class extends dt{constructor(){super(...arguments),this.devices=[],this.wattThreshold=1e3,this._defaultIconPath="M7,2V13H10V22L17,10H13L17,2H7Z"}render(){if(!this.devices||0===this.devices.length)return G`<div class="row"><span class="empty">No devices configured</span></div>`;const t=[...this.devices].sort((t,e)=>e.watts-t.watts);return G`
       <div class="row" role="list" aria-label="Device power consumption">
-        ${t.map(t=>{var e;return F`
+        ${t.map(t=>{var e;return G`
             <div
               class="chip ${t.watts<5?"dim":""}"
               role="listitem"
               title="${t.name}: ${ft(t.watts,this.wattThreshold)}"
               style="${t.color?`border-color: ${t.color}33;`:""}"
             >
-              ${(null===(e=t.icon)||void 0===e?void 0:e.startsWith("mdi:"))?F`<ha-icon icon="${t.icon}" style="${t.color?`color:${t.color};`:""}"></ha-icon>`:F`<svg viewBox="0 0 24 24" aria-hidden="true"
+              ${(null===(e=t.icon)||void 0===e?void 0:e.startsWith("mdi:"))?G`<ha-icon icon="${t.icon}" style="${t.color?`color:${t.color};`:""}"></ha-icon>`:G`<svg viewBox="0 0 24 24" aria-hidden="true"
                     style="${t.color?`fill:${t.color};`:""}">
                     <path d="${t.icon||this._defaultIconPath}" />
                   </svg>`}
@@ -644,7 +654,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       color: var(--secondary-text-color, #9ca3af);
       font-style: italic;
     }
-  `,t([gt({type:Array})],St.prototype,"devices",void 0),t([gt({type:Number})],St.prototype,"wattThreshold",void 0),St=t([ht("device-row")],St);const Ht=[{key:"solar",enabled:!0},{key:"battery",enabled:!0},{key:"grid",enabled:!0},{key:"load",enabled:!0}];let At=class extends dt{constructor(){super(...arguments),this._solar=0,this._battery=0,this._grid=0,this._load=0,this._soc=0,this._solarExport=0,this._gridToBattery=0,this._flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this._sparklines={},this._error=null,this._lastSparklineFetch=0,this._sparklineDebounceMs=3e5}get hass(){return this._hass}static getStubConfig(){return{solar:{entity:"sensor.solar_power"},battery:{entity:"sensor.battery_power",soc_entity:"sensor.battery_soc"},grid:{entity:"sensor.grid_power"},load:{entity:"sensor.load_power"}}}static getConfigElement(){return document.createElement("solar-overview-card-editor")}setConfig(t){var e,i,o;if(!(null===(e=t.solar)||void 0===e?void 0:e.entity))throw new Error('solar-overview-card: "solar.entity" required');if(!(null===(i=t.battery)||void 0===i?void 0:i.entity))throw new Error('solar-overview-card: "battery.entity" required');const r=t.grid,s=!!(null===(o=t.load)||void 0===o?void 0:o.entity),a=!!((null==r?void 0:r.entity)||(null==r?void 0:r.import_entity)||(null==r?void 0:r.export_entity)||(null==r?void 0:r.battery_entity));if(!s&&!a)throw new Error("solar-overview-card: at least one of load.entity or a grid entity is required");this._config={watt_threshold:1e3,show_sparklines:!0,theme:"auto",show_flow:!0,show_stats:!0,show_devices:!0,...t},this._error=null}getCardSize(){return 4}set hass(t){if(this._hass=t,this._config)try{const t=this._config.grid,e=this._readEntity(this._config.solar.entity),i=this._readEntity(this._config.battery.entity),o=this._config.load.entity?this._readEntity(this._config.load.entity):0,r=t.entity?this._readEntity(t.entity):0;this._solar=this._config.solar.invert?-e:e,this._battery=this._config.battery.invert?-i:i,this._grid=t.invert?-r:r,this._load=this._config.load.invert?-o:o,this._config.battery.soc_entity&&(this._soc=this._readEntity(this._config.battery.soc_entity));const s=t.import_entity?this._readEntity(t.import_entity):void 0,a=t.export_entity?this._readEntity(t.export_entity):this._config.solar.export_entity?this._readEntity(this._config.solar.export_entity):void 0,n=t.to_battery_entity?this._readEntity(t.to_battery_entity):this._config.battery.grid_charge_entity?this._readEntity(this._config.battery.grid_charge_entity):void 0,l=t.from_battery_entity?this._readEntity(t.from_battery_entity):void 0,d=t.battery_entity?this._readEntity(t.battery_entity):void 0;this._flows=mt({solar:this._solar,battery:this._battery,load:this._load,gridCombined:this._grid,gridImport:s,gridExport:a,gridToBattery:n,batteryToGrid:l,gridBatteryCombined:d});const c=Date.now();!1!==this._config.show_sparklines&&c-this._lastSparklineFetch>this._sparklineDebounceMs&&(this._lastSparklineFetch=c,this._fetchSparklines())}catch(t){this._error=t.message}}_readEntity(t){var e;if(!(null===(e=this._hass)||void 0===e?void 0:e.states))return 0;const i=this._hass.states[t];return i?_t(i.state):0}async _fetchSparklines(){var t,e,i,o;if(!this._config||!(null===(t=this._hass)||void 0===t?void 0:t.callApi))return;const r=(null!==(e=this._config.panels)&&void 0!==e?e:[]).filter(t=>!t.key&&t.entity).map(t=>t.entity),s=[this._config.solar.entity,this._config.battery.entity,null!==(i=this._config.grid.entity)&&void 0!==i?i:this._config.grid.import_entity,this._config.load.entity,...r].filter(t=>!!t),a=new Date,n=null!==(o=this._config.sparkline_hours)&&void 0!==o?o:2,l=new Date(a.getTime()-60*n*60*1e3).toISOString(),d={};await Promise.allSettled(s.map(async t=>{try{const e=`history/period/${l}?filter_entity_id=${t}&minimal_response=true&no_attributes=true`,i=await this._hass.callApi("GET",e);if(!Array.isArray(i)||0===i.length)return;d[t]=i[0].map(t=>{const e=_t(t.state);return isNaN(e)?null:{time:new Date(t.last_updated).getTime(),value:e}}).filter(t=>null!==t)}catch{}})),this._sparklines={...this._sparklines,...d}}_threshold(){var t,e;return null!==(e=null===(t=this._config)||void 0===t?void 0:t.watt_threshold)&&void 0!==e?e:1e3}_secondaryLabel(t){var e,i;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return"";const o=this._hass.states[t];if(!o)return"";const r=null!==(i=o.attributes.unit_of_measurement)&&void 0!==i?i:"";return"W"===r?ft(_t(o.state),this._threshold()):"kW"===r?ft(1e3*_t(o.state),this._threshold()):r?`${o.state} ${r}`:o.state}_customPanel(t){var e,i,o,r,s,a,n,l,d;const c=t.entity,h=null===(e=this._hass)||void 0===e?void 0:e.states[c],p=_t(null==h?void 0:h.state),v=null!==(o=null===(i=null==h?void 0:h.attributes)||void 0===i?void 0:i.unit_of_measurement)&&void 0!==o?o:"",g=this._threshold(),u="W"===v||"kW"===v?ft(p,g):v?`${Number.isInteger(p)?p:p.toFixed(1)} ${v}`:`${Math.round(p)}`,y=null!==(r=t.color)&&void 0!==r?r:"#6366f1",f=null!==(n=null!==(s=t.name)&&void 0!==s?s:null===(a=null==h?void 0:h.attributes)||void 0===a?void 0:a.friendly_name)&&void 0!==n?n:c;return F`
+  `,t([gt({type:Array})],St.prototype,"devices",void 0),t([gt({type:Number})],St.prototype,"wattThreshold",void 0),St=t([ht("device-row")],St);const Ht=[{key:"solar",enabled:!0},{key:"battery",enabled:!0},{key:"grid",enabled:!0},{key:"load",enabled:!0}];let At=class extends dt{constructor(){super(...arguments),this._solar=0,this._battery=0,this._grid=0,this._load=0,this._soc=0,this._solarExport=0,this._gridToBattery=0,this._flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this._sparklines={},this._error=null,this._lastSparklineFetch=0,this._sparklineDebounceMs=3e5}get hass(){return this._hass}static getStubConfig(){return{solar:{entity:"sensor.solar_power"},battery:{entity:"sensor.battery_power",soc_entity:"sensor.battery_soc"},grid:{entity:"sensor.grid_power"},load:{entity:"sensor.load_power"}}}static getConfigElement(){return document.createElement("solar-overview-card-editor")}setConfig(t){var e,i,o;if(!(null===(e=t.solar)||void 0===e?void 0:e.entity))throw new Error('solar-overview-card: "solar.entity" required');if(!(null===(i=t.battery)||void 0===i?void 0:i.entity))throw new Error('solar-overview-card: "battery.entity" required');const r=t.grid,s=!!(null===(o=t.load)||void 0===o?void 0:o.entity),a=!!((null==r?void 0:r.entity)||(null==r?void 0:r.import_entity)||(null==r?void 0:r.export_entity)||(null==r?void 0:r.battery_entity));if(!s&&!a)throw new Error("solar-overview-card: at least one of load.entity or a grid entity is required");this._config={watt_threshold:1e3,show_sparklines:!0,theme:"auto",show_flow:!0,show_stats:!0,show_devices:!0,...t},this._error=null}getCardSize(){return 4}set hass(t){if(this._hass=t,this._config)try{const t=this._config.grid,e=this._readEntity(this._config.solar.entity),i=this._readEntity(this._config.battery.entity),o=this._config.load.entity?this._readEntity(this._config.load.entity):0,r=t.entity?this._readEntity(t.entity):0;this._solar=this._config.solar.invert?-e:e,this._battery=this._config.battery.invert?-i:i,this._grid=t.invert?-r:r,this._load=this._config.load.invert?-o:o,this._config.battery.soc_entity&&(this._soc=this._readEntity(this._config.battery.soc_entity));const s=t.import_entity?this._readEntity(t.import_entity):void 0,a=t.export_entity?this._readEntity(t.export_entity):this._config.solar.export_entity?this._readEntity(this._config.solar.export_entity):void 0,n=t.to_battery_entity?this._readEntity(t.to_battery_entity):this._config.battery.grid_charge_entity?this._readEntity(this._config.battery.grid_charge_entity):void 0,l=t.from_battery_entity?this._readEntity(t.from_battery_entity):void 0,d=t.battery_entity?this._readEntity(t.battery_entity):void 0;this._flows=mt({solar:this._solar,battery:this._battery,load:this._load,gridCombined:this._grid,gridImport:s,gridExport:a,gridToBattery:n,batteryToGrid:l,gridBatteryCombined:d});const c=Date.now();!1!==this._config.show_sparklines&&c-this._lastSparklineFetch>this._sparklineDebounceMs&&(this._lastSparklineFetch=c,this._fetchSparklines())}catch(t){this._error=t.message}}_readEntity(t){var e;if(!(null===(e=this._hass)||void 0===e?void 0:e.states))return 0;const i=this._hass.states[t];return i?_t(i.state):0}async _fetchSparklines(){var t,e,i,o;if(!this._config||!(null===(t=this._hass)||void 0===t?void 0:t.callApi))return;const r=(null!==(e=this._config.panels)&&void 0!==e?e:[]).filter(t=>!t.key&&t.entity).map(t=>t.entity),s=[this._config.solar.entity,this._config.battery.entity,null!==(i=this._config.grid.entity)&&void 0!==i?i:this._config.grid.import_entity,this._config.load.entity,...r].filter(t=>!!t),a=new Date,n=null!==(o=this._config.sparkline_hours)&&void 0!==o?o:2,l=new Date(a.getTime()-60*n*60*1e3).toISOString(),d={};await Promise.allSettled(s.map(async t=>{try{const e=`history/period/${l}?filter_entity_id=${t}&minimal_response=true&no_attributes=true`,i=await this._hass.callApi("GET",e);if(!Array.isArray(i)||0===i.length)return;d[t]=i[0].map(t=>{const e=_t(t.state);return isNaN(e)?null:{time:new Date(t.last_updated).getTime(),value:e}}).filter(t=>null!==t)}catch{}})),this._sparklines={...this._sparklines,...d}}_threshold(){var t,e;return null!==(e=null===(t=this._config)||void 0===t?void 0:t.watt_threshold)&&void 0!==e?e:1e3}_secondaryLabel(t){var e,i;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return"";const o=this._hass.states[t];if(!o)return"";const r=null!==(i=o.attributes.unit_of_measurement)&&void 0!==i?i:"";return"W"===r?ft(_t(o.state),this._threshold()):"kW"===r?ft(1e3*_t(o.state),this._threshold()):r?`${o.state} ${r}`:o.state}_customPanel(t){var e,i,o,r,s,a,n,l,d;const c=t.entity,h=null===(e=this._hass)||void 0===e?void 0:e.states[c],p=_t(null==h?void 0:h.state),v=null!==(o=null===(i=null==h?void 0:h.attributes)||void 0===i?void 0:i.unit_of_measurement)&&void 0!==o?o:"",g=this._threshold(),u="W"===v||"kW"===v?ft(p,g):v?`${Number.isInteger(p)?p:p.toFixed(1)} ${v}`:`${Math.round(p)}`,y=null!==(r=t.color)&&void 0!==r?r:"#6366f1",f=null!==(n=null!==(s=t.name)&&void 0!==s?s:null===(a=null==h?void 0:h.attributes)||void 0===a?void 0:a.friendly_name)&&void 0!==n?n:c;return G`
       <stat-panel
         .entityId="${c}"
         .name="${f}"
@@ -658,19 +668,19 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         .panelClass="panel--custom"
         .badgeClass="badge--custom"
       ></stat-panel>
-    `}_deviceItems(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.map(t=>{var e,i;return{entityId:t.entity,name:null!==(e=t.name)&&void 0!==e?e:t.entity,icon:null!==(i=t.icon)&&void 0!==i?i:"M7,2V13H10V22L17,10H13L17,2H7Z",watts:this._readEntity(t.entity),color:t.color}}):[]}_diagramDevices(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.filter(t=>t.show_on_diagram).map(t=>{var e,i;return{name:null!==(e=t.name)&&void 0!==e?e:t.entity,watts:this._readEntity(t.entity),color:null!==(i=t.color)&&void 0!==i?i:"#6366f1"}}):[]}_panelProps(t,e,i,o,r,s){var a,n,l;const d=this._threshold(),c=this._config[t];return{entityId:s,name:null!==(a=null==c?void 0:c.name)&&void 0!==a?a:i,icon:o,value:e,displayValue:ft(e,d),stateLabel:bt(s,e),stateColor:r,showSparkline:!1!==(null===(n=this._config)||void 0===n?void 0:n.show_sparklines),sparklineHistory:null!==(l=this._sparklines[s])&&void 0!==l?l:[],panelClass:`panel--${t}`,badgeClass:`badge--${t}`}}render(){var t,e,i,o,r,s,a,n,l,d,c;if(!this._config)return F`<ha-card><div class="error-card">solar-overview-card: no config.</div></ha-card>`;if(this._error)return F`<ha-card><div class="error-card">Error: ${this._error}</div></ha-card>`;const h=this._threshold(),p=!1!==this._config.show_flow,v=!1!==this._config.show_stats,g=!1!==this._config.show_devices,u=this._panelProps("solar",this._solar,"Solar","M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M5,5H11V11H5V5M13,5H19V11H13V5M5,13H11V19H5V13M13,13H19V19H13V13Z","#f59e0b",this._config.solar.entity),y=this._panelProps("battery",this._battery,"Battery","M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z","#10b981",this._config.battery.entity),f=this._config.grid.entity?this._grid:this._flows.gridToHome+this._flows.gridToBattery-(this._flows.solarToGrid+this._flows.batteryToGrid),_=this._panelProps("grid",f,"Grid","M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z","#8b5cf6",null!==(e=null!==(t=this._config.grid.entity)&&void 0!==t?t:this._config.grid.import_entity)&&void 0!==e?e:""),m=this._flows.solarToHome+this._flows.batteryToHome+this._flows.gridToHome,b=this._panelProps("load",m,"Home","M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z","#3b82f6",null!==(i=this._config.load.entity)&&void 0!==i?i:""),$=this._deviceItems();return F`
+    `}_deviceItems(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.map(t=>{var e,i;return{entityId:t.entity,name:null!==(e=t.name)&&void 0!==e?e:t.entity,icon:null!==(i=t.icon)&&void 0!==i?i:"M7,2V13H10V22L17,10H13L17,2H7Z",watts:this._readEntity(t.entity),color:t.color}}):[]}_diagramDevices(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.filter(t=>t.show_on_diagram).map(t=>{var e,i;return{name:null!==(e=t.name)&&void 0!==e?e:t.entity,watts:this._readEntity(t.entity),color:null!==(i=t.color)&&void 0!==i?i:"#6366f1"}}):[]}_panelProps(t,e,i,o,r,s){var a,n,l;const d=this._threshold(),c=this._config[t];return{entityId:s,name:null!==(a=null==c?void 0:c.name)&&void 0!==a?a:i,icon:o,value:e,displayValue:ft(e,d),stateLabel:bt(s,e),stateColor:r,showSparkline:!1!==(null===(n=this._config)||void 0===n?void 0:n.show_sparklines),sparklineHistory:null!==(l=this._sparklines[s])&&void 0!==l?l:[],panelClass:`panel--${t}`,badgeClass:`badge--${t}`}}render(){var t,e,i,o,r,s,a,n,l,d,c,h;if(!this._config)return G`<ha-card><div class="error-card">solar-overview-card: no config.</div></ha-card>`;if(this._error)return G`<ha-card><div class="error-card">Error: ${this._error}</div></ha-card>`;const p=this._threshold(),v=!1!==this._config.show_flow,g=!1!==this._config.show_stats,u=!1!==this._config.show_devices,y=this._panelProps("solar",this._solar,"Solar","M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M5,5H11V11H5V5M13,5H19V11H13V5M5,13H11V19H5V13M13,13H19V19H13V13Z","#f59e0b",this._config.solar.entity),f=this._panelProps("battery",this._battery,"Battery","M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z","#10b981",this._config.battery.entity),_=this._config.grid.entity?this._grid:this._flows.gridToHome+this._flows.gridToBattery-(this._flows.solarToGrid+this._flows.batteryToGrid),m=this._panelProps("grid",_,"Grid","M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z","#8b5cf6",null!==(e=null!==(t=this._config.grid.entity)&&void 0!==t?t:this._config.grid.import_entity)&&void 0!==e?e:""),b=this._flows.solarToHome+this._flows.batteryToHome+this._flows.gridToHome,$=this._panelProps("load",b,"Home","M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z","#3b82f6",null!==(i=this._config.load.entity)&&void 0!==i?i:""),x=this._deviceItems();return G`
       <ha-card>
         <div class="card" theme="${null!==(o=this._config.theme)&&void 0!==o?o:"auto"}">
 
-          ${p?F`
+          ${v?G`
             <div class="flow-diagram">
               <flow-diagram
                 .solar="${this._solar}"
                 .battery="${this._battery}"
-                .grid="${f}"
-                .load="${m}"
+                .grid="${_}"
+                .load="${b}"
                 .socPercent="${this._soc}"
-                .wattThreshold="${h}"
+                .wattThreshold="${p}"
                 .flows="${this._flows}"
                 .diagramDevices="${this._diagramDevices()}"
                 .solarName="${null!==(r=this._config.solar.name)&&void 0!==r?r:"Solar"}"
@@ -679,6 +689,8 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                 .batteryName="${null!==(n=this._config.battery.name)&&void 0!==n?n:"Battery"}"
                 .backgroundImage="${null!==(l=this._config.flow_background)&&void 0!==l?l:""}"
                 .textColor="${null!==(d=this._config.diagram_text_color)&&void 0!==d?d:"#ffffff"}"
+                .nodeStyle="${null!==(c=this._config.node_style)&&void 0!==c?c:"circle"}"
+                .showFlowLines="${!1!==this._config.show_flow_lines}"
                 .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
                 .gridSecondary="${this._secondaryLabel(this._config.grid.secondary_entity)}"
@@ -688,9 +700,9 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `:""}
 
-          ${v?F`
+          ${g?G`
             <div class="stat-grid">
-              ${(null!==(c=this._config.panels)&&void 0!==c?c:Ht).filter(t=>!1!==t.enabled).map(t=>{if(t.key){const e={solar:u,battery:y,grid:_,load:b}[t.key];return F`
+              ${(null!==(h=this._config.panels)&&void 0!==h?h:Ht).filter(t=>!1!==t.enabled).map(t=>{if(t.key){const e={solar:y,battery:f,grid:m,load:$}[t.key];return G`
                       <stat-panel
                         .entityId="${e.entityId}"
                         .name="${e.name}"
@@ -708,25 +720,25 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `:""}
 
-          ${g&&this._config.devices&&this._config.devices.length>0?F`
+          ${u&&this._config.devices&&this._config.devices.length>0?G`
             <div class="devices-section">
               <div class="devices-label">Devices</div>
               <device-row
-                .devices="${$}"
-                .wattThreshold="${h}"
+                .devices="${x}"
+                .wattThreshold="${p}"
               ></device-row>
             </div>
           `:""}
 
         </div>
       </ha-card>
-    `}updated(t){super.updated(t)}};At.styles=[yt,a`:host { display: block; } ha-card { overflow: hidden; }`],t([ut()],At.prototype,"_config",void 0),t([ut()],At.prototype,"_solar",void 0),t([ut()],At.prototype,"_battery",void 0),t([ut()],At.prototype,"_grid",void 0),t([ut()],At.prototype,"_load",void 0),t([ut()],At.prototype,"_soc",void 0),t([ut()],At.prototype,"_solarExport",void 0),t([ut()],At.prototype,"_gridToBattery",void 0),t([ut()],At.prototype,"_flows",void 0),t([ut()],At.prototype,"_sparklines",void 0),t([ut()],At.prototype,"_error",void 0),At=t([ht("solar-overview-card")],At);let Ct=class extends dt{constructor(){super(...arguments),this._page="main",this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1},this._editingIndex=null,this._editingDevice={entity:"",name:"",icon:"",color:"#6366f1",show_on_diagram:!1},this._newPanel={entity:"",name:"",color:"#6366f1"}}setConfig(t){this._config=t}_setValue(t,e){var i;if(!this._config)return;const o=t.split("."),r=JSON.parse(JSON.stringify(this._config)),s=r;if(2===o.length){const[t,r]=o,a={...null!==(i=s[t])&&void 0!==i?i:{}};""===e||null==e?delete a[r]:a[r]=e,s[t]=a}else""===e||null==e?delete s[o[0]]:s[o[0]]=e;this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:r}}))}_computeCurrentFlows(){if(!this.hass||!this._config)return null;try{const t=this._config,e=t.grid,i=t=>{var e;return t?_t(null===(e=this.hass.states[t])||void 0===e?void 0:e.state):0},o=i(t.solar.entity)*(t.solar.invert?-1:1),r=i(t.battery.entity)*(t.battery.invert?-1:1),s=i(t.load.entity)*(t.load.invert?-1:1),a=e.entity?i(e.entity)*(e.invert?-1:1):0,n=e.import_entity?i(e.import_entity):void 0,l=e.export_entity?i(e.export_entity):t.solar.export_entity?i(t.solar.export_entity):void 0,d=e.to_battery_entity?i(e.to_battery_entity):void 0,c=e.from_battery_entity?i(e.from_battery_entity):void 0;return mt({solar:o,battery:r,load:s,gridCombined:a,gridImport:n,gridExport:l,gridToBattery:d,batteryToGrid:c,gridBatteryCombined:e.battery_entity?i(e.battery_entity):void 0})}catch{return null}}_pageHeader(t,e){return F`
+    `}updated(t){super.updated(t)}};At.styles=[yt,a`:host { display: block; } ha-card { overflow: hidden; }`],t([ut()],At.prototype,"_config",void 0),t([ut()],At.prototype,"_solar",void 0),t([ut()],At.prototype,"_battery",void 0),t([ut()],At.prototype,"_grid",void 0),t([ut()],At.prototype,"_load",void 0),t([ut()],At.prototype,"_soc",void 0),t([ut()],At.prototype,"_solarExport",void 0),t([ut()],At.prototype,"_gridToBattery",void 0),t([ut()],At.prototype,"_flows",void 0),t([ut()],At.prototype,"_sparklines",void 0),t([ut()],At.prototype,"_error",void 0),At=t([ht("solar-overview-card")],At);let Ct=class extends dt{constructor(){super(...arguments),this._page="main",this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1},this._editingIndex=null,this._editingDevice={entity:"",name:"",icon:"",color:"#6366f1",show_on_diagram:!1},this._newPanel={entity:"",name:"",color:"#6366f1"}}setConfig(t){this._config=t}_setValue(t,e){var i;if(!this._config)return;const o=t.split("."),r=JSON.parse(JSON.stringify(this._config)),s=r;if(2===o.length){const[t,r]=o,a={...null!==(i=s[t])&&void 0!==i?i:{}};""===e||null==e?delete a[r]:a[r]=e,s[t]=a}else""===e||null==e?delete s[o[0]]:s[o[0]]=e;this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:r}}))}_computeCurrentFlows(){if(!this.hass||!this._config)return null;try{const t=this._config,e=t.grid,i=t=>{var e;return t?_t(null===(e=this.hass.states[t])||void 0===e?void 0:e.state):0},o=i(t.solar.entity)*(t.solar.invert?-1:1),r=i(t.battery.entity)*(t.battery.invert?-1:1),s=i(t.load.entity)*(t.load.invert?-1:1),a=e.entity?i(e.entity)*(e.invert?-1:1):0,n=e.import_entity?i(e.import_entity):void 0,l=e.export_entity?i(e.export_entity):t.solar.export_entity?i(t.solar.export_entity):void 0,d=e.to_battery_entity?i(e.to_battery_entity):void 0,c=e.from_battery_entity?i(e.from_battery_entity):void 0;return mt({solar:o,battery:r,load:s,gridCombined:a,gridImport:n,gridExport:l,gridToBattery:d,batteryToGrid:c,gridBatteryCombined:e.battery_entity?i(e.battery_entity):void 0})}catch{return null}}_pageHeader(t,e){return G`
       <div class="page-header">
         <button class="back-btn" @click="${()=>{this._page="main",this._editingIndex=null}}">‹</button>
         <span class="page-icon">${t}</span>
         <span class="page-title">${e}</span>
       </div>
-    `}_boolField(t,e,i){return F`
+    `}_boolField(t,e,i){return G`
       <div class="bool-row">
         <span class="bool-label">${t}</span>
         <ha-selector
@@ -735,7 +747,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           @value-changed="${t=>this._setValue(e,t.detail.value)}"
         ></ha-selector>
       </div>
-    `}_entityField(t,e,i,o){var r,s;return F`
+    `}_entityField(t,e,i,o){var r,s;return G`
       <div class="field-wrap">
         <div class="field-row">
           <ha-selector
@@ -745,11 +757,11 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             .value="${null!=i?i:""}"
             @value-changed="${t=>{var i;return this._setValue(e,null!==(i=t.detail.value)&&void 0!==i?i:"")}}"
           ></ha-selector>
-          ${i?F`
+          ${i?G`
             <button class="clear-btn" title="Clear" @click="${()=>this._setValue(e,"")}">✕</button>
           `:""}
         </div>
-        ${void 0!==(null==o?void 0:o.namePath)?F`
+        ${void 0!==(null==o?void 0:o.namePath)?G`
           <div class="field-row" style="margin-top:4px;">
             <ha-selector
               .label="Display name"
@@ -757,15 +769,15 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
               .value="${null!==(r=o.nameValue)&&void 0!==r?r:""}"
               @value-changed="${t=>{var e;return this._setValue(o.namePath,null!==(e=t.detail.value)&&void 0!==e?e:"")}}"
             ></ha-selector>
-            ${o.nameValue?F`
+            ${o.nameValue?G`
               <button class="clear-btn" title="Clear" @click="${()=>this._setValue(o.namePath,"")}">✕</button>
             `:""}
           </div>
         `:""}
-        ${(null==o?void 0:o.hint)?F`<p class="hint" style="margin:3px 0 0;">${o.hint}</p>`:""}
+        ${(null==o?void 0:o.hint)?G`<p class="hint" style="margin:3px 0 0;">${o.hint}</p>`:""}
         ${void 0!==(null==o?void 0:o.invertPath)?this._boolField("Invert sign (flip +/−)",o.invertPath,null!==(s=o.invertValue)&&void 0!==s&&s):""}
       </div>
-    `}_textField(t,e,i){return F`
+    `}_textField(t,e,i){return G`
       <div class="field-row">
         <ha-selector
           .label="${t}"
@@ -773,11 +785,11 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           .value="${null!=i?i:""}"
           @value-changed="${t=>{var i;return this._setValue(e,null!==(i=t.detail.value)&&void 0!==i?i:"")}}"
         ></ha-selector>
-        ${i?F`
+        ${i?G`
           <button class="clear-btn" title="Clear" @click="${()=>this._setValue(e,"")}">✕</button>
         `:""}
       </div>
-    `}_renderMain(){var t,e,i,o,r,s,a,n,l,d,c,h,p;if(!this._config)return F``;const v=this._config,g=null!==(e=null===(t=v.devices)||void 0===t?void 0:t.length)&&void 0!==e?e:0,u=(t,e,i,o,r)=>F`
+    `}_renderMain(){var t,e,i,o,r,s,a,n,l,d,c,h,p;if(!this._config)return G``;const v=this._config,g=null!==(e=null===(t=v.devices)||void 0===t?void 0:t.length)&&void 0!==e?e:0,u=(t,e,i,o,r)=>G`
       <div class="nav-item" @click="${()=>{this._page=t}}">
         <div class="nav-icon" style="background:${r}">${e}</div>
         <div class="nav-text">
@@ -786,7 +798,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         </div>
         <span class="nav-arrow">›</span>
       </div>
-    `,y=(null!==(i=v.panels)&&void 0!==i?i:Ht).filter(t=>!1!==t.enabled).length;return F`
+    `,y=(null!==(i=v.panels)&&void 0!==i?i:Ht).filter(t=>!1!==t.enabled).length;return G`
       <div class="nav-list">
         ${u("setup","⚙️","Setup","Visibility & sparklines","rgba(107,114,128,0.18)")}
         ${u("solar","☀️","Solar",null!==(r=null===(o=v.solar)||void 0===o?void 0:o.entity)&&void 0!==r?r:"Not configured","rgba(245,158,11,0.18)")}
@@ -797,39 +809,49 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         ${u("outlets","🔌","Outlets",g>0?`${g} device${1!==g?"s":""}`:"No devices added","rgba(99,102,241,0.18)")}
         ${u("layout","🗺️","Layout","Drag nodes to reposition","rgba(16,185,129,0.18)")}
       </div>
-    `}_renderSetupPage(){var t,e;if(!this._config)return F``;const i=this._config;return F`
+    `}_renderSetupPage(){var t,e,i;if(!this._config)return G``;const o=this._config;return G`
       ${this._pageHeader("⚙️","Setup")}
       <div class="form-col">
         <div class="section-label" style="margin-top:0;">Sections</div>
-        ${this._boolField("Show flow diagram","show_flow",!1!==i.show_flow)}
-        ${this._boolField("Show stat panels","show_stats",!1!==i.show_stats)}
-        ${this._boolField("Show devices row","show_devices",!1!==i.show_devices)}
-        ${this._boolField("Show sparklines","show_sparklines",!1!==i.show_sparklines)}
+        ${this._boolField("Show flow diagram","show_flow",!1!==o.show_flow)}
+        ${this._boolField("Show stat panels","show_stats",!1!==o.show_stats)}
+        ${this._boolField("Show devices row","show_devices",!1!==o.show_devices)}
+        ${this._boolField("Show sparklines","show_sparklines",!1!==o.show_sparklines)}
+        <div class="section-label">Flow diagram style</div>
+        <div class="bool-row">
+          <span class="bool-label">Node style</span>
+          <ha-selector
+            .selector=${{select:{options:["circle","card"],mode:"list"}}}
+            .value="${null!==(t=o.node_style)&&void 0!==t?t:"circle"}"
+            @value-changed="${t=>this._setValue("node_style",t.detail.value)}"
+          ></ha-selector>
+        </div>
+        ${this._boolField("Show animated flow lines","show_flow_lines",!1!==o.show_flow_lines)}
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
           <input type="color"
-            .value="${null!==(t=i.diagram_text_color)&&void 0!==t?t:"#ffffff"}"
+            .value="${null!==(e=o.diagram_text_color)&&void 0!==e?e:"#ffffff"}"
             @input="${t=>this._setValue("diagram_text_color",t.target.value)}"
           />
-          ${i.diagram_text_color&&"#ffffff"!==i.diagram_text_color?F`
+          ${o.diagram_text_color&&"#ffffff"!==o.diagram_text_color?G`
             <button class="clear-btn" title="Reset to white" @click="${()=>this._setValue("diagram_text_color","")}">✕</button>
           `:""}
         </div>
         <p class="hint">Default: white. Applies to all node labels and values.</p>
         <div class="section-label">Flow diagram background</div>
-        ${this._textField("Background image URL or /local/ path","flow_background",i.flow_background)}
+        ${this._textField("Background image URL or /local/ path","flow_background",o.flow_background)}
         <p class="hint">e.g. /local/solar-bg.png or https://… — image fills diagram area.</p>
         <div class="section-label">Sparkline history</div>
         <ha-selector
           .label="Hours of history to display (default: 2)"
           .selector=${{number:{min:1,max:48,step:1,mode:"box"}}}
-          .value="${null!==(e=i.sparkline_hours)&&void 0!==e?e:2}"
+          .value="${null!==(i=o.sparkline_hours)&&void 0!==i?i:2}"
           @value-changed="${t=>this._setValue("sparkline_hours",t.detail.value)}"
         ></ha-selector>
         <p class="hint">Applies to all sparklines. Larger values fetch more history from HA.</p>
       </div>
-    `}_renderSolarPage(){if(!this._config)return F``;const t=this._config.solar;return F`
+    `}_renderSolarPage(){if(!this._config)return G``;const t=this._config.solar;return G`
       ${this._pageHeader("☀️","Solar Config")}
       <div class="form-col">
         ${this._entityField("Solar generation  (W ≥ 0)","solar.entity",null==t?void 0:t.entity,{invertPath:"solar.invert",invertValue:null==t?void 0:t.invert,namePath:"solar.name",nameValue:null==t?void 0:t.name})}
@@ -837,7 +859,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         <div class="section-label">Diagram node</div>
         ${this._entityField("Secondary entity (shown below value on Solar node)","solar.secondary_entity",null==t?void 0:t.secondary_entity,{hint:"e.g. a second PV sensor or string total"})}
       </div>
-    `}_renderBatteryPage(){if(!this._config)return F``;const t=this._config.battery;return F`
+    `}_renderBatteryPage(){if(!this._config)return G``;const t=this._config.battery;return G`
       ${this._pageHeader("🔋","Battery Config")}
       <div class="form-col">
         ${this._entityField("Battery power  (+ = charging,  − = discharging)","battery.entity",null==t?void 0:t.entity,{invertPath:"battery.invert",invertValue:null==t?void 0:t.invert,namePath:"battery.name",nameValue:null==t?void 0:t.name})}
@@ -845,7 +867,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         <div class="section-label">Diagram node</div>
         ${this._entityField("Secondary entity (shown below value on Battery node)","battery.secondary_entity",null==t?void 0:t.secondary_entity,{hint:"e.g. battery status or temperature"})}
       </div>
-    `}_renderGridPage(){if(!this._config)return F``;const t=this._config.grid;return F`
+    `}_renderGridPage(){if(!this._config)return G``;const t=this._config.grid;return G`
       ${this._pageHeader("⚡","Grid Config")}
       <div class="form-col">
         <div class="section-label" style="margin-top:0;">Combined sensor (fallback)</div>
@@ -860,13 +882,13 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         <div class="section-label">Diagram node</div>
         ${this._entityField("Secondary entity (shown below value on Grid node)","grid.secondary_entity",null==t?void 0:t.secondary_entity,{hint:"e.g. frient meter or grid import sensor"})}
       </div>
-    `}_renderHousePage(){var t;if(!this._config)return F``;const e=this._config.load,i=this._computeCurrentFlows(),o=null!==(t=this._config.watt_threshold)&&void 0!==t?t:1e3,r=t=>ft(t,o);return F`
+    `}_renderHousePage(){var t;if(!this._config)return G``;const e=this._config.load,i=this._computeCurrentFlows(),o=null!==(t=this._config.watt_threshold)&&void 0!==t?t:1e3,r=t=>ft(t,o);return G`
       ${this._pageHeader("🏠","House Config")}
       <div class="form-col">
         ${this._entityField("Home consumption  (W ≥ 0)","load.entity",null==e?void 0:e.entity,{invertPath:"load.invert",invertValue:null==e?void 0:e.invert,namePath:"load.name",nameValue:null==e?void 0:e.name})}
         <div class="section-label">Diagram node</div>
         ${this._entityField("Secondary entity (shown below value on Home node)","load.secondary_entity",null==e?void 0:e.secondary_entity,{hint:"e.g. a sub-metered consumption sensor"})}
-        ${i?F`
+        ${i?G`
           <div class="section-label">Live flows (solar + battery + grid → house)</div>
           <div class="flow-stats">
             <div class="flow-stat">
@@ -884,41 +906,43 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           </div>
         `:""}
       </div>
-    `}_renderLayoutPage(){var t,e,i,o,r,s,a,n,l;if(!this._config)return F``;const d=this._config,c=d.grid,h=t=>{var e,i,o;return t?_t(null!==(o=null===(i=null===(e=this.hass)||void 0===e?void 0:e.states[t])||void 0===i?void 0:i.state)&&void 0!==o?o:"0"):0},p=h(d.solar.entity)*(d.solar.invert?-1:1),v=h(d.battery.entity)*(d.battery.invert?-1:1),g=h(null===(t=d.load)||void 0===t?void 0:t.entity),u=c.entity?h(c.entity)*(c.invert?-1:1):0,y=h(d.battery.soc_entity),f=(()=>{try{return mt({solar:p,battery:v,load:g,gridCombined:u,gridImport:c.import_entity?h(c.import_entity):void 0,gridExport:c.export_entity?h(c.export_entity):void 0,gridToBattery:c.to_battery_entity?h(c.to_battery_entity):void 0,batteryToGrid:c.from_battery_entity?h(c.from_battery_entity):void 0,gridBatteryCombined:c.battery_entity?h(c.battery_entity):void 0})}catch{return{solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0}}})(),_=!!d.node_positions&&Object.keys(d.node_positions).length>0;return F`
+    `}_renderLayoutPage(){var t,e,i,o,r,s,a,n,l,d;if(!this._config)return G``;const c=this._config,h=c.grid,p=t=>{var e,i,o;return t?_t(null!==(o=null===(i=null===(e=this.hass)||void 0===e?void 0:e.states[t])||void 0===i?void 0:i.state)&&void 0!==o?o:"0"):0},v=p(c.solar.entity)*(c.solar.invert?-1:1),g=p(c.battery.entity)*(c.battery.invert?-1:1),u=p(null===(t=c.load)||void 0===t?void 0:t.entity),y=h.entity?p(h.entity)*(h.invert?-1:1):0,f=p(c.battery.soc_entity),_=(()=>{try{return mt({solar:v,battery:g,load:u,gridCombined:y,gridImport:h.import_entity?p(h.import_entity):void 0,gridExport:h.export_entity?p(h.export_entity):void 0,gridToBattery:h.to_battery_entity?p(h.to_battery_entity):void 0,batteryToGrid:h.from_battery_entity?p(h.from_battery_entity):void 0,gridBatteryCombined:h.battery_entity?p(h.battery_entity):void 0})}catch{return{solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0}}})(),m=!!c.node_positions&&Object.keys(c.node_positions).length>0;return G`
       ${this._pageHeader("🗺️","Layout")}
       <div class="form-col">
         <p class="hint" style="margin:0 0 8px;">Drag nodes to reposition. Changes save automatically.</p>
         <div style="border:1px solid var(--divider-color,rgba(255,255,255,0.1));border-radius:10px;overflow:hidden;">
           <flow-diagram
-            .solar="${p}"
-            .battery="${v}"
-            .grid="${u}"
-            .load="${g}"
-            .socPercent="${y}"
-            .wattThreshold="${null!==(e=d.watt_threshold)&&void 0!==e?e:1e3}"
-            .flows="${f}"
-            .solarName="${null!==(i=d.solar.name)&&void 0!==i?i:"Solar"}"
-            .gridName="${null!==(o=d.grid.name)&&void 0!==o?o:"Grid"}"
-            .homeName="${null!==(s=null===(r=d.load)||void 0===r?void 0:r.name)&&void 0!==s?s:"Home"}"
-            .batteryName="${null!==(a=d.battery.name)&&void 0!==a?a:"Battery"}"
-            .textColor="${null!==(n=d.diagram_text_color)&&void 0!==n?n:"#ffffff"}"
-            .nodePositions="${d.node_positions}"
-            .backgroundImage="${null!==(l=d.flow_background)&&void 0!==l?l:""}"
+            .solar="${v}"
+            .battery="${g}"
+            .grid="${y}"
+            .load="${u}"
+            .socPercent="${f}"
+            .wattThreshold="${null!==(e=c.watt_threshold)&&void 0!==e?e:1e3}"
+            .flows="${_}"
+            .solarName="${null!==(i=c.solar.name)&&void 0!==i?i:"Solar"}"
+            .gridName="${null!==(o=c.grid.name)&&void 0!==o?o:"Grid"}"
+            .homeName="${null!==(s=null===(r=c.load)||void 0===r?void 0:r.name)&&void 0!==s?s:"Home"}"
+            .batteryName="${null!==(a=c.battery.name)&&void 0!==a?a:"Battery"}"
+            .textColor="${null!==(n=c.diagram_text_color)&&void 0!==n?n:"#ffffff"}"
+            .nodeStyle="${null!==(l=c.node_style)&&void 0!==l?l:"circle"}"
+            .showFlowLines="${!1!==c.show_flow_lines}"
+            .nodePositions="${c.node_positions}"
+            .backgroundImage="${null!==(d=c.flow_background)&&void 0!==d?d:""}"
             .editMode="${!0}"
             @nodes-moved="${t=>this._setValue("node_positions",t.detail.positions)}"
           ></flow-diagram>
         </div>
-        ${_?F`
+        ${m?G`
           <button class="add-btn" style="align-self:flex-start;background:rgba(239,68,68,0.15);color:#ef4444;"
             @click="${()=>this._setValue("node_positions",void 0)}">
             Reset to default positions
           </button>
         `:""}
       </div>
-    `}_renderPanelsPage(){var t;if(!this._config)return F``;const e=null!==(t=this._config.panels)&&void 0!==t?t:Ht,i={solar:{icon:"☀️",label:"Solar"},battery:{icon:"🔋",label:"Battery"},grid:{icon:"⚡",label:"Grid"},load:{icon:"🏠",label:"House"}};return F`
+    `}_renderPanelsPage(){var t;if(!this._config)return G``;const e=null!==(t=this._config.panels)&&void 0!==t?t:Ht,i={solar:{icon:"☀️",label:"Solar"},battery:{icon:"🔋",label:"Battery"},grid:{icon:"⚡",label:"Grid"},load:{icon:"🏠",label:"House"}};return G`
       ${this._pageHeader("📊","Stat Panels")}
       <div class="form-col">
-        ${e.map((t,o)=>{var r,s,a;const n=!!t.key,l=n?i[t.key].icon:"📈",d=n?i[t.key].label:null!==(s=null!==(r=t.name)&&void 0!==r?r:t.entity)&&void 0!==s?s:"Custom",c=!n&&t.entity?F`<span class="nav-sub" style="margin:0;">${t.entity}</span>`:"";return F`
+        ${e.map((t,o)=>{var r,s,a;const n=!!t.key,l=n?i[t.key].icon:"📈",d=n?i[t.key].label:null!==(s=null!==(r=t.name)&&void 0!==r?r:t.entity)&&void 0!==s?s:"Custom",c=!n&&t.entity?G`<span class="nav-sub" style="margin:0;">${t.entity}</span>`:"";return G`
             <div class="panel-item">
               <div class="panel-move">
                 <button class="move-btn" ?disabled="${0===o}"
@@ -926,9 +950,9 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                 <button class="move-btn" ?disabled="${o===e.length-1}"
                   @click="${()=>this._movePanel(o,1)}">▼</button>
               </div>
-              ${n?F`<span style="font-size:1.1rem;">${l}</span>`:F`<span style="width:10px;height:10px;border-radius:50%;background:${null!==(a=t.color)&&void 0!==a?a:"#6366f1"};flex-shrink:0;"></span>`}
+              ${n?G`<span style="font-size:1.1rem;">${l}</span>`:G`<span style="width:10px;height:10px;border-radius:50%;background:${null!==(a=t.color)&&void 0!==a?a:"#6366f1"};flex-shrink:0;"></span>`}
               <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${d}${c}</span>
-              ${n?"":F`
+              ${n?"":G`
                 <button class="device-btn danger" title="Remove" @click="${()=>this._removeCustomPanel(o)}">✕</button>
               `}
               <ha-selector
@@ -961,7 +985,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
 
         <p class="hint">Reorder with ▲▼. Custom panels support any HA entity.</p>
       </div>
-    `}_addCustomPanel(){var t;if(!this._config||!this._newPanel.entity)return;const e=[...null!==(t=this._config.panels)&&void 0!==t?t:Ht,{entity:this._newPanel.entity,name:this._newPanel.name||void 0,color:this._newPanel.color||"#6366f1",enabled:!0}];this._setPanels(e),this._newPanel={entity:"",name:"",color:"#6366f1"}}_removeCustomPanel(t){var e,i;const o=[...null!==(i=null===(e=this._config)||void 0===e?void 0:e.panels)&&void 0!==i?i:Ht];o.splice(t,1),this._setPanels(o)}_setPanels(t){this._config&&this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,panels:t}}}))}_togglePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht];r[t]={...r[t],enabled:e},this._setPanels(r)}_movePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht],s=t+e;s<0||s>=r.length||([r[t],r[s]]=[r[s],r[t]],this._setPanels(r))}_startEdit(t){var e,i,o,r;const s=this._config.devices[t];this._editingDevice={entity:s.entity,name:null!==(e=s.name)&&void 0!==e?e:"",icon:null!==(i=s.icon)&&void 0!==i?i:"",color:null!==(o=s.color)&&void 0!==o?o:"#6366f1",show_on_diagram:null!==(r=s.show_on_diagram)&&void 0!==r&&r},this._editingIndex=t}_saveEdit(){var t;if(null===this._editingIndex||!this._config)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[]];e[this._editingIndex]={...this._editingDevice},this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._editingIndex=null}_cancelEdit(){this._editingIndex=null}_deleteDevice(t){var e;if(!this._config)return;const i=[...null!==(e=this._config.devices)&&void 0!==e?e:[]];i.splice(t,1),this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:i}}}))}_addDevice(){var t;if(!this._config||!this._newDevice.entity)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[],{...this._newDevice}];this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1}}_deviceForm(t,e,i,o,r){return F`
+    `}_addCustomPanel(){var t;if(!this._config||!this._newPanel.entity)return;const e=[...null!==(t=this._config.panels)&&void 0!==t?t:Ht,{entity:this._newPanel.entity,name:this._newPanel.name||void 0,color:this._newPanel.color||"#6366f1",enabled:!0}];this._setPanels(e),this._newPanel={entity:"",name:"",color:"#6366f1"}}_removeCustomPanel(t){var e,i;const o=[...null!==(i=null===(e=this._config)||void 0===e?void 0:e.panels)&&void 0!==i?i:Ht];o.splice(t,1),this._setPanels(o)}_setPanels(t){this._config&&this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,panels:t}}}))}_togglePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht];r[t]={...r[t],enabled:e},this._setPanels(r)}_movePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht],s=t+e;s<0||s>=r.length||([r[t],r[s]]=[r[s],r[t]],this._setPanels(r))}_startEdit(t){var e,i,o,r;const s=this._config.devices[t];this._editingDevice={entity:s.entity,name:null!==(e=s.name)&&void 0!==e?e:"",icon:null!==(i=s.icon)&&void 0!==i?i:"",color:null!==(o=s.color)&&void 0!==o?o:"#6366f1",show_on_diagram:null!==(r=s.show_on_diagram)&&void 0!==r&&r},this._editingIndex=t}_saveEdit(){var t;if(null===this._editingIndex||!this._config)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[]];e[this._editingIndex]={...this._editingDevice},this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._editingIndex=null}_cancelEdit(){this._editingIndex=null}_deleteDevice(t){var e;if(!this._config)return;const i=[...null!==(e=this._config.devices)&&void 0!==e?e:[]];i.splice(t,1),this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:i}}}))}_addDevice(){var t;if(!this._config||!this._newDevice.entity)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[],{...this._newDevice}];this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1}}_deviceForm(t,e,i,o,r){return G`
       <ha-selector .hass="${this.hass}" .label="Entity"
         .selector=${{entity:{}}} .value="${t.entity}"
         @value-changed="${t=>{var i;return e({entity:null!==(i=t.detail.value)&&void 0!==i?i:""})}}"
@@ -992,22 +1016,22 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       </div>
 
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        ${r?F`<button class="add-btn" style="background:rgba(255,255,255,0.1);color:var(--primary-text-color);" @click="${r}">Cancel</button>`:""}
+        ${r?G`<button class="add-btn" style="background:rgba(255,255,255,0.1);color:var(--primary-text-color);" @click="${r}">Cancel</button>`:""}
         <button class="add-btn" ?disabled="${!t.entity}" @click="${o}">${i}</button>
       </div>
-    `}_renderOutletsPage(){var t,e;const i=null!==(e=null===(t=this._config)||void 0===t?void 0:t.devices)&&void 0!==e?e:[];return F`
+    `}_renderOutletsPage(){var t,e;const i=null!==(e=null===(t=this._config)||void 0===t?void 0:t.devices)&&void 0!==e?e:[];return G`
       ${this._pageHeader("🔌","Outlets / Devices")}
 
-      ${i.length>0?F`
+      ${i.length>0?G`
         <div class="device-list">
-          ${i.map((t,e)=>{var i,o;return F`
+          ${i.map((t,e)=>{var i,o;return G`
             <div>
               <div class="device-item">
                 <div class="device-item-color" style="background:${null!==(i=t.color)&&void 0!==i?i:"#6366f1"}"></div>
                 <div style="flex:1;min-width:0;">
                   <div class="device-item-name">
                     ${null!==(o=t.name)&&void 0!==o?o:t.entity}
-                    ${t.show_on_diagram?F`<span class="diagram-badge">diagram</span>`:""}
+                    ${t.show_on_diagram?G`<span class="diagram-badge">diagram</span>`:""}
                   </div>
                   <div class="device-item-entity">${t.entity}</div>
                 </div>
@@ -1019,7 +1043,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                   <button class="device-btn danger" @click="${()=>this._deleteDevice(e)}">✕</button>
                 </div>
               </div>
-              ${this._editingIndex===e?F`
+              ${this._editingIndex===e?G`
                 <div class="device-edit-form">
                   ${this._deviceForm(this._editingDevice,t=>{this._editingDevice={...this._editingDevice,...t},this.requestUpdate()},"Save",()=>this._saveEdit(),()=>this._cancelEdit())}
                 </div>
@@ -1027,13 +1051,13 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `})}
         </div>
-      `:F`<p class="hint">No devices added yet.</p>`}
+      `:G`<p class="hint">No devices added yet.</p>`}
 
       <div class="add-device-form">
         <div class="section-label" style="margin-top:0;">Add device</div>
         ${this._deviceForm(this._newDevice,t=>{this._newDevice={...this._newDevice,...t},this.requestUpdate()},"Add Device",()=>this._addDevice())}
       </div>
-    `}render(){if(!this._config)return F``;switch(this._page){case"setup":return this._renderSetupPage();case"solar":return this._renderSolarPage();case"battery":return this._renderBatteryPage();case"grid":return this._renderGridPage();case"house":return this._renderHousePage();case"panels":return this._renderPanelsPage();case"outlets":return this._renderOutletsPage();case"layout":return this._renderLayoutPage();default:return this._renderMain()}}};Ct.styles=a`
+    `}render(){if(!this._config)return G``;switch(this._page){case"setup":return this._renderSetupPage();case"solar":return this._renderSolarPage();case"battery":return this._renderBatteryPage();case"grid":return this._renderGridPage();case"house":return this._renderHousePage();case"panels":return this._renderPanelsPage();case"outlets":return this._renderOutletsPage();case"layout":return this._renderLayoutPage();default:return this._renderMain()}}};Ct.styles=a`
     :host { display: block; padding: 16px; }
 
     /* ── Navigation cards ── */

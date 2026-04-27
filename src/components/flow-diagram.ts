@@ -34,6 +34,12 @@ const DEVICE_R    = 17;
 const DEVICE_ICON = 9;
 const DEVICE_GAP  = 52;
 
+// Card-style node dims
+const CARD_W      = 82;
+const CARD_H      = 46;
+const CARD_H_HALF = CARD_H / 2;  // used like NODE_R for text offsets
+const CARD_R      = 10;          // border-radius
+
 export type NodeKey = 'solar' | 'grid' | 'home' | 'battery';
 
 export interface NodePositions {
@@ -86,6 +92,8 @@ export class FlowDiagram extends LitElement {
   @property({ type: Boolean }) editMode = false;
   @property({ type: Object }) nodePositions?: NodePositions;
   @property({ type: String }) textColor = '#ffffff';
+  @property({ type: String }) nodeStyle: 'circle' | 'card' = 'circle';
+  @property({ type: Boolean }) showFlowLines = true;
 
   // ── Drag state ──────────────────────────────────────────────────────────────
   @state() private _pos: AllPos = defaultPos();
@@ -155,6 +163,10 @@ export class FlowDiagram extends LitElement {
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
+  private get _nodeMargin(): number {
+    return this.nodeStyle === 'card' ? CARD_H_HALF + 6 : NODE_R + 4;
+  }
+
   private _batteryColor(): string {
     const soc = Math.max(0, Math.min(100, this.socPercent));
     let r: number, g: number, b: number;
@@ -193,7 +205,7 @@ export class FlowDiagram extends LitElement {
     watts: number, stroke: string, reverse = false,
   ) {
     const active = watts > 1;
-    const { x1, y1, x2, y2 } = this._trim(ax, ay, bx, by);
+    const { x1, y1, x2, y2 } = this._trim(ax, ay, bx, by, this._nodeMargin);
     const sw = this._lineWidth(watts);
     const dashClass = active ? (reverse ? 'flow-active-rev' : 'flow-active') : '';
     return svg`
@@ -233,6 +245,38 @@ export class FlowDiagram extends LitElement {
   ) {
     const tc = this.textColor;
     const dragging = this.editMode && this._dragging === nodeKey;
+    const isCard = this.nodeStyle === 'card';
+    const R = isCard ? CARD_H_HALF : NODE_R;
+
+    // Edit-mode drag handle (dashed outline)
+    const editRing = this.editMode ? svg`
+      ${isCard
+        ? svg`<rect x="${cx - CARD_W / 2 - 6}" y="${cy - R - 6}"
+            width="${CARD_W + 12}" height="${CARD_H + 12}" rx="${CARD_R + 4}"
+            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
+            stroke-dasharray="4 3" opacity="${dragging ? 1 : 0.6}" />`
+        : svg`<circle cx="${cx}" cy="${cy}" r="${NODE_R + 6}"
+            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
+            stroke-dasharray="4 3" opacity="${dragging ? 1 : 0.6}" />`
+      }
+    ` : '';
+
+    // Shape (circle or card)
+    const shape = isCard
+      ? svg`<rect x="${cx - CARD_W / 2}" y="${cy - R}"
+          width="${CARD_W}" height="${CARD_H}" rx="${CARD_R}"
+          fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />`
+      : svg`<circle cx="${cx}" cy="${cy}" r="${NODE_R}"
+          fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />`;
+
+    // Icon — centered in shape
+    const iconScale = ICON_S * 2 / 24;
+    const icon = svg`
+      <g transform="translate(${cx - ICON_S}, ${cy - ICON_S}) scale(${iconScale})">
+        <path d="${iconPath}" fill="${fill}" />
+      </g>
+    `;
+
     return svg`
       <g
         class="${this.editMode ? 'draggable' : ''} node"
@@ -240,26 +284,17 @@ export class FlowDiagram extends LitElement {
         @pointermove="${(e: PointerEvent) => this._onPointerMove(e)}"
         @pointerup="${() => this._onPointerUp()}"
       >
-        ${this.editMode ? svg`
-          <circle cx="${cx}" cy="${cy}" r="${NODE_R + 6}"
-            fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
-            stroke-dasharray="4 3"
-            opacity="${dragging ? 1 : 0.6}"
-          />
-        ` : ''}
-        <circle cx="${cx}" cy="${cy}" r="${NODE_R}"
-          fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />
-        <g transform="translate(${cx - ICON_S}, ${cy - ICON_S}) scale(${ICON_S * 2 / 24})">
-          <path d="${iconPath}" fill="${fill}" />
-        </g>
-        <text x="${cx}" y="${cy + NODE_R + 14}" text-anchor="middle"
+        ${editRing}
+        ${shape}
+        ${icon}
+        <text x="${cx}" y="${cy + R + 14}" text-anchor="middle"
           font-size="10" font-family="Roboto, sans-serif"
           fill="${tc}" opacity="0.65">${label}</text>
-        <text x="${cx}" y="${cy + NODE_R + 26}" text-anchor="middle"
+        <text x="${cx}" y="${cy + R + 26}" text-anchor="middle"
           font-size="11" font-weight="700" font-family="Roboto, sans-serif"
           fill="${tc}">${formatPower(watts, this.wattThreshold)}</text>
         ${secondary ? svg`
-          <text x="${cx}" y="${cy + NODE_R + 38}" text-anchor="middle"
+          <text x="${cx}" y="${cy + R + 38}" text-anchor="middle"
             font-size="9" font-family="Roboto, sans-serif"
             fill="${tc}" opacity="0.65">${secondary}</text>
         ` : ''}
@@ -293,11 +328,22 @@ export class FlowDiagram extends LitElement {
   }
 
   private _socRing(bx: number, by: number) {
+    const color = this._batteryColor();
+    const R = this.nodeStyle === 'card' ? CARD_H_HALF : NODE_R;
+    const socTextY = by + R + (this.batterySecondary ? 50 : 38);
+
+    // Card style: no ring arc, just SOC% text
+    if (this.nodeStyle === 'card') {
+      return svg`
+        <text x="${bx}" y="${socTextY}"
+          text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
+          fill="${color}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
+      `;
+    }
+
     const r = NODE_R + 5;
     const circ = 2 * Math.PI * r;
     const filled = (this.socPercent / 100) * circ;
-    const color = this._batteryColor();
-    const socTextY = by + NODE_R + (this.batterySecondary ? 50 : 38);
     return svg`
       <circle
         cx="${bx}" cy="${by}" r="${r}"
@@ -370,20 +416,21 @@ export class FlowDiagram extends LitElement {
         ` : ''}
 
         <!-- Flow lines -->
-        ${this._flowLine(p.solar.x,   p.solar.y,   p.home.x,    p.home.y,    f.solarToHome,    '#f59e0b')}
-        ${this._flowLine(p.solar.x,   p.solar.y,   p.battery.x, p.battery.y, f.solarToBattery, '#f59e0b')}
-        ${this._flowLine(p.solar.x,   p.solar.y,   p.grid.x,    p.grid.y,    f.solarToGrid,    '#f59e0b')}
-        ${this._flowLine(p.grid.x,    p.grid.y,    p.home.x,    p.home.y,    f.gridToHome,     '#8b5cf6')}
-        ${this._flowLine(p.battery.x, p.battery.y, p.home.x,    p.home.y,    f.batteryToHome,  battColor)}
-        ${f.batteryToGrid > f.gridToBattery
-          ? this._flowLine(p.battery.x, p.battery.y, p.grid.x, p.grid.y, f.batteryToGrid, '#10b981')
-          : this._flowLine(p.grid.x,    p.grid.y, p.battery.x, p.battery.y, f.gridToBattery, '#8b5cf6')}
+        ${this.showFlowLines ? svg`
+          ${this._flowLine(p.solar.x,   p.solar.y,   p.home.x,    p.home.y,    f.solarToHome,    '#f59e0b')}
+          ${this._flowLine(p.solar.x,   p.solar.y,   p.battery.x, p.battery.y, f.solarToBattery, '#f59e0b')}
+          ${this._flowLine(p.solar.x,   p.solar.y,   p.grid.x,    p.grid.y,    f.solarToGrid,    '#f59e0b')}
+          ${this._flowLine(p.grid.x,    p.grid.y,    p.home.x,    p.home.y,    f.gridToHome,     '#8b5cf6')}
+          ${this._flowLine(p.battery.x, p.battery.y, p.home.x,    p.home.y,    f.batteryToHome,  battColor)}
+          ${f.batteryToGrid > f.gridToBattery
+            ? this._flowLine(p.battery.x, p.battery.y, p.grid.x, p.grid.y, f.batteryToGrid, '#10b981')
+            : this._flowLine(p.grid.x,    p.grid.y, p.battery.x, p.battery.y, f.gridToBattery, '#8b5cf6')}
+          ${devicePositions.map(({ d, x, y }) =>
+            this._deviceLine(p.home.x, p.home.y, x, y, d.watts, d.color || '#6366f1')
+          )}
+        ` : ''}
 
-        <!-- Device lines -->
-        ${devicePositions.map(({ d, x, y }) =>
-          this._deviceLine(p.home.x, p.home.y, x, y, d.watts, d.color || '#6366f1')
-        )}
-
+        <!-- SOC ring / text -->
         ${this._socRing(p.battery.x, p.battery.y)}
 
         <!-- Main nodes -->
