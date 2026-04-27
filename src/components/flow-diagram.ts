@@ -94,6 +94,11 @@ export class FlowDiagram extends LitElement {
   @property({ type: String }) textColor = '#ffffff';
   @property({ type: String }) nodeStyle: 'circle' | 'card' = 'circle';
   @property({ type: Boolean }) showFlowLines = true;
+  // Node accent colours — empty string = use built-in default
+  @property({ type: String }) solarColor = '';
+  @property({ type: String }) gridColor = '';
+  @property({ type: String }) homeColor = '';
+  @property({ type: String }) batteryNodeColor = ''; // empty = SOC-based dynamic
 
   // ── Drag state ──────────────────────────────────────────────────────────────
   @state() private _pos: AllPos = defaultPos();
@@ -162,6 +167,11 @@ export class FlowDiagram extends LitElement {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  private _bgFill(color: string): string {
+    if (color.startsWith('rgb(')) return color.replace('rgb(', 'rgba(').replace(')', ', 0.15)');
+    return `${color}26`;
+  }
 
   private get _nodeMargin(): number {
     return this.nodeStyle === 'card' ? CARD_H_HALF + 6 : NODE_R + 4;
@@ -362,8 +372,12 @@ export class FlowDiagram extends LitElement {
   protected render() {
     const f = this.flows;
     const p = this._pos;
-    const battColor = this._batteryColor();
-    const battBg = battColor.replace('rgb(', 'rgba(').replace(')', ', 0.15)');
+    const solarFill   = this.solarColor   || '#f59e0b';
+    const gridFill    = this.gridColor    || '#8b5cf6';
+    const homeFill    = this.homeColor    || '#3b82f6';
+    const battFill    = this.batteryNodeColor || this._batteryColor();
+    const battColor   = this._batteryColor(); // always SOC-based (for ring)
+    const battBg      = this._bgFill(battFill);
 
     // ── Device satellite layout (relative to home node) ──────────────────
     const devs = this.diagramDevices ?? [];
@@ -421,7 +435,7 @@ export class FlowDiagram extends LitElement {
           ${this._flowLine(p.solar.x,   p.solar.y,   p.battery.x, p.battery.y, f.solarToBattery, '#f59e0b')}
           ${this._flowLine(p.solar.x,   p.solar.y,   p.grid.x,    p.grid.y,    f.solarToGrid,    '#f59e0b')}
           ${this._flowLine(p.grid.x,    p.grid.y,    p.home.x,    p.home.y,    f.gridToHome,     '#8b5cf6')}
-          ${this._flowLine(p.battery.x, p.battery.y, p.home.x,    p.home.y,    f.batteryToHome,  battColor)}
+          ${this._flowLine(p.battery.x, p.battery.y, p.home.x,    p.home.y,    f.batteryToHome,  battFill)}
           ${f.batteryToGrid > f.gridToBattery
             ? this._flowLine(p.battery.x, p.battery.y, p.grid.x, p.grid.y, f.batteryToGrid, '#10b981')
             : this._flowLine(p.grid.x,    p.grid.y, p.battery.x, p.battery.y, f.gridToBattery, '#8b5cf6')}
@@ -434,10 +448,10 @@ export class FlowDiagram extends LitElement {
         ${this._socRing(p.battery.x, p.battery.y)}
 
         <!-- Main nodes -->
-        ${this._node(p.solar.x,   p.solar.y,   ICON_SOLAR,   this.solarName,   this.solar,   '#f59e0b', 'rgba(245,158,11,0.15)',  this.solarSecondary,   'solar')}
-        ${this._node(p.grid.x,    p.grid.y,    ICON_GRID,    this.gridName,    this.grid,    '#8b5cf6', 'rgba(139,92,246,0.15)',  this.gridSecondary,    'grid')}
-        ${this._node(p.home.x,    p.home.y,    ICON_HOME,    this.homeName,    this.load,    '#3b82f6', 'rgba(59,130,246,0.15)',  this.homeSecondary,    'home')}
-        ${this._node(p.battery.x, p.battery.y, ICON_BATTERY, this.batteryName, this.battery, battColor, battBg,                  this.batterySecondary, 'battery')}
+        ${this._node(p.solar.x,   p.solar.y,   ICON_SOLAR,   this.solarName,   this.solar,   solarFill, this._bgFill(solarFill), this.solarSecondary,   'solar')}
+        ${this._node(p.grid.x,    p.grid.y,    ICON_GRID,    this.gridName,    this.grid,    gridFill,  this._bgFill(gridFill),  this.gridSecondary,    'grid')}
+        ${this._node(p.home.x,    p.home.y,    ICON_HOME,    this.homeName,    this.load,    homeFill,  this._bgFill(homeFill),  this.homeSecondary,    'home')}
+        ${this._node(p.battery.x, p.battery.y, ICON_BATTERY, this.batteryName, this.battery, battFill,  battBg,                  this.batterySecondary, 'battery')}
 
         <!-- Device satellite nodes -->
         ${devicePositions.map(({ d, x, y }) => this._deviceNode(x, y, d))}

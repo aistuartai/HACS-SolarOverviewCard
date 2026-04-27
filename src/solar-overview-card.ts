@@ -330,6 +330,10 @@ export class SolarOverviewCard extends LitElement {
                 .gridName="${this._config.grid.name ?? 'Grid'}"
                 .homeName="${this._config.load.name ?? 'Home'}"
                 .batteryName="${this._config.battery.name ?? 'Battery'}"
+                .solarColor="${this._config.solar.color ?? ''}"
+                .gridColor="${this._config.grid.color ?? ''}"
+                .homeColor="${this._config.load.color ?? ''}"
+                .batteryNodeColor="${this._config.battery.color ?? ''}"
                 .backgroundImage="${this._config.flow_background ?? ''}"
                 .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
                 .nodeStyle="${this._config.node_style ?? 'circle'}"
@@ -666,6 +670,21 @@ export class SolarOverviewCardEditor extends LitElement {
     `;
   }
 
+  private _colorField(label: string, path: string, value: string | undefined, defaultColor: string) {
+    return html`
+      <div class="color-row">
+        <label>${label}</label>
+        <input type="color"
+          .value="${value || defaultColor}"
+          @input="${(e: Event) => this._setValue(path, (e.target as HTMLInputElement).value)}"
+        />
+        ${value ? html`
+          <button class="clear-btn" title="Reset to default" @click="${() => this._setValue(path, '')}">✕</button>
+        ` : ''}
+      </div>
+    `;
+  }
+
   private _textField(label: string, path: string, value: string | undefined) {
     return html`
       <div class="field-row">
@@ -777,6 +796,7 @@ export class SolarOverviewCardEditor extends LitElement {
           hint: 'overrides grid.export_entity for Solar → Grid flow',
         })}
         <div class="section-label">Diagram node</div>
+        ${this._colorField('Node colour', 'solar.color', s?.color, '#f59e0b')}
         ${this._entityField('Secondary entity (shown below value on Solar node)', 'solar.secondary_entity', s?.secondary_entity, {
           hint: 'e.g. a second PV sensor or string total',
         })}
@@ -796,6 +816,7 @@ export class SolarOverviewCardEditor extends LitElement {
         })}
         ${this._entityField('State of charge  (0–100 %)', 'battery.soc_entity', b?.soc_entity)}
         <div class="section-label">Diagram node</div>
+        ${this._colorField('Node colour (overrides SOC-based dynamic colour)', 'battery.color', b?.color, '#10b981')}
         ${this._entityField('Secondary entity (shown below value on Battery node)', 'battery.secondary_entity', b?.secondary_entity, {
           hint: 'e.g. battery status or temperature',
         })}
@@ -830,6 +851,7 @@ export class SolarOverviewCardEditor extends LitElement {
           hint: 'overrides battery_entity negative side',
         })}
         <div class="section-label">Diagram node</div>
+        ${this._colorField('Node colour', 'grid.color', g?.color, '#8b5cf6')}
         ${this._entityField('Secondary entity (shown below value on Grid node)', 'grid.secondary_entity', g?.secondary_entity, {
           hint: 'e.g. frient meter or grid import sensor',
         })}
@@ -851,6 +873,7 @@ export class SolarOverviewCardEditor extends LitElement {
           namePath: 'load.name', nameValue: l?.name,
         })}
         <div class="section-label">Diagram node</div>
+        ${this._colorField('Node colour', 'load.color', l?.color, '#3b82f6')}
         ${this._entityField('Secondary entity (shown below value on Home node)', 'load.secondary_entity', l?.secondary_entity, {
           hint: 'e.g. a sub-metered consumption sensor',
         })}
