@@ -88,6 +88,13 @@ export interface SolarCardConfig {
   show_stats?: boolean;
   show_devices?: boolean;
   flow_background?: string;
+  diagram_text_color?: string;
+  node_positions?: {
+    solar?:   { x: number; y: number };
+    grid?:    { x: number; y: number };
+    home?:    { x: number; y: number };
+    battery?: { x: number; y: number };
+  };
 }
 
 export interface HomeAssistant {

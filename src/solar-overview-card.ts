@@ -331,6 +331,8 @@ export class SolarOverviewCard extends LitElement {
                 .homeName="${this._config.load.name ?? 'Home'}"
                 .batteryName="${this._config.battery.name ?? 'Battery'}"
                 .backgroundImage="${this._config.flow_background ?? ''}"
+                .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
+                .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
                 .gridSecondary="${this._secondaryLabel(this._config.grid.secondary_entity)}"
                 .homeSecondary="${this._secondaryLabel(this._config.load.secondary_entity)}"
@@ -390,7 +392,7 @@ export class SolarOverviewCard extends LitElement {
 
 // ─── Visual config editor ────────────────────────────────────────────────────
 
-type EditorPage = 'main' | 'setup' | 'solar' | 'battery' | 'grid' | 'house' | 'panels' | 'outlets';
+type EditorPage = 'main' | 'setup' | 'solar' | 'battery' | 'grid' | 'house' | 'panels' | 'outlets' | 'layout';
 type EFOpts = { invertPath?: string; invertValue?: boolean; namePath?: string; nameValue?: string; hint?: string };
 
 @customElement('solar-overview-card-editor')
@@ -706,6 +708,7 @@ export class SolarOverviewCardEditor extends LitElement {
         ${navItem('house',   '🏠', 'House',   c.load?.entity    ?? 'Not configured',                        'rgba(59,130,246,0.18)')}
         ${navItem('panels',  '📊', 'Panels',  `${activePanels} of 4 shown`,                                 'rgba(6,182,212,0.18)')}
         ${navItem('outlets', '🔌', 'Outlets', deviceCount > 0 ? `${deviceCount} device${deviceCount !== 1 ? 's' : ''}` : 'No devices added', 'rgba(99,102,241,0.18)')}
+        ${navItem('layout',  '🗺️', 'Layout',  'Drag nodes to reposition',                                                                       'rgba(16,185,129,0.18)')}
       </div>
     `;
   }
@@ -721,6 +724,18 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._boolField('Show stat panels',   'show_stats',      c.show_stats      !== false)}
         ${this._boolField('Show devices row',   'show_devices',    c.show_devices    !== false)}
         ${this._boolField('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
+        <div class="section-label">Flow diagram text</div>
+        <div class="color-row">
+          <label>Text colour</label>
+          <input type="color"
+            .value="${c.diagram_text_color ?? '#ffffff'}"
+            @input="${(e: Event) => this._setValue('diagram_text_color', (e.target as HTMLInputElement).value)}"
+          />
+          ${c.diagram_text_color && c.diagram_text_color !== '#ffffff' ? html`
+            <button class="clear-btn" title="Reset to white" @click="${() => this._setValue('diagram_text_color', '')}">✕</button>
+          ` : ''}
+        </div>
+        <p class="hint">Default: white. Applies to all node labels and values.</p>
         <div class="section-label">Flow diagram background</div>
         ${this._textField('Background image URL or /local/ path', 'flow_background', c.flow_background)}
         <p class="hint">e.g. /local/solar-bg.png or https://… — image fills diagram area.</p>
@@ -843,6 +858,66 @@ export class SolarOverviewCardEditor extends LitElement {
               <span class="flow-stat-value">${fmt(flows.batteryToHome)}</span>
             </div>
           </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  private _renderLayoutPage() {
+    if (!this._config) return html``;
+    const c = this._config;
+    const g = c.grid;
+    const read = (id: string | undefined) =>
+      id ? parseFloat_safe(this.hass?.states[id]?.state ?? '0') : 0;
+    const solar   = read(c.solar.entity!)   * (c.solar.invert   ? -1 : 1);
+    const battery = read(c.battery.entity!) * (c.battery.invert ? -1 : 1);
+    const load    = read(c.load?.entity);
+    const gridRaw = g.entity ? read(g.entity) * (g.invert ? -1 : 1) : 0;
+    const soc     = read(c.battery.soc_entity);
+    const flows   = (() => {
+      try {
+        return calculateFlows({
+          solar, battery, load, gridCombined: gridRaw,
+          gridImport:    g.import_entity      ? read(g.import_entity)      : undefined,
+          gridExport:    g.export_entity      ? read(g.export_entity)      : undefined,
+          gridToBattery: g.to_battery_entity  ? read(g.to_battery_entity)  : undefined,
+          batteryToGrid: g.from_battery_entity ? read(g.from_battery_entity) : undefined,
+          gridBatteryCombined: g.battery_entity ? read(g.battery_entity)   : undefined,
+        });
+      } catch { return { solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0 }; }
+    })();
+    const hasPositions = !!c.node_positions &&
+      Object.keys(c.node_positions).length > 0;
+
+    return html`
+      ${this._pageHeader('🗺️', 'Layout')}
+      <div class="form-col">
+        <p class="hint" style="margin:0 0 8px;">Drag nodes to reposition. Changes save automatically.</p>
+        <div style="border:1px solid var(--divider-color,rgba(255,255,255,0.1));border-radius:10px;overflow:hidden;">
+          <flow-diagram
+            .solar="${solar}"
+            .battery="${battery}"
+            .grid="${gridRaw}"
+            .load="${load}"
+            .socPercent="${soc}"
+            .wattThreshold="${c.watt_threshold ?? 1000}"
+            .flows="${flows}"
+            .solarName="${c.solar.name ?? 'Solar'}"
+            .gridName="${c.grid.name ?? 'Grid'}"
+            .homeName="${c.load?.name ?? 'Home'}"
+            .batteryName="${c.battery.name ?? 'Battery'}"
+            .textColor="${c.diagram_text_color ?? '#ffffff'}"
+            .nodePositions="${c.node_positions}"
+            .backgroundImage="${c.flow_background ?? ''}"
+            .editMode="${true}"
+            @nodes-moved="${(e: CustomEvent) => this._setValue('node_positions', e.detail.positions)}"
+          ></flow-diagram>
+        </div>
+        ${hasPositions ? html`
+          <button class="add-btn" style="align-self:flex-start;background:rgba(239,68,68,0.15);color:#ef4444;"
+            @click="${() => this._setValue('node_positions', undefined)}">
+            Reset to default positions
+          </button>
         ` : ''}
       </div>
     `;
@@ -1102,6 +1177,7 @@ export class SolarOverviewCardEditor extends LitElement {
       case 'house':   return this._renderHousePage();
       case 'panels':  return this._renderPanelsPage();
       case 'outlets': return this._renderOutletsPage();
+      case 'layout':  return this._renderLayoutPage();
       default:        return this._renderMain();
     }
   }
