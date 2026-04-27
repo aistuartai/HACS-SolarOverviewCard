@@ -62,6 +62,7 @@ export class FlowDiagram extends LitElement {
     gridToHome: 0, batteryToHome: 0, gridToBattery: 0, batteryToGrid: 0,
   };
   @property({ type: Array }) diagramDevices: DiagramDevice[] = [];
+  @property({ type: String }) backgroundImage = '';
 
   static styles = css`
     :host { display: block; }
@@ -264,6 +265,16 @@ export class FlowDiagram extends LitElement {
         role="img"
         style="width:100%;height:auto;display:block;"
       >
+        <!-- Background image -->
+        ${this.backgroundImage ? svg`
+          <image
+            href="${this.backgroundImage}"
+            x="0" y="${minY}"
+            width="${vbW}" height="${vbH}"
+            preserveAspectRatio="xMidYMid slice"
+          />
+        ` : ''}
+
         <!-- Flow lines drawn under nodes -->
 
         <!-- Solar → Home -->

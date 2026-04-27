@@ -330,6 +330,7 @@ export class SolarOverviewCard extends LitElement {
                 .gridName="${this._config.grid.name ?? 'Grid'}"
                 .homeName="${this._config.load.name ?? 'Home'}"
                 .batteryName="${this._config.battery.name ?? 'Battery'}"
+                .backgroundImage="${this._config.flow_background ?? ''}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
                 .gridSecondary="${this._secondaryLabel(this._config.grid.secondary_entity)}"
                 .homeSecondary="${this._secondaryLabel(this._config.load.secondary_entity)}"
@@ -720,6 +721,9 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._boolField('Show stat panels',   'show_stats',      c.show_stats      !== false)}
         ${this._boolField('Show devices row',   'show_devices',    c.show_devices    !== false)}
         ${this._boolField('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
+        <div class="section-label">Flow diagram background</div>
+        ${this._textField('Background image URL or /local/ path', 'flow_background', c.flow_background)}
+        <p class="hint">e.g. /local/solar-bg.png or https://… — image fills diagram area.</p>
         <div class="section-label">Sparkline history</div>
         <ha-selector
           .label="Hours of history to display (default: 2)"

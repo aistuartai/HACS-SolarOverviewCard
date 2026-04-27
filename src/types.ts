@@ -87,6 +87,7 @@ export interface SolarCardConfig {
   show_flow?: boolean;
   show_stats?: boolean;
   show_devices?: boolean;
+  flow_background?: string;
 }
 
 export interface HomeAssistant {
