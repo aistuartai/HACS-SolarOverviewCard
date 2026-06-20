@@ -2,6 +2,7 @@ export interface EntityConfig {
   entity: string;
   name?: string;
   icon?: string;
+  /** @deprecated Use positive_means instead. */
   invert?: boolean;
 }
 
@@ -9,6 +10,7 @@ export interface OptionalEntityConfig {
   entity?: string;
   name?: string;
   icon?: string;
+  /** @deprecated Use positive_means instead. */
   invert?: boolean;
   color?: string;
   /** Secondary entity shown as a second line on the Home diagram node. */
@@ -24,7 +26,16 @@ export interface SolarEntityConfig extends EntityConfig {
 }
 
 export interface BatteryConfig extends EntityConfig {
+  /**
+   * Declares what a positive sensor value means.
+   * 'charging' (default): positive = battery charging, negative = discharging.
+   * 'discharging': positive = battery discharging, negative = charging.
+   * Replaces the invert flag with an explicit semantic declaration.
+   */
+  positive_means?: 'charging' | 'discharging';
   soc_entity?: string;
+  /** Optional text-state entity (e.g. "Charging" / "Discharging" / "Idle") used for the state label. */
+  status_entity?: string;
   color?: string;
   /** Secondary entity shown as a second line on the Battery diagram node. */
   secondary_entity?: string;
@@ -38,9 +49,10 @@ export interface BatteryConfig extends EntityConfig {
  * for its respective flow.
  *
  * Priority for each flow:
- *   Grid → Home      : import_entity  >  entity (when positive)
+ *   Grid → Home      : import_entity  >  entity (when positive, after subtracting gridToBattery)
  *   Any  → Grid      : export_entity  >  solar.export_entity  >  entity (when negative, solar > 0)
  *   Grid → Battery   : to_battery_entity  >  battery_entity (when positive)
+ *                      or auto-derived from battery charging exceeding solar output
  *   Battery → Grid   : from_battery_entity  >  battery_entity (when negative)
  */
 export interface GridConfig {
@@ -48,6 +60,14 @@ export interface GridConfig {
   entity?: string;
   name?: string;
   icon?: string;
+  /**
+   * Declares what a positive sensor value means.
+   * 'importing' (default): positive = grid import, negative = export.
+   * 'exporting': positive = grid export, negative = import.
+   * Replaces the invert flag with an explicit semantic declaration.
+   */
+  positive_means?: 'importing' | 'exporting';
+  /** @deprecated Use positive_means instead. */
   invert?: boolean;
   color?: string;
   /** Secondary entity shown as a second line on the Grid diagram node. */

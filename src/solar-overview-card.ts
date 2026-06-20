@@ -106,9 +106,14 @@ export class SolarOverviewCard extends LitElement {
       const rawLoad    = this._config.load.entity ? this._readEntity(this._config.load.entity) : 0;
       const rawGrid    = g.entity ? this._readEntity(g.entity) : 0;
 
-      this._solar   = this._config.solar.invert   ? -rawSolar   : rawSolar;
-      this._battery = this._config.battery.invert ? -rawBattery : rawBattery;
-      this._grid    = g.invert ? -rawGrid : rawGrid;
+      // Normalise to: solar ≥ 0, battery positive=charging, grid positive=importing.
+      // positive_means takes precedence over the legacy invert flag.
+      const batteryInvert = this._config.battery.positive_means === 'discharging' || this._config.battery.invert === true;
+      const gridInvert    = this._config.grid.positive_means    === 'exporting'   || g.invert === true;
+
+      this._solar   = this._config.solar.invert ? -rawSolar   : rawSolar;
+      this._battery = batteryInvert ? -rawBattery : rawBattery;
+      this._grid    = gridInvert    ? -rawGrid    : rawGrid;
       this._load    = this._config.load.invert ? -rawLoad : rawLoad;
 
       if (this._config.battery.soc_entity) {
@@ -266,6 +271,7 @@ export class SolarOverviewCard extends LitElement {
     icon: string,
     color: string,
     entityId: string,
+    stateOverride?: string,
   ) {
     const thr = this._threshold();
     const cfg = this._config![key];
@@ -275,7 +281,7 @@ export class SolarOverviewCard extends LitElement {
       icon,
       value: watts,
       displayValue: formatPower(watts, thr),
-      stateLabel: getStateLabel(entityId, watts),
+      stateLabel: stateOverride ?? getStateLabel(key, watts),
       stateColor: color,
       showSparkline: this._config?.show_sparklines !== false,
       sparklineHistory: this._sparklines[entityId] ?? [],
@@ -299,15 +305,23 @@ export class SolarOverviewCard extends LitElement {
     const showDevices = this._config.show_devices !== false;
 
     const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity!);
-    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity!);
+
+    // Battery: use status_entity text as state label when available (e.g. "Charging" / "Discharging" / "Idle")
+    const batteryStatusText = this._config.battery.status_entity
+      ? (this._hass?.states[this._config.battery.status_entity]?.state ?? undefined)
+      : undefined;
+    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity!, batteryStatusText);
+
     // When no combined grid entity, derive net grid from flows (+ import, − export)
     const gridNetDisplay = this._config.grid.entity
       ? this._grid
       : (this._flows.gridToHome + this._flows.gridToBattery) - (this._flows.solarToGrid + this._flows.batteryToGrid);
     const grid    = this._panelProps('grid', gridNetDisplay, 'Grid', MDI_GRID, '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
-    // Total home consumption: solar direct + battery discharge + grid import
+
+    // Home consumption: prefer load.entity when configured (most accurate), else sum flows.
     const homeDelivered = this._flows.solarToHome + this._flows.batteryToHome + this._flows.gridToHome;
-    const load    = this._panelProps('load', homeDelivered, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity ?? '');
+    const homeDisplay = this._config.load.entity ? this._load : homeDelivered;
+    const load    = this._panelProps('load', homeDisplay, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity ?? '');
 
     const devices = this._deviceItems();
 

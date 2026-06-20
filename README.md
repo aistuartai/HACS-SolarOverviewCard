@@ -16,12 +16,14 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 |---------|--------|
 | **Animated flow diagram** | SVG nodes for Solar, Grid, Home, Battery with dashed flow lines that animate in the direction of current power movement. Line thickness scales with wattage. |
 | **Custom background image** | Set any image (local `/local/` path or URL) as the flow diagram background via `flow_background`. |
-| **Dynamic battery ring** | SOC progress arc transitions smoothly from green (full) → amber → red (empty). |
+| **Dynamic battery SOC** | SOC % shown on the battery node. In `circle` mode: animated arc ring transitioning red → amber → green. In `card` mode: colour-coded percentage text. |
 | **Device satellite nodes** | Individual device nodes fan out from the Home node on the diagram — toggle per-device. |
 | **2 × 2 stat panels** | Large current value, colour-coded state badge (Generating / Charging / Importing…), optional sparkline history. |
 | **Device chip row** | Horizontal scrollable chips for individual devices, sorted by wattage. Dim when idle. |
 | **4 independent grid sensors** | Separate entities for Grid→Home, Solar/Battery→Grid, Grid→Battery, Battery→Grid. Combined fallback also supported. |
-| **Sign-convention invert** | Per-entity `invert: true` flag for inverters that report the opposite sign. |
+| **Sign-convention declaration** | `positive_means: charging\|discharging` on battery and `positive_means: importing\|exporting` on grid — explicit semantic declaration replaces the binary `invert` flag. The old `invert` flag still works for backward compatibility. |
+| **Battery status entity** | Optional `battery.status_entity` reads a text sensor (e.g. "Charging" / "Discharging" / "Idle") and uses it as the state label instead of inferring from power value. |
+| **Auto-derived grid→battery flow** | When no explicit `to_battery_entity` is configured, the card automatically infers how much grid power is going to the battery: `gridToBattery = batteryCharging − solarToBattery`. Grid→Home is then corrected by subtracting that amount. No extra sensors needed. |
 | **Section toggles** | Show/hide the flow diagram, stat panels, device row, and sparklines independently. |
 | **Draggable node layout** | Drag nodes in the visual editor to reposition them; positions are saved to config. |
 | **Node style** | Choose `circle` (default) or `card` style for all diagram nodes. |
@@ -82,19 +84,24 @@ solar:
 
 # ── Battery ────────────────────────────────────────────────────────────────────
 battery:
-  entity: sensor.battery_power      # + = charging,  − = discharging
+  entity: sensor.battery_power      # signed power sensor
   soc_entity: sensor.battery_soc    # State of charge 0–100 %
+  positive_means: charging          # 'charging' (default) or 'discharging'
+                                    # Replaces the old invert flag — invert still works
+  status_entity: sensor.battery_status  # Optional text sensor: "Charging"/"Discharging"/"Idle"
   name: Battery
-  invert: false                     # Set true if your sensor reports + = discharging
 
 # ── Grid — combined fallback ───────────────────────────────────────────────────
 # Use `grid.entity` as a single combined sensor, OR configure the individual
 # flow sensors below. Individual sensors take priority over the combined entity.
+# When only grid.entity is configured, grid→battery flow is auto-derived from
+# the battery charging value (no extra sensors needed).
 grid:
   entity: sensor.grid_power         # + = importing,  − = exporting  (fallback)
+  positive_means: importing         # 'importing' (default) or 'exporting'
+                                    # Replaces the old invert flag — invert still works
 
   # Individual flow sensors (each optional — override the combined entity):
-  import_entity: sensor.grid_import         # Grid → Home  (W ≥ 0)
   export_entity: sensor.grid_export         # Solar/Battery → Grid  (W ≥ 0)
   battery_entity: sensor.grid_battery       # Grid ↔ Battery combined
                                             #   + = grid charges battery
@@ -103,7 +110,6 @@ grid:
   from_battery_entity: sensor.bat_to_grid   # Battery → Grid only  (W ≥ 0)
 
   name: Grid
-  invert: false                     # Set true if + = exporting on your meter
 
 # ── Home load ──────────────────────────────────────────────────────────────────
 load:
@@ -196,36 +202,47 @@ Most installations have a single combined grid sensor. Use `grid.entity` as the 
 
 | Flow | Combined entity behaviour | Individual entity |
 |------|--------------------------|-------------------|
-| Grid → Home | `grid.entity > 0` | `grid.import_entity` |
+| Grid → Home | `grid.entity > 0` minus auto-derived gridToBattery | `grid.import_entity` |
 | Solar/Battery → Grid | `grid.entity < 0` when `solar > 0` | `grid.export_entity` |
-| Grid → Battery | not derivable from combined | `grid.to_battery_entity` or `grid.battery_entity > 0` |
+| Grid → Battery | **auto-derived**: `batteryCharging − solarToBattery` | `grid.to_battery_entity` or `grid.battery_entity > 0` |
 | Battery → Grid | not derivable from combined | `grid.from_battery_entity` or `grid.battery_entity < 0` |
 
 ---
 
 ## Sign convention reference
 
-| Entity | Positive means | Negative means |
-|--------|---------------|----------------|
+| Entity | Default: positive means | Default: negative means |
+|--------|------------------------|------------------------|
 | `solar.entity` | Generating | — (always ≥ 0) |
 | `battery.entity` | Charging ← grid/solar | Discharging → home/grid |
 | `grid.entity` | Importing → home | Exporting ← solar/battery |
 | `load.entity` | Consuming | — (always ≥ 0) |
 | `grid.battery_entity` | Grid charging battery | Battery discharging to grid |
 
-Add `invert: true` to any entity whose sensor reports the opposite sign.
+If your sensor reports the opposite sign, declare it explicitly:
+
+```yaml
+battery:
+  positive_means: discharging   # sensor is positive when discharging
+grid:
+  positive_means: exporting     # sensor is positive when exporting
+```
+
+The old `invert: true` flag still works as an alias for `positive_means: discharging` / `positive_means: exporting`.
 
 ---
 
 ## Home value calculation
 
-The **Home** stat panel and flow-diagram node display the sum of measured inflows:
+When `load.entity` is configured, the **Home** stat panel shows that sensor value directly (most accurate).
+
+When no load entity is configured, the card derives home consumption from flows:
 
 ```
-Home = batteryToHome + gridToHome
+Home = solarToHome + batteryToHome + gridToHome
 ```
 
-This is derived from the other sensors rather than the raw load entity, giving an accurate real-time consumption figure even when the load sensor lags.
+The flow diagram always uses the calculated flow breakdown to animate power movement correctly.
 
 ---
 
