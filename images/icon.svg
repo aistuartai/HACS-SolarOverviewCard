@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <title>Solar Overview Card</title>
+  <defs>
+    <linearGradient id="pg" x1="85%" y1="0%" x2="15%" y2="100%">
+      <stop offset="0%" stop-color="#243d72"/>
+      <stop offset="100%" stop-color="#070e1e"/>
+    </linearGradient>
+    <clipPath id="pc">
+      <polygon points="55,190 355,145 405,342 105,387"/>
+    </clipPath>
+  </defs>
+
+  <!-- Badge background -->
+  <circle cx="250" cy="250" r="232" fill="#04081a"/>
+  <circle cx="250" cy="250" r="228" fill="#070c1c"/>
+  <circle cx="250" cy="250" r="228" fill="none" stroke="#111c32" stroke-width="2"/>
+
+  <!-- Sun atmospheric halo -->
+  <circle cx="285" cy="72" r="65" fill="#f59e0b" opacity="0.08"/>
+  <circle cx="285" cy="72" r="44" fill="#fbbf24" opacity="0.12"/>
+
+  <!-- Sun rays -->
+  <g transform="translate(285,72)" stroke="#f59e0b" stroke-linecap="round">
+    <line x1="0" y1="-38" x2="0" y2="-54" stroke-width="3.5"/>
+    <line x1="27" y1="-27" x2="38" y2="-38" stroke-width="3"/>
+    <line x1="38" y1="0" x2="54" y2="0" stroke-width="3.5"/>
+    <line x1="27" y1="27" x2="38" y2="38" stroke-width="3"/>
+    <line x1="0" y1="38" x2="0" y2="54" stroke-width="3.5"/>
+    <line x1="-27" y1="27" x2="-38" y2="38" stroke-width="3"/>
+    <line x1="-38" y1="0" x2="-54" y2="0" stroke-width="3.5"/>
+    <line x1="-27" y1="-27" x2="-38" y2="-38" stroke-width="3"/>
+  </g>
+
+  <!-- Sun disc -->
+  <circle cx="285" cy="72" r="23" fill="#fde68a"/>
+  <circle cx="285" cy="72" r="17" fill="#fbbf24"/>
+  <circle cx="285" cy="72" r="9" fill="#f97316"/>
+
+  <!-- Panel right face (depth) -->
+  <polygon points="355,145 405,342 411,364 361,167" fill="#0a1524"/>
+
+  <!-- Panel bottom face (depth) -->
+  <polygon points="105,387 405,342 411,364 111,409" fill="#0d1928"/>
+
+  <!-- Panel main face -->
+  <polygon points="55,190 355,145 405,342 105,387" fill="url(#pg)"/>
+
+  <!-- Cell grid (clipped to panel) -->
+  <g clip-path="url(#pc)" opacity="0.68">
+    <line x1="73" y1="198" x2="343" y2="157" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="88" y1="257" x2="358" y2="216" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="103" y1="316" x2="373" y2="275" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="118" y1="375" x2="388" y2="334" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="73" y1="198" x2="118" y2="375" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="141" y1="188" x2="186" y2="365" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="208" y1="178" x2="253" y2="355" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="276" y1="167" x2="321" y2="344" stroke="#3565b0" stroke-width="1.5"/>
+    <line x1="343" y1="157" x2="388" y2="334" stroke="#3565b0" stroke-width="1.5"/>
+  </g>
+
+  <!-- Top edge light reflection -->
+  <line x1="55" y1="190" x2="355" y2="145" stroke="#5282c0" stroke-width="1.5" opacity="0.42"/>
+
+  <!-- Panel frame border -->
+  <polygon points="55,190 355,145 405,342 105,387" fill="none" stroke="#263e6e" stroke-width="2.5"/>
+
+  <!-- Corner mounting bolts -->
+  <circle cx="55" cy="190" r="5" fill="#1e3460" stroke="#0e1e3c" stroke-width="1.5"/>
+  <circle cx="355" cy="145" r="5" fill="#1e3460" stroke="#0e1e3c" stroke-width="1.5"/>
+  <circle cx="405" cy="342" r="5" fill="#1e3460" stroke="#0e1e3c" stroke-width="1.5"/>
+  <circle cx="105" cy="387" r="5" fill="#1e3460" stroke="#0e1e3c" stroke-width="1.5"/>
+</svg>
