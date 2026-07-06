@@ -351,6 +351,7 @@ export class SolarOverviewCard extends LitElement {
                 .backgroundImage="${this._config.flow_background ?? ''}"
                 .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
                 .nodeStyle="${this._config.node_style ?? 'circle'}"
+                .nodeIconSize="${this._config.node_icon_size ?? 18}"
                 .showFlowLines="${this._config.show_flow_lines !== false}"
                 .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
@@ -606,10 +607,12 @@ export class SolarOverviewCardEditor extends LitElement {
       const g = c.grid;
       const read = (id: string | undefined) =>
         id ? parseFloat_safe(this.hass!.states[id]?.state) : 0;
-      const solar   = read(c.solar.entity!)   * (c.solar.invert   ? -1 : 1);
-      const battery = read(c.battery.entity!) * (c.battery.invert ? -1 : 1);
-      const load    = read(c.load.entity)     * (c.load.invert    ? -1 : 1);
-      const gridRaw = g.entity ? read(g.entity) * (g.invert ? -1 : 1) : 0;
+      const batteryInvert = c.battery.positive_means === 'discharging' || c.battery.invert === true;
+      const gridInvert    = g.positive_means === 'exporting' || g.invert === true;
+      const solar   = read(c.solar.entity!)   * (c.solar.invert  ? -1 : 1);
+      const battery = read(c.battery.entity!) * (batteryInvert   ? -1 : 1);
+      const load    = read(c.load.entity)     * (c.load.invert   ? -1 : 1);
+      const gridRaw = g.entity ? read(g.entity) * (gridInvert    ? -1 : 1) : 0;
       const gridImport    = g.import_entity       ? read(g.import_entity)       : undefined;
       const gridExport    = g.export_entity       ? read(g.export_entity)       :
                             c.solar.export_entity ? read(c.solar.export_entity) : undefined;
@@ -769,6 +772,13 @@ export class SolarOverviewCardEditor extends LitElement {
           ></ha-selector>
         </div>
         ${this._boolField('Show animated flow lines', 'show_flow_lines', c.show_flow_lines !== false)}
+        <ha-selector
+          .label="Node icon size (default: 18)"
+          .selector=${{ number: { min: 10, max: 26, step: 1, mode: 'slider' } }}
+          .value="${c.node_icon_size ?? 18}"
+          @value-changed="${(e: CustomEvent) => this._setValue('node_icon_size', e.detail.value)}"
+        ></ha-selector>
+        <p class="hint">Max ~22 before icons clip the circle edge.</p>
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
@@ -918,10 +928,12 @@ export class SolarOverviewCardEditor extends LitElement {
     const g = c.grid;
     const read = (id: string | undefined) =>
       id ? parseFloat_safe(this.hass?.states[id]?.state ?? '0') : 0;
-    const solar   = read(c.solar.entity!)   * (c.solar.invert   ? -1 : 1);
-    const battery = read(c.battery.entity!) * (c.battery.invert ? -1 : 1);
-    const load    = read(c.load?.entity);
-    const gridRaw = g.entity ? read(g.entity) * (g.invert ? -1 : 1) : 0;
+    const batteryInvert = c.battery.positive_means === 'discharging' || c.battery.invert === true;
+    const gridInvert    = g.positive_means === 'exporting' || g.invert === true;
+    const solar   = read(c.solar.entity!)   * (c.solar.invert ? -1 : 1);
+    const battery = read(c.battery.entity!) * (batteryInvert   ? -1 : 1);
+    const load    = read(c.load?.entity)    * (c.load?.invert  ? -1 : 1);
+    const gridRaw = g.entity ? read(g.entity) * (gridInvert    ? -1 : 1) : 0;
     const soc     = read(c.battery.soc_entity);
     const flows   = (() => {
       try {
@@ -957,6 +969,7 @@ export class SolarOverviewCardEditor extends LitElement {
             .batteryName="${c.battery.name ?? 'Battery'}"
             .textColor="${c.diagram_text_color ?? '#ffffff'}"
             .nodeStyle="${c.node_style ?? 'circle'}"
+            .nodeIconSize="${c.node_icon_size ?? 18}"
             .showFlowLines="${c.show_flow_lines !== false}"
             .nodePositions="${c.node_positions}"
             .backgroundImage="${c.flow_background ?? ''}"

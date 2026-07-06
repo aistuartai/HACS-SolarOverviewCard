@@ -114,6 +114,7 @@ export interface SolarCardConfig {
   flow_background?: string;
   diagram_text_color?: string;
   node_style?: 'circle' | 'card';
+  node_icon_size?: number;
   show_flow_lines?: boolean;
   node_positions?: {
     solar?:   { x: number; y: number };

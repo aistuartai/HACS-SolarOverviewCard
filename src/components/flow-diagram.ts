@@ -94,6 +94,7 @@ export class FlowDiagram extends LitElement {
   @property({ type: String }) textColor = '#ffffff';
   @property({ type: String }) nodeStyle: 'circle' | 'card' = 'circle';
   @property({ type: Boolean }) showFlowLines = true;
+  @property({ type: Number }) nodeIconSize = 18;
   // Node accent colours — empty string = use built-in default
   @property({ type: String }) solarColor = '';
   @property({ type: String }) gridColor = '';
@@ -280,9 +281,10 @@ export class FlowDiagram extends LitElement {
           fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />`;
 
     // Icon — centered in shape
-    const iconScale = ICON_S * 2 / 24;
+    const iS = this.nodeIconSize;
+    const iconScale = iS * 2 / 24;
     const icon = svg`
-      <g transform="translate(${cx - ICON_S}, ${cy - ICON_S}) scale(${iconScale})">
+      <g transform="translate(${cx - iS}, ${cy - iS}) scale(${iconScale})">
         <path d="${iconPath}" fill="${fill}" />
       </g>
     `;
