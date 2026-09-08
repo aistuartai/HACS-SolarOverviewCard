@@ -1,6 +1,6 @@
 {
   "name": "solar-overview-card",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Solar energy overview card for Home Assistant",
   "type": "module",
   "main": "dist/solar-overview-card.js",

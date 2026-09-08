@@ -1,5 +1,5 @@
 import { LitElement, html, css, PropertyValues } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { SparklinePoint } from '../types';
 
 /**
@@ -22,8 +22,6 @@ export class StatPanel extends LitElement {
 
   /** Formatted display value (set by parent to avoid duplicating logic) */
   @property({ type: String }) displayValue = '';
-
-  @state() private _canvasReady = false;
 
   static styles = css`
     :host { display: block; }
@@ -57,6 +55,11 @@ export class StatPanel extends LitElement {
     .icon-wrap svg {
       width: 20px;
       height: 20px;
+    }
+
+    .icon-wrap ha-icon {
+      --mdc-icon-size: 20px;
+      display: flex;
     }
 
     .name {
@@ -110,8 +113,6 @@ export class StatPanel extends LitElement {
       this._drawSparkline();
     }
     if (changed.has('showSparkline') && this.showSparkline) {
-      this._canvasReady = true;
-      this.requestUpdate();
       this.updateComplete.then(() => this._drawSparkline());
     }
   }
@@ -179,9 +180,11 @@ export class StatPanel extends LitElement {
       <div class="panel ${this.panelClass}">
         <div class="header">
           <div class="icon-wrap">
-            <svg viewBox="0 0 24 24" fill="${this.stateColor}">
-              <path d="${this.icon}" />
-            </svg>
+            ${this.icon?.startsWith('mdi:')
+              ? html`<ha-icon icon="${this.icon}" style="color:${this.stateColor};"></ha-icon>`
+              : html`<svg viewBox="0 0 24 24" fill="${this.stateColor}" aria-hidden="true">
+                  <path d="${this.icon}" />
+                </svg>`}
           </div>
           <span class="name">${this.name}</span>
         </div>

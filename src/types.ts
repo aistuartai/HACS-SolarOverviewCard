@@ -93,6 +93,8 @@ export interface PanelConfig {
   key?: 'solar' | 'battery' | 'grid' | 'load';  // built-in panel
   entity?: string;   // custom panel entity
   name?: string;
+  /** MDI name ("mdi:meter-electric") or a raw SVG path. Falls back to a lightning bolt. */
+  icon?: string;
   color?: string;
   enabled: boolean;
 }

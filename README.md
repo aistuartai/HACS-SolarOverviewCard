@@ -27,6 +27,7 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 | **Section toggles** | Show/hide the flow diagram, stat panels, device row, and sparklines independently. |
 | **Draggable node layout** | Drag nodes in the visual editor to reposition them; positions are saved to config. |
 | **Node style** | Choose `circle` (default) or `card` style for all diagram nodes. |
+| **Unit-aware sensors** | Sensors reporting kW or MW are scaled to watts automatically. |
 | **Visual config editor** | Full GUI editor with entity pickers, icon selector, colour picker, and device add/edit/delete. |
 | **Responsive** | Scales from a narrow sidebar card to a full-width dashboard view. |
 | **Theme-aware** | Follows HA CSS variables; override with `theme: light \| dark`. |
@@ -188,11 +189,22 @@ panels:
     enabled: true
   - key: load
     enabled: true
+  - key: load
+    name: Consumption           # Optional: rename a built-in panel
+    icon: mdi:home-lightning-bolt   # Optional: override its icon
+    enabled: true
   - entity: sensor.house_temperature   # Custom panel — any HA entity
     name: Temperature
+    icon: mdi:thermometer            # Optional (default: lightning bolt)
     color: "#06b6d4"
     enabled: true
 ```
+
+Panel names are displayed in capitals, so `name: Meter` renders as **METER**.
+
+Icons accept any MDI name (`mdi:meter-electric`) or a raw SVG path. Both
+built-in and custom panels support `name`, `icon` and `color`; all three are
+editable in the visual editor's **Stat Panels** page.
 
 ---
 

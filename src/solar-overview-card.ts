@@ -3,21 +3,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { cardStyles } from './styles';
 import { FlowData, SolarCardConfig, PanelConfig, HomeAssistant, SparklinePoint } from './types';
-import { formatPower, parseFloat_safe, calculateFlows, getStateLabel } from './utils';
+import { formatPower, parseFloat_safe, toWatts, calculateFlows, getStateLabel, normaliseInputs } from './utils';
+import { MDI_SOLAR, MDI_BATTERY, MDI_GRID, MDI_HOME, MDI_DEVICE } from './icons';
 
 import './components/flow-diagram';
 import type { DiagramDevice } from './components/flow-diagram';
 import './components/stat-panel';
 import './components/device-row';
-
-const MDI_SOLAR =
-  'M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M5,5H11V11H5V5M13,5H19V11H13V5M5,13H11V19H5V13M13,13H19V19H13V13Z';
-const MDI_BATTERY =
-  'M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z';
-const MDI_GRID =
-  'M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z';
-const MDI_HOME =
-  'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z';
 
 const DEFAULT_PANELS: PanelConfig[] = [
   { key: 'solar',   enabled: true },
@@ -99,47 +91,21 @@ export class SolarOverviewCard extends LitElement {
     if (!this._config) return;
 
     try {
-      const g = this._config.grid;
+      const n = normaliseInputs(this._config, (id) => this._readEntity(id));
+      this._solar   = n.solar;
+      this._battery = n.battery;
+      this._grid    = n.grid;
+      this._load    = n.load;
 
-      const rawSolar   = this._readEntity(this._config.solar.entity!);
-      const rawBattery = this._readEntity(this._config.battery.entity!);
-      const rawLoad    = this._config.load.entity ? this._readEntity(this._config.load.entity) : 0;
-      const rawGrid    = g.entity ? this._readEntity(g.entity) : 0;
+      this._soc = this._config.battery.soc_entity
+        ? this._readEntity(this._config.battery.soc_entity)
+        : 0;
 
-      // Normalise to: solar ≥ 0, battery positive=charging, grid positive=importing.
-      // positive_means takes precedence over the legacy invert flag.
-      const batteryInvert = this._config.battery.positive_means === 'discharging' || this._config.battery.invert === true;
-      const gridInvert    = this._config.grid.positive_means    === 'exporting'   || g.invert === true;
+      this._flows = calculateFlows(n.flowParams);
 
-      this._solar   = this._config.solar.invert ? -rawSolar   : rawSolar;
-      this._battery = batteryInvert ? -rawBattery : rawBattery;
-      this._grid    = gridInvert    ? -rawGrid    : rawGrid;
-      this._load    = this._config.load.invert ? -rawLoad : rawLoad;
-
-      if (this._config.battery.soc_entity) {
-        this._soc = this._readEntity(this._config.battery.soc_entity);
-      }
-
-      // Resolve all grid flow entities
-      const gridImport     = g.import_entity       ? this._readEntity(g.import_entity)       : undefined;
-      const gridExport     = g.export_entity        ? this._readEntity(g.export_entity)        :
-                             this._config.solar.export_entity ? this._readEntity(this._config.solar.export_entity) : undefined;
-      const gridToBattery  = g.to_battery_entity    ? this._readEntity(g.to_battery_entity)    :
-                             this._config.battery.grid_charge_entity ? this._readEntity(this._config.battery.grid_charge_entity) : undefined;
-      const batteryToGrid  = g.from_battery_entity  ? this._readEntity(g.from_battery_entity)  : undefined;
-      const gridBatteryCombined = g.battery_entity  ? this._readEntity(g.battery_entity)        : undefined;
-
-      this._flows = calculateFlows({
-        solar: this._solar,
-        battery: this._battery,
-        load: this._load,
-        gridCombined: this._grid,
-        gridImport,
-        gridExport,
-        gridToBattery,
-        batteryToGrid,
-        gridBatteryCombined,
-      });
+      // Clear any error from an earlier bad update — otherwise one transient
+      // failure leaves the card stuck on the error view until it is re-saved.
+      this._error = null;
 
       const now = Date.now();
       if (
@@ -154,11 +120,12 @@ export class SolarOverviewCard extends LitElement {
     }
   }
 
-  private _readEntity(entityId: string): number {
-    if (!this._hass?.states) return 0;
+  /** Reads an entity, scaling kW/MW sensors to watts. */
+  private _readEntity(entityId: string | undefined): number {
+    if (!entityId || !this._hass?.states) return 0;
     const ent = this._hass.states[entityId];
     if (!ent) return 0;
-    return parseFloat_safe(ent.state);
+    return toWatts(ent.state, ent.attributes.unit_of_measurement as string | undefined);
   }
 
   private async _fetchSparklines(): Promise<void> {
@@ -224,7 +191,7 @@ export class SolarOverviewCard extends LitElement {
       : unit ? `${Number.isInteger(val) ? val : val.toFixed(1)} ${unit}` : `${Math.round(val)}`;
     const color = panel.color ?? '#6366f1';
     const name = panel.name ?? (state?.attributes?.friendly_name as string) ?? entity;
-    const icon = 'M7,2V13H10V22L17,10H13L17,2H7Z';
+    const icon = panel.icon || MDI_DEVICE;
     return html`
       <stat-panel
         .entityId="${entity}"
@@ -232,7 +199,7 @@ export class SolarOverviewCard extends LitElement {
         .icon="${icon}"
         .value="${val}"
         .displayValue="${display}"
-        .stateLabel="${val > 0 ? 'Active' : 'Idle'}"
+        .stateLabel="${getStateLabel(entity, val)}"
         .stateColor="${color}"
         .showSparkline="${this._config?.show_sparklines !== false}"
         .sparklineHistory="${this._sparklines[entity] ?? []}"
@@ -247,7 +214,7 @@ export class SolarOverviewCard extends LitElement {
     return this._config.devices.map((d) => ({
       entityId: d.entity,
       name: d.name ?? d.entity,
-      icon: d.icon ?? 'M7,2V13H10V22L17,10H13L17,2H7Z',
+      icon: d.icon ?? MDI_DEVICE,
       watts: this._readEntity(d.entity),
       color: d.color,
     }));
@@ -278,7 +245,7 @@ export class SolarOverviewCard extends LitElement {
     return {
       entityId,
       name: cfg?.name ?? defaultName,
-      icon,
+      icon: cfg?.icon ?? icon,
       value: watts,
       displayValue: formatPower(watts, thr),
       stateLabel: stateOverride ?? getStateLabel(key, watts),
@@ -425,7 +392,7 @@ export class SolarOverviewCardEditor extends LitElement {
   @state() private _newDevice = { entity: '', name: '', icon: 'mdi:power-socket', color: '#6366f1', show_on_diagram: false };
   @state() private _editingIndex: number | null = null;
   @state() private _editingDevice = { entity: '', name: '', icon: '', color: '#6366f1', show_on_diagram: false };
-  @state() private _newPanel = { entity: '', name: '', color: '#6366f1' };
+  @state() private _newPanel = { entity: '', name: '', icon: '', color: '#6366f1' };
 
   static styles = css`
     :host { display: block; padding: 16px; }
@@ -603,26 +570,12 @@ export class SolarOverviewCardEditor extends LitElement {
   private _computeCurrentFlows(): FlowData | null {
     if (!this.hass || !this._config) return null;
     try {
-      const c = this._config;
-      const g = c.grid;
-      const read = (id: string | undefined) =>
-        id ? parseFloat_safe(this.hass!.states[id]?.state) : 0;
-      const batteryInvert = c.battery.positive_means === 'discharging' || c.battery.invert === true;
-      const gridInvert    = g.positive_means === 'exporting' || g.invert === true;
-      const solar   = read(c.solar.entity!)   * (c.solar.invert  ? -1 : 1);
-      const battery = read(c.battery.entity!) * (batteryInvert   ? -1 : 1);
-      const load    = read(c.load.entity)     * (c.load.invert   ? -1 : 1);
-      const gridRaw = g.entity ? read(g.entity) * (gridInvert    ? -1 : 1) : 0;
-      const gridImport    = g.import_entity       ? read(g.import_entity)       : undefined;
-      const gridExport    = g.export_entity       ? read(g.export_entity)       :
-                            c.solar.export_entity ? read(c.solar.export_entity) : undefined;
-      const gridToBattery = g.to_battery_entity   ? read(g.to_battery_entity)   : undefined;
-      const batteryToGrid = g.from_battery_entity ? read(g.from_battery_entity) : undefined;
-      const gridBatteryCombined = g.battery_entity ? read(g.battery_entity)     : undefined;
-      return calculateFlows({
-        solar, battery, load, gridCombined: gridRaw,
-        gridImport, gridExport, gridToBattery, batteryToGrid, gridBatteryCombined,
-      });
+      const read = (id: string | undefined) => {
+        if (!id) return 0;
+        const ent = this.hass!.states[id];
+        return ent ? toWatts(ent.state, ent.attributes.unit_of_measurement as string | undefined) : 0;
+      };
+      return calculateFlows(normaliseInputs(this._config, read).flowParams);
     } catch { return null; }
   }
 
@@ -1012,9 +965,16 @@ export class SolarOverviewCardEditor extends LitElement {
                 <button class="move-btn" ?disabled="${i === panels.length - 1}"
                   @click="${() => this._movePanel(i, 1)}">▼</button>
               </div>
-              ${!isBuiltin ? html`<span style="width:10px;height:10px;border-radius:50%;background:${p.color ?? '#6366f1'};flex-shrink:0;"></span>` : html`<span style="font-size:1.1rem;">${icon}</span>`}
+              ${!isBuiltin
+                ? html`<span style="width:10px;height:10px;border-radius:50%;background:${p.color ?? '#6366f1'};flex-shrink:0;"></span>`
+                : html`<span style="font-size:1.1rem;">${icon}</span>`}
               <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${label}${sub}</span>
               ${!isBuiltin ? html`
+                <div style="width:150px;flex-shrink:0;">
+                  <ha-selector .label="Icon" .selector=${{ icon: {} }} .value="${p.icon ?? ''}"
+                    @value-changed="${(e: CustomEvent) => this._setPanelIcon(i, e.detail.value ?? '')}"
+                  ></ha-selector>
+                </div>
                 <button class="device-btn danger" title="Remove" @click="${() => this._removeCustomPanel(i)}">✕</button>
               ` : ''}
               <ha-selector
@@ -1032,9 +992,14 @@ export class SolarOverviewCardEditor extends LitElement {
             .selector=${{ entity: {} }} .value="${this._newPanel.entity}"
             @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, entity: e.detail.value ?? '' }; this.requestUpdate(); }}"
           ></ha-selector>
-          <ha-selector .label="Name (optional)" .selector=${{ text: {} }} .value="${this._newPanel.name}"
-            @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, name: e.detail.value ?? '' }; this.requestUpdate(); }}"
-          ></ha-selector>
+          <div class="add-device-row">
+            <ha-selector .label="Name (optional)" .selector=${{ text: {} }} .value="${this._newPanel.name}"
+              @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, name: e.detail.value ?? '' }; this.requestUpdate(); }}"
+            ></ha-selector>
+            <ha-selector .label="Icon" .selector=${{ icon: {} }} .value="${this._newPanel.icon}"
+              @value-changed="${(e: CustomEvent) => { this._newPanel = { ...this._newPanel, icon: e.detail.value ?? '' }; this.requestUpdate(); }}"
+            ></ha-selector>
+          </div>
           <div class="color-row">
             <label>Colour</label>
             <input type="color" .value="${this._newPanel.color}"
@@ -1046,7 +1011,7 @@ export class SolarOverviewCardEditor extends LitElement {
           </div>
         </div>
 
-        <p class="hint">Reorder with ▲▼. Custom panels support any HA entity.</p>
+        <p class="hint">Reorder with ▲▼. Custom panels support any HA entity, with their own icon and colour.</p>
       </div>
     `;
   }
@@ -1058,11 +1023,12 @@ export class SolarOverviewCardEditor extends LitElement {
     const panels = [...(this._config.panels ?? DEFAULT_PANELS), {
       entity: this._newPanel.entity,
       name:   this._newPanel.name  || undefined,
+      icon:   this._newPanel.icon  || undefined,
       color:  this._newPanel.color || '#6366f1',
       enabled: true,
     }];
     this._setPanels(panels);
-    this._newPanel = { entity: '', name: '', color: '#6366f1' };
+    this._newPanel = { entity: '', name: '', icon: '', color: '#6366f1' };
   }
 
   private _removeCustomPanel(index: number): void {
@@ -1076,6 +1042,12 @@ export class SolarOverviewCardEditor extends LitElement {
     this.dispatchEvent(new CustomEvent('config-changed', {
       detail: { config: { ...this._config, panels } },
     }));
+  }
+
+  private _setPanelIcon(index: number, icon: string): void {
+    const panels = [...(this._config?.panels ?? DEFAULT_PANELS)];
+    panels[index] = { ...panels[index], icon: icon || undefined };
+    this._setPanels(panels);
   }
 
   private _togglePanel(index: number, value: boolean): void {
