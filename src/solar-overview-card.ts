@@ -324,6 +324,7 @@ export class SolarOverviewCard extends LitElement {
                 .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
                 .nodeStyle="${this._config.node_style ?? 'circle'}"
                 .nodeSize="${this._config.node_size ?? 32}"
+                .nodeTextSize="${this._config.node_text_size ?? 11}"
                 .nodeIconSize="${this._config.node_icon_size ?? defaultIconSize(this._config.node_size)}"
                 .showFlowLines="${this._config.show_flow_lines !== false}"
                 .nodePositions="${this._config.node_positions}"
@@ -747,6 +748,13 @@ export class SolarOverviewCardEditor extends LitElement {
           @value-changed="${(e: CustomEvent) => this._setValue('node_icon_size', e.detail.value)}"
         ></ha-selector>
         <p class="hint">Keep it under ~70% of the node size or icons clip the edge.</p>
+        <ha-selector
+          .label="Node text size (default: 11)"
+          .selector=${{ number: { min: 7, max: 22, step: 1, mode: 'slider' } }}
+          .value="${c.node_text_size ?? 11}"
+          @value-changed="${(e: CustomEvent) => this._setValue('node_text_size', e.detail.value)}"
+        ></ha-selector>
+        <p class="hint">Sets the value text under each node. Names, secondary lines, SOC% and the device labels scale with it.</p>
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
@@ -938,6 +946,7 @@ export class SolarOverviewCardEditor extends LitElement {
             .textColor="${c.diagram_text_color ?? '#ffffff'}"
             .nodeStyle="${c.node_style ?? 'circle'}"
             .nodeSize="${c.node_size ?? 32}"
+            .nodeTextSize="${c.node_text_size ?? 11}"
             .nodeIconSize="${c.node_icon_size ?? defaultIconSize(c.node_size)}"
             .showFlowLines="${c.show_flow_lines !== false}"
             .nodePositions="${c.node_positions}"

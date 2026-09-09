@@ -28,6 +28,9 @@ const BATTERY_X = CX;       const BATTERY_Y = CY + ARM;
 
 /** Default node radius. `nodeSize` overrides it and scales the card style to match. */
 const NODE_R = 32;
+
+/** Default font size of the value text under a node — every other label is derived from it. */
+const TEXT_BASE = 11;
 const ICON_S = 18;
 
 const DEVICE_ARM  = 82;
@@ -97,6 +100,8 @@ export class FlowDiagram extends LitElement {
   @property({ type: Number }) nodeIconSize = 18;
   /** Circle radius in viewBox units. Card-style nodes scale proportionally. */
   @property({ type: Number }) nodeSize = NODE_R;
+  /** Font size of the value under each node. Labels, secondaries and SOC scale with it. */
+  @property({ type: Number }) nodeTextSize = TEXT_BASE;
   // Node accent colours — empty string = use built-in default
   @property({ type: String }) solarColor = '';
   @property({ type: String }) gridColor = '';
@@ -179,6 +184,14 @@ export class FlowDiagram extends LitElement {
   private get _cardH(): number    { return CARD_H * this._scale; }
   private get _cardHalf(): number { return this._cardH / 2; }
   private get _cardR(): number    { return CARD_R * this._scale; }
+
+  /** How much node text has been scaled away from the built-in default. */
+  private get _textScale(): number { return this.nodeTextSize / TEXT_BASE; }
+
+  /** Value / label / secondary font sizes, and the row spacing that goes with them. */
+  private get _fsValue(): number     { return this.nodeTextSize; }
+  private get _fsLabel(): number     { return this.nodeTextSize - 1; }
+  private get _fsSecondary(): number { return this.nodeTextSize - 2; }
 
   /** Half-height of a node, whichever style is in use. */
   private get _halfHeight(): number {
@@ -316,15 +329,15 @@ export class FlowDiagram extends LitElement {
         ${editRing}
         ${shape}
         ${icon}
-        <text x="${cx}" y="${cy + R + 14}" text-anchor="middle"
-          font-size="10" font-family="Roboto, sans-serif"
+        <text x="${cx}" y="${cy + R + 14 * this._textScale}" text-anchor="middle"
+          font-size="${this._fsLabel}" font-family="Roboto, sans-serif"
           fill="${tc}" opacity="0.65">${label}</text>
-        <text x="${cx}" y="${cy + R + 26}" text-anchor="middle"
-          font-size="11" font-weight="700" font-family="Roboto, sans-serif"
+        <text x="${cx}" y="${cy + R + 26 * this._textScale}" text-anchor="middle"
+          font-size="${this._fsValue}" font-weight="700" font-family="Roboto, sans-serif"
           fill="${tc}">${formatPower(watts, this.wattThreshold)}</text>
         ${secondary ? svg`
-          <text x="${cx}" y="${cy + R + 38}" text-anchor="middle"
-            font-size="9" font-family="Roboto, sans-serif"
+          <text x="${cx}" y="${cy + R + 38 * this._textScale}" text-anchor="middle"
+            font-size="${this._fsSecondary}" font-family="Roboto, sans-serif"
             fill="${tc}" opacity="0.65">${secondary}</text>
         ` : ''}
       </g>
@@ -346,11 +359,11 @@ export class FlowDiagram extends LitElement {
         <g transform="translate(${cx - DEVICE_ICON}, ${cy - DEVICE_ICON}) scale(${DEVICE_ICON * 2 / 24})">
           <path d="${ICON_DEVICE}" fill="${color}" />
         </g>
-        <text x="${cx}" y="${cy + DEVICE_R + 11}" text-anchor="middle"
-          font-size="8.5" font-family="Roboto, sans-serif"
+        <text x="${cx}" y="${cy + DEVICE_R + 11 * this._textScale}" text-anchor="middle"
+          font-size="${8.5 * this._textScale}" font-family="Roboto, sans-serif"
           fill="${tc}" opacity="0.65">${label}</text>
-        <text x="${cx}" y="${cy + DEVICE_R + 21}" text-anchor="middle"
-          font-size="9" font-weight="700" font-family="Roboto, sans-serif"
+        <text x="${cx}" y="${cy + DEVICE_R + 21 * this._textScale}" text-anchor="middle"
+          font-size="${9 * this._textScale}" font-weight="700" font-family="Roboto, sans-serif"
           fill="${tc}">${formatPower(d.watts, this.wattThreshold)}</text>
       </g>
     `;
@@ -359,13 +372,13 @@ export class FlowDiagram extends LitElement {
   private _socRing(bx: number, by: number) {
     const color = this._batteryColor();
     const R = this._halfHeight;
-    const socTextY = by + R + (this.batterySecondary ? 50 : 38);
+    const socTextY = by + R + (this.batterySecondary ? 50 : 38) * this._textScale;
 
     // Card style: no ring arc, just SOC% text
     if (this.nodeStyle === 'card') {
       return svg`
         <text x="${bx}" y="${socTextY}"
-          text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
+          text-anchor="middle" font-size="${this._fsSecondary}" font-family="Roboto, sans-serif"
           fill="${color}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
       `;
     }
@@ -383,7 +396,7 @@ export class FlowDiagram extends LitElement {
         opacity="0.85" stroke-linecap="round"
       />
       <text x="${bx}" y="${socTextY}"
-        text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
+        text-anchor="middle" font-size="${this._fsSecondary}" font-family="Roboto, sans-serif"
         fill="${color}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
     `;
   }
@@ -410,7 +423,8 @@ export class FlowDiagram extends LitElement {
     }));
 
     // ── Dynamic viewBox from node positions ──────────────────────────────
-    const pad = this._nodeR + 60;
+    // Text hangs below each node, so the padding tracks the text size as well.
+    const pad = this._nodeR + 60 * this._textScale;
     const allX = [p.solar.x, p.grid.x, p.home.x, p.battery.x, ...devicePositions.map(d => d.x)];
     const allY = [p.solar.y, p.grid.y, p.home.y, p.battery.y, ...devicePositions.map(d => d.y)];
     const vbMinX = Math.min(...allX) - pad;

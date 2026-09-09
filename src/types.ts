@@ -119,6 +119,8 @@ export interface SolarCardConfig {
   /** Diagram node radius in viewBox units (default: 32). Card-style nodes scale to match. */
   node_size?: number;
   node_icon_size?: number;
+  /** Font size of the value under each node (default: 11). Labels and SOC scale with it. */
+  node_text_size?: number;
   show_flow_lines?: boolean;
   node_positions?: {
     solar?:   { x: number; y: number };
