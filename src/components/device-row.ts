@@ -50,12 +50,17 @@ export class DeviceRow extends LitElement {
       padding: 4px 10px 4px 7px;
       white-space: nowrap;
       flex-shrink: 0;
-      cursor: default;
+      cursor: pointer;
       transition: opacity 0.2s, background 0.15s;
     }
 
     .chip:hover {
       background: rgba(255,255,255,0.09);
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--primary-color, #3b82f6);
+      outline-offset: 2px;
     }
 
     .chip.dim {
@@ -97,6 +102,16 @@ export class DeviceRow extends LitElement {
   private _defaultIconPath =
     'M7,2V13H10V22L17,10H13L17,2H7Z';
 
+  /** Opens Home Assistant's more-info dialog for a device chip. */
+  private _openMoreInfo(entityId: string): void {
+    if (!entityId) return;
+    this.dispatchEvent(new CustomEvent('hass-more-info', {
+      detail: { entityId },
+      bubbles: true,
+      composed: true,
+    }));
+  }
+
   protected render() {
     if (!this.devices || this.devices.length === 0) {
       return html`<div class="row"><span class="empty">No devices configured</span></div>`;
@@ -111,8 +126,13 @@ export class DeviceRow extends LitElement {
             <div
               class="chip ${d.watts < 5 ? 'dim' : ''}"
               role="listitem"
+              tabindex="0"
               title="${d.name}: ${formatPower(d.watts, this.wattThreshold)}"
               style="${d.color ? `border-color: ${d.color}33;` : ''}"
+              @click="${() => this._openMoreInfo(d.entityId)}"
+              @keydown="${(e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._openMoreInfo(d.entityId); }
+              }}"
             >
               ${d.icon?.startsWith('mdi:')
                 ? html`<ha-icon icon="${d.icon}" style="${d.color ? `color:${d.color};` : ''}"></ha-icon>`

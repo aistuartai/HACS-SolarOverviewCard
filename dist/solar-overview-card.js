@@ -4,18 +4,18 @@ function t(t,e,i,o){var r,s=arguments.length,a=s<3?e:null===o?o=Object.getOwnPro
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,o=Symbol(),r=new WeakMap;let s=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==o)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=r.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&r.set(e,t))}return t}toString(){return this.cssText}};const a=(t,...e)=>{const i=1===t.length?t[0]:e.reduce((e,i,o)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[o+1],t[0]);return new s(i,t,o)},n=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new s("string"==typeof t?t:t+"",void 0,o))(e)})(t):t,{is:l,defineProperty:d,getOwnPropertyDescriptor:c,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:v}=Object,u=globalThis,g=u.trustedTypes,y=g?g.emptyScript:"",f=u.reactiveElementPolyfillSupport,_=(t,e)=>t,m={toAttribute(t,e){switch(e){case Boolean:t=t?y:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},b=(t,e)=>!l(t,e),$={attribute:!0,type:String,converter:m,reflect:!1,useDefault:!1,hasChanged:b};
+const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,o=Symbol(),r=new WeakMap;let s=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==o)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=r.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&r.set(e,t))}return t}toString(){return this.cssText}};const a=(t,...e)=>{const i=1===t.length?t[0]:e.reduce((e,i,o)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[o+1],t[0]);return new s(i,t,o)},n=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new s("string"==typeof t?t:t+"",void 0,o))(e)})(t):t,{is:l,defineProperty:d,getOwnPropertyDescriptor:c,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,v=globalThis,g=v.trustedTypes,y=g?g.emptyScript:"",f=v.reactiveElementPolyfillSupport,_=(t,e)=>t,m={toAttribute(t,e){switch(e){case Boolean:t=t?y:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},b=(t,e)=>!l(t,e),$={attribute:!0,type:String,converter:m,reflect:!1,useDefault:!1,hasChanged:b};
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */Symbol.metadata??=Symbol("metadata"),u.litPropertyMetadata??=new WeakMap;let x=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=$){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),o=this.getPropertyDescriptor(t,i,e);void 0!==o&&d(this.prototype,t,o)}}static getPropertyDescriptor(t,e,i){const{get:o,set:r}=c(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:o,set(e){const s=o?.call(this);r?.call(this,e),this.requestUpdate(t,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??$}static _$Ei(){if(this.hasOwnProperty(_("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(_("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(_("properties"))){const t=this.properties,e=[...h(t),...p(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(n(t))}else void 0!==t&&e.push(n(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,o)=>{if(i)t.adoptedStyleSheets=o.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const i of o){const o=document.createElement("style"),r=e.litNonce;void 0!==r&&o.setAttribute("nonce",r),o.textContent=i.cssText,t.appendChild(o)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),o=this.constructor._$Eu(t,i);if(void 0!==o&&!0===i.reflect){const r=(void 0!==i.converter?.toAttribute?i.converter:m).toAttribute(e,i.type);this._$Em=t,null==r?this.removeAttribute(o):this.setAttribute(o,r),this._$Em=null}}_$AK(t,e){const i=this.constructor,o=i._$Eh.get(t);if(void 0!==o&&this._$Em!==o){const t=i.getPropertyOptions(o),r="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:m;this._$Em=o;const s=r.fromAttribute(e,t.type);this[o]=s??this._$Ej?.get(o)??s,this._$Em=null}}requestUpdate(t,e,i,o=!1,r){if(void 0!==t){const s=this.constructor;if(!1===o&&(r=this[t]),i??=s.getPropertyOptions(t),!((i.hasChanged??b)(r,e)||i.useDefault&&i.reflect&&r===this._$Ej?.get(t)&&!this.hasAttribute(s._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:o,wrapped:r},s){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,s??e??this[t]),!0!==r||void 0!==s)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===o&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,o=this[e];!0!==t||this._$AL.has(e)||void 0===o||this.C(e,void 0,i,o)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};x.elementStyles=[],x.shadowRootOptions={mode:"open"},x[_("elementProperties")]=new Map,x[_("finalized")]=new Map,f?.({ReactiveElement:x}),(u.reactiveElementVersions??=[]).push("2.1.2");
+ */Symbol.metadata??=Symbol("metadata"),v.litPropertyMetadata??=new WeakMap;let x=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=$){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),o=this.getPropertyDescriptor(t,i,e);void 0!==o&&d(this.prototype,t,o)}}static getPropertyDescriptor(t,e,i){const{get:o,set:r}=c(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:o,set(e){const s=o?.call(this);r?.call(this,e),this.requestUpdate(t,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??$}static _$Ei(){if(this.hasOwnProperty(_("elementProperties")))return;const t=u(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(_("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(_("properties"))){const t=this.properties,e=[...h(t),...p(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(n(t))}else void 0!==t&&e.push(n(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,o)=>{if(i)t.adoptedStyleSheets=o.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const i of o){const o=document.createElement("style"),r=e.litNonce;void 0!==r&&o.setAttribute("nonce",r),o.textContent=i.cssText,t.appendChild(o)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),o=this.constructor._$Eu(t,i);if(void 0!==o&&!0===i.reflect){const r=(void 0!==i.converter?.toAttribute?i.converter:m).toAttribute(e,i.type);this._$Em=t,null==r?this.removeAttribute(o):this.setAttribute(o,r),this._$Em=null}}_$AK(t,e){const i=this.constructor,o=i._$Eh.get(t);if(void 0!==o&&this._$Em!==o){const t=i.getPropertyOptions(o),r="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:m;this._$Em=o;const s=r.fromAttribute(e,t.type);this[o]=s??this._$Ej?.get(o)??s,this._$Em=null}}requestUpdate(t,e,i,o=!1,r){if(void 0!==t){const s=this.constructor;if(!1===o&&(r=this[t]),i??=s.getPropertyOptions(t),!((i.hasChanged??b)(r,e)||i.useDefault&&i.reflect&&r===this._$Ej?.get(t)&&!this.hasAttribute(s._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:o,wrapped:r},s){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,s??e??this[t]),!0!==r||void 0!==s)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===o&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,o=this[e];!0!==t||this._$AL.has(e)||void 0===o||this.C(e,void 0,i,o)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};x.elementStyles=[],x.shadowRootOptions={mode:"open"},x[_("elementProperties")]=new Map,x[_("finalized")]=new Map,f?.({ReactiveElement:x}),(v.reactiveElementVersions??=[]).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const w=globalThis,k=t=>t,S=w.trustedTypes,C=S?S.createPolicy("lit-html",{createHTML:t=>t}):void 0,P="$lit$",H=`lit$${Math.random().toFixed(9).slice(2)}$`,A="?"+H,E=`<${A}>`,M=document,T=()=>M.createComment(""),N=t=>null===t||"object"!=typeof t&&"function"!=typeof t,V=Array.isArray,L="[ \t\n\f\r]",z=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,D=/-->/g,I=/>/g,B=RegExp(`>|${L}(?:([^\\s"'>=/]+)(${L}*=${L}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),F=/'/g,O=/"/g,R=/^(?:script|style|textarea|title)$/i,U=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),G=U(1),W=U(2),j=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),Z=new WeakMap,J=M.createTreeWalker(M,129);function Y(t,e){if(!V(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==C?C.createHTML(e):e}const K=(t,e)=>{const i=t.length-1,o=[];let r,s=2===e?"<svg>":3===e?"<math>":"",a=z;for(let e=0;e<i;e++){const i=t[e];let n,l,d=-1,c=0;for(;c<i.length&&(a.lastIndex=c,l=a.exec(i),null!==l);)c=a.lastIndex,a===z?"!--"===l[1]?a=D:void 0!==l[1]?a=I:void 0!==l[2]?(R.test(l[2])&&(r=RegExp("</"+l[2],"g")),a=B):void 0!==l[3]&&(a=B):a===B?">"===l[0]?(a=r??z,d=-1):void 0===l[1]?d=-2:(d=a.lastIndex-l[2].length,n=l[1],a=void 0===l[3]?B:'"'===l[3]?O:F):a===O||a===F?a=B:a===D||a===I?a=z:(a=B,r=void 0);const h=a===B&&t[e+1].startsWith("/>")?" ":"";s+=a===z?i+E:d>=0?(o.push(n),i.slice(0,d)+P+i.slice(d)+H+h):i+H+(-2===d?e:h)}return[Y(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),o]};class X{constructor({strings:t,_$litType$:e},i){let o;this.parts=[];let r=0,s=0;const a=t.length-1,n=this.parts,[l,d]=K(t,e);if(this.el=X.createElement(l,i),J.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(o=J.nextNode())&&n.length<a;){if(1===o.nodeType){if(o.hasAttributes())for(const t of o.getAttributeNames())if(t.endsWith(P)){const e=d[s++],i=o.getAttribute(t).split(H),a=/([.?@])?(.*)/.exec(e);n.push({type:1,index:r,name:a[2],strings:i,ctor:"."===a[1]?ot:"?"===a[1]?rt:"@"===a[1]?st:it}),o.removeAttribute(t)}else t.startsWith(H)&&(n.push({type:6,index:r}),o.removeAttribute(t));if(R.test(o.tagName)){const t=o.textContent.split(H),e=t.length-1;if(e>0){o.textContent=S?S.emptyScript:"";for(let i=0;i<e;i++)o.append(t[i],T()),J.nextNode(),n.push({type:2,index:++r});o.append(t[e],T())}}}else if(8===o.nodeType)if(o.data===A)n.push({type:2,index:r});else{let t=-1;for(;-1!==(t=o.data.indexOf(H,t+1));)n.push({type:7,index:r}),t+=H.length-1}r++}}static createElement(t,e){const i=M.createElement("template");return i.innerHTML=t,i}}function Q(t,e,i=t,o){if(e===j)return e;let r=void 0!==o?i._$Co?.[o]:i._$Cl;const s=N(e)?void 0:e._$litDirective$;return r?.constructor!==s&&(r?._$AO?.(!1),void 0===s?r=void 0:(r=new s(t),r._$AT(t,i,o)),void 0!==o?(i._$Co??=[])[o]=r:i._$Cl=r),void 0!==r&&(e=Q(t,r._$AS(t,e.values),r,o)),e}class tt{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,o=(t?.creationScope??M).importNode(e,!0);J.currentNode=o;let r=J.nextNode(),s=0,a=0,n=i[0];for(;void 0!==n;){if(s===n.index){let e;2===n.type?e=new et(r,r.nextSibling,this,t):1===n.type?e=new n.ctor(r,n.name,n.strings,this,t):6===n.type&&(e=new at(r,this,t)),this._$AV.push(e),n=i[++a]}s!==n?.index&&(r=J.nextNode(),s++)}return J.currentNode=M,o}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class et{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Q(this,t,e),N(t)?t===q||null==t||""===t?(this._$AH!==q&&this._$AR(),this._$AH=q):t!==this._$AH&&t!==j&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>V(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==q&&N(this._$AH)?this._$AA.nextSibling.data=t:this.T(M.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,o="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=X.createElement(Y(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(e);else{const t=new tt(o,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new X(t)),e}k(t){V(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,o=0;for(const r of t)o===e.length?e.push(i=new et(this.O(T()),this.O(T()),this,this.options)):i=e[o],i._$AI(r),o++;o<e.length&&(this._$AR(i&&i._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=k(t).nextSibling;k(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class it{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,o,r){this.type=1,this._$AH=q,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=q}_$AI(t,e=this,i,o){const r=this.strings;let s=!1;if(void 0===r)t=Q(this,t,e,0),s=!N(t)||t!==this._$AH&&t!==j,s&&(this._$AH=t);else{const o=t;let a,n;for(t=r[0],a=0;a<r.length-1;a++)n=Q(this,o[i+a],e,a),n===j&&(n=this._$AH[a]),s||=!N(n)||n!==this._$AH[a],n===q?t=q:t!==q&&(t+=(n??"")+r[a+1]),this._$AH[a]=n}s&&!o&&this.j(t)}j(t){t===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class ot extends it{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===q?void 0:t}}class rt extends it{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==q)}}class st extends it{constructor(t,e,i,o,r){super(t,e,i,o,r),this.type=5}_$AI(t,e=this){if((t=Q(this,t,e,0)??q)===j)return;const i=this._$AH,o=t===q&&i!==q||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,r=t!==q&&(i===q||o);o&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class at{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Q(this,t)}}const nt=w.litHtmlPolyfillSupport;nt?.(X,et),(w.litHtmlVersions??=[]).push("3.3.2");const lt=globalThis;
+const w=globalThis,k=t=>t,S=w.trustedTypes,P=S?S.createPolicy("lit-html",{createHTML:t=>t}):void 0,C="$lit$",H=`lit$${Math.random().toFixed(9).slice(2)}$`,A="?"+H,E=`<${A}>`,M=document,T=()=>M.createComment(""),N=t=>null===t||"object"!=typeof t&&"function"!=typeof t,V=Array.isArray,z="[ \t\n\f\r]",I=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,L=/-->/g,D=/>/g,R=RegExp(`>|${z}(?:([^\\s"'>=/]+)(${z}*=${z}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),B=/'/g,F=/"/g,O=/^(?:script|style|textarea|title)$/i,U=t=>(e,...i)=>({_$litType$:t,strings:e,values:i}),G=U(1),W=U(2),j=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),Z=new WeakMap,J=M.createTreeWalker(M,129);function Y(t,e){if(!V(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==P?P.createHTML(e):e}const K=(t,e)=>{const i=t.length-1,o=[];let r,s=2===e?"<svg>":3===e?"<math>":"",a=I;for(let e=0;e<i;e++){const i=t[e];let n,l,d=-1,c=0;for(;c<i.length&&(a.lastIndex=c,l=a.exec(i),null!==l);)c=a.lastIndex,a===I?"!--"===l[1]?a=L:void 0!==l[1]?a=D:void 0!==l[2]?(O.test(l[2])&&(r=RegExp("</"+l[2],"g")),a=R):void 0!==l[3]&&(a=R):a===R?">"===l[0]?(a=r??I,d=-1):void 0===l[1]?d=-2:(d=a.lastIndex-l[2].length,n=l[1],a=void 0===l[3]?R:'"'===l[3]?F:B):a===F||a===B?a=R:a===L||a===D?a=I:(a=R,r=void 0);const h=a===R&&t[e+1].startsWith("/>")?" ":"";s+=a===I?i+E:d>=0?(o.push(n),i.slice(0,d)+C+i.slice(d)+H+h):i+H+(-2===d?e:h)}return[Y(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),o]};class X{constructor({strings:t,_$litType$:e},i){let o;this.parts=[];let r=0,s=0;const a=t.length-1,n=this.parts,[l,d]=K(t,e);if(this.el=X.createElement(l,i),J.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(o=J.nextNode())&&n.length<a;){if(1===o.nodeType){if(o.hasAttributes())for(const t of o.getAttributeNames())if(t.endsWith(C)){const e=d[s++],i=o.getAttribute(t).split(H),a=/([.?@])?(.*)/.exec(e);n.push({type:1,index:r,name:a[2],strings:i,ctor:"."===a[1]?ot:"?"===a[1]?rt:"@"===a[1]?st:it}),o.removeAttribute(t)}else t.startsWith(H)&&(n.push({type:6,index:r}),o.removeAttribute(t));if(O.test(o.tagName)){const t=o.textContent.split(H),e=t.length-1;if(e>0){o.textContent=S?S.emptyScript:"";for(let i=0;i<e;i++)o.append(t[i],T()),J.nextNode(),n.push({type:2,index:++r});o.append(t[e],T())}}}else if(8===o.nodeType)if(o.data===A)n.push({type:2,index:r});else{let t=-1;for(;-1!==(t=o.data.indexOf(H,t+1));)n.push({type:7,index:r}),t+=H.length-1}r++}}static createElement(t,e){const i=M.createElement("template");return i.innerHTML=t,i}}function Q(t,e,i=t,o){if(e===j)return e;let r=void 0!==o?i._$Co?.[o]:i._$Cl;const s=N(e)?void 0:e._$litDirective$;return r?.constructor!==s&&(r?._$AO?.(!1),void 0===s?r=void 0:(r=new s(t),r._$AT(t,i,o)),void 0!==o?(i._$Co??=[])[o]=r:i._$Cl=r),void 0!==r&&(e=Q(t,r._$AS(t,e.values),r,o)),e}class tt{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,o=(t?.creationScope??M).importNode(e,!0);J.currentNode=o;let r=J.nextNode(),s=0,a=0,n=i[0];for(;void 0!==n;){if(s===n.index){let e;2===n.type?e=new et(r,r.nextSibling,this,t):1===n.type?e=new n.ctor(r,n.name,n.strings,this,t):6===n.type&&(e=new at(r,this,t)),this._$AV.push(e),n=i[++a]}s!==n?.index&&(r=J.nextNode(),s++)}return J.currentNode=M,o}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class et{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Q(this,t,e),N(t)?t===q||null==t||""===t?(this._$AH!==q&&this._$AR(),this._$AH=q):t!==this._$AH&&t!==j&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>V(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==q&&N(this._$AH)?this._$AA.nextSibling.data=t:this.T(M.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,o="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=X.createElement(Y(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(e);else{const t=new tt(o,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Z.get(t.strings);return void 0===e&&Z.set(t.strings,e=new X(t)),e}k(t){V(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,o=0;for(const r of t)o===e.length?e.push(i=new et(this.O(T()),this.O(T()),this,this.options)):i=e[o],i._$AI(r),o++;o<e.length&&(this._$AR(i&&i._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=k(t).nextSibling;k(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class it{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,o,r){this.type=1,this._$AH=q,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=q}_$AI(t,e=this,i,o){const r=this.strings;let s=!1;if(void 0===r)t=Q(this,t,e,0),s=!N(t)||t!==this._$AH&&t!==j,s&&(this._$AH=t);else{const o=t;let a,n;for(t=r[0],a=0;a<r.length-1;a++)n=Q(this,o[i+a],e,a),n===j&&(n=this._$AH[a]),s||=!N(n)||n!==this._$AH[a],n===q?t=q:t!==q&&(t+=(n??"")+r[a+1]),this._$AH[a]=n}s&&!o&&this.j(t)}j(t){t===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class ot extends it{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===q?void 0:t}}class rt extends it{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==q)}}class st extends it{constructor(t,e,i,o,r){super(t,e,i,o,r),this.type=5}_$AI(t,e=this){if((t=Q(this,t,e,0)??q)===j)return;const i=this._$AH,o=t===q&&i!==q||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,r=t!==q&&(i===q||o);o&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class at{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Q(this,t)}}const nt=w.litHtmlPolyfillSupport;nt?.(X,et),(w.litHtmlVersions??=[]).push("3.3.2");const lt=globalThis;
 /**
  * @license
  * Copyright 2017 Google LLC
@@ -26,17 +26,17 @@ const w=globalThis,k=t=>t,S=w.trustedTypes,C=S?S.createPolicy("lit-html",{create
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)},pt={attribute:!0,type:String,converter:m,reflect:!1,hasChanged:b},vt=(t=pt,e,i)=>{const{kind:o,metadata:r}=i;let s=globalThis.litPropertyMetadata.get(r);if(void 0===s&&globalThis.litPropertyMetadata.set(r,s=new Map),"setter"===o&&((t=Object.create(t)).wrapped=!0),s.set(i.name,t),"accessor"===o){const{name:o}=i;return{set(i){const r=e.get.call(this);e.set.call(this,i),this.requestUpdate(o,r,t,!0,i)},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===o){const{name:o}=i;return function(i){const r=this[o];e.call(this,i),this.requestUpdate(o,r,t,!0,i)}}throw Error("Unsupported decorator location: "+o)};
+const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)},pt={attribute:!0,type:String,converter:m,reflect:!1,hasChanged:b},ut=(t=pt,e,i)=>{const{kind:o,metadata:r}=i;let s=globalThis.litPropertyMetadata.get(r);if(void 0===s&&globalThis.litPropertyMetadata.set(r,s=new Map),"setter"===o&&((t=Object.create(t)).wrapped=!0),s.set(i.name,t),"accessor"===o){const{name:o}=i;return{set(i){const r=e.get.call(this);e.set.call(this,i),this.requestUpdate(o,r,t,!0,i)},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===o){const{name:o}=i;return function(i){const r=this[o];e.call(this,i),this.requestUpdate(o,r,t,!0,i)}}throw Error("Unsupported decorator location: "+o)};
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */function ut(t){return(e,i)=>"object"==typeof i?vt(t,e,i):((t,e,i)=>{const o=e.hasOwnProperty(i);return e.constructor.createProperty(i,t),o?Object.getOwnPropertyDescriptor(e,i):void 0})(t,e,i)}
+ */function vt(t){return(e,i)=>"object"==typeof i?ut(t,e,i):((t,e,i)=>{const o=e.hasOwnProperty(i);return e.constructor.createProperty(i,t),o?Object.getOwnPropertyDescriptor(e,i):void 0})(t,e,i)}
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */function gt(t){return ut({...t,state:!0,attribute:!1})}const yt=a`
+ */function gt(t){return vt({...t,state:!0,attribute:!1})}const yt=a`
   /* ─── Colour tokens ───────────────────────────────────────────── */
   :host {
     --color-solar:   #f59e0b;
@@ -324,33 +324,33 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
     font-size: 0.875rem;
     border-left: 3px solid #ef4444;
   }
-`;function ft(t,e){return Math.abs(t)>=e?`${(t/1e3).toFixed(1)} kW`:`${Math.round(t)} W`}function _t(t,e){const i=mt(t);return"kW"===e?1e3*i:"MW"===e?1e6*i:i}function mt(t){if(null==t)return 0;const e="number"==typeof t?t:parseFloat(t);return isNaN(e)?0:e}function bt(t){const{solar:e,battery:i,load:o,gridCombined:r}=t,s=e>0?void 0!==t.gridExport?Math.max(0,t.gridExport):r<0?Math.abs(r):0:0,a=i>0&&e>0?Math.min(i,e):0,n=void 0!==t.gridToBattery?Math.max(0,t.gridToBattery):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined>0?t.gridBatteryCombined:i>0?Math.max(0,i-a):0,l=void 0!==t.gridImport?Math.max(0,t.gridImport):r>0?Math.max(0,r-n):0;return{solarToHome:e>0?o>0?Math.min(e,o):Math.max(0,e-s-a):0,solarToBattery:a,solarToGrid:s,gridToHome:l,batteryToHome:i<0?Math.abs(i):0,gridToBattery:n,batteryToGrid:void 0!==t.batteryToGrid?Math.max(0,t.batteryToGrid):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined<0?Math.abs(t.gridBatteryCombined):0}}function $t(t,e){switch(t){case"solar":return e>0?"Generating":"Idle";case"battery":return e>0?"Charging":e<0?"Discharging":"Idle";case"grid":return e>0?"Importing":e<0?"Exporting":"Idle";case"load":return e>0?"Consuming":"Idle";default:return e>0?"Active":"Idle"}}function xt(t,e){var i,o;const r=t.grid,s="discharging"===t.battery.positive_means||!0===t.battery.invert,a="exporting"===r.positive_means||!0===r.invert,n=e(t.solar.entity)*(t.solar.invert?-1:1),l=e(t.battery.entity)*(s?-1:1),d=e(null===(i=t.load)||void 0===i?void 0:i.entity)*((null===(o=t.load)||void 0===o?void 0:o.invert)?-1:1),c=r.entity?e(r.entity)*(a?-1:1):0,h=r.export_entity?e(r.export_entity):t.solar.export_entity?e(t.solar.export_entity):void 0,p=r.to_battery_entity?e(r.to_battery_entity):t.battery.grid_charge_entity?e(t.battery.grid_charge_entity):void 0;return{solar:n,battery:l,grid:c,load:d,flowParams:{solar:n,battery:l,load:d,gridCombined:c,gridImport:r.import_entity?e(r.import_entity):void 0,gridExport:h,gridToBattery:p,batteryToGrid:r.from_battery_entity?e(r.from_battery_entity):void 0,gridBatteryCombined:r.battery_entity?e(r.battery_entity):void 0}}}const wt="M7,2V13H10V22L17,10H13L17,2H7Z",kt=32,St=17;let Ct=class extends dt{constructor(){super(...arguments),this.solar=0,this.battery=0,this.grid=0,this.load=0,this.socPercent=0,this.wattThreshold=1e3,this.solarName="Solar",this.gridName="Grid",this.homeName="Home",this.batteryName="Battery",this.solarSecondary="",this.gridSecondary="",this.homeSecondary="",this.batterySecondary="",this.flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this.diagramDevices=[],this.backgroundImage="",this.editMode=!1,this.textColor="#ffffff",this.nodeStyle="circle",this.showFlowLines=!0,this.nodeIconSize=18,this.solarColor="",this.gridColor="",this.homeColor="",this.batteryNodeColor="",this._pos={solar:{x:150,y:50},grid:{x:50,y:150},home:{x:250,y:150},battery:{x:150,y:250}},this._dragging=null,this._dragStartClient={x:0,y:0},this._dragStartPos={x:0,y:0}}willUpdate(t){var e,i,o,r,s;if(t.has("nodePositions")){const t=null!==(e=this.nodePositions)&&void 0!==e?e:{};this._pos={solar:{x:150,y:50,...null!==(i=t.solar)&&void 0!==i?i:{}},grid:{x:50,y:150,...null!==(o=t.grid)&&void 0!==o?o:{}},home:{x:250,y:150,...null!==(r=t.home)&&void 0!==r?r:{}},battery:{x:150,y:250,...null!==(s=t.battery)&&void 0!==s?s:{}}}}}_onNodePointerDown(t,e){this.editMode&&(t.preventDefault(),t.stopPropagation(),this._dragging=e,this._dragStartClient={x:t.clientX,y:t.clientY},this._dragStartPos={...this._pos[e]},t.currentTarget.setPointerCapture(t.pointerId))}_onPointerMove(t){if(!this._dragging)return;const e=this.shadowRoot.querySelector("svg").getScreenCTM();if(!e)return;const i=(t.clientX-this._dragStartClient.x)/e.a,o=(t.clientY-this._dragStartClient.y)/e.d;this._pos={...this._pos,[this._dragging]:{x:Math.round(this._dragStartPos.x+i),y:Math.round(this._dragStartPos.y+o)}}}_onPointerUp(){this._dragging&&(this._dragging=null,this.dispatchEvent(new CustomEvent("nodes-moved",{detail:{positions:{...this._pos}},bubbles:!0,composed:!0})))}_bgFill(t){return t.startsWith("rgb(")?t.replace("rgb(","rgba(").replace(")",", 0.15)"):`${t}26`}get _nodeMargin(){return"card"===this.nodeStyle?29:36}_batteryColor(){const t=Math.max(0,Math.min(100,this.socPercent));let e,i,o;if(t>=50){const r=(t-50)/50;e=Math.round(16+229*r),i=Math.round(185+-27*r),o=Math.round(129+-118*r)}else{const r=t/50;e=Math.round(239+6*r),i=Math.round(68+90*r),o=Math.round(68+-57*r)}return`rgb(${e},${i},${o})`}_lineWidth(t){return t<=0?2:Math.min(8,Math.max(2,t/1e3*4+2))}_trim(t,e,i,o,r=36){const s=i-t,a=o-e,n=Math.sqrt(s*s+a*a);return 0===n?{x1:t,y1:e,x2:i,y2:o}:{x1:t+s/n*r,y1:e+a/n*r,x2:i-s/n*r,y2:o-a/n*r}}_flowLine(t,e,i,o,r,s,a=!1){const n=r>1,{x1:l,y1:d,x2:c,y2:h}=this._trim(t,e,i,o,this._nodeMargin),p=this._lineWidth(r),v=n?a?"flow-active-rev":"flow-active":"";return W`
+`;function ft(t,e){return Math.abs(t)>=e?`${(t/1e3).toFixed(1)} kW`:`${Math.round(t)} W`}function _t(t,e){const i=mt(t);return"kW"===e?1e3*i:"MW"===e?1e6*i:i}function mt(t){if(null==t)return 0;const e="number"==typeof t?t:parseFloat(t);return isNaN(e)?0:e}function bt(t){const{solar:e,battery:i,load:o,gridCombined:r}=t,s=e>0?void 0!==t.gridExport?Math.max(0,t.gridExport):r<0?Math.abs(r):0:0,a=i>0&&e>0?Math.min(i,e):0,n=void 0!==t.gridToBattery?Math.max(0,t.gridToBattery):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined>0?t.gridBatteryCombined:i>0?Math.max(0,i-a):0,l=void 0!==t.gridImport?Math.max(0,t.gridImport):r>0?Math.max(0,r-n):0;return{solarToHome:e>0?o>0?Math.min(e,o):Math.max(0,e-s-a):0,solarToBattery:a,solarToGrid:s,gridToHome:l,batteryToHome:i<0?Math.abs(i):0,gridToBattery:n,batteryToGrid:void 0!==t.batteryToGrid?Math.max(0,t.batteryToGrid):void 0!==t.gridBatteryCombined&&t.gridBatteryCombined<0?Math.abs(t.gridBatteryCombined):0}}function $t(t,e){switch(t){case"solar":return e>0?"Generating":"Idle";case"battery":return e>0?"Charging":e<0?"Discharging":"Idle";case"grid":return e>0?"Importing":e<0?"Exporting":"Idle";case"load":return e>0?"Consuming":"Idle";default:return e>0?"Active":"Idle"}}function xt(t,e){var i,o;const r=t.grid,s="discharging"===t.battery.positive_means||!0===t.battery.invert,a="exporting"===r.positive_means||!0===r.invert,n=e(t.solar.entity)*(t.solar.invert?-1:1),l=e(t.battery.entity)*(s?-1:1),d=e(null===(i=t.load)||void 0===i?void 0:i.entity)*((null===(o=t.load)||void 0===o?void 0:o.invert)?-1:1),c=r.entity?e(r.entity)*(a?-1:1):0,h=r.export_entity?e(r.export_entity):t.solar.export_entity?e(t.solar.export_entity):void 0,p=r.to_battery_entity?e(r.to_battery_entity):t.battery.grid_charge_entity?e(t.battery.grid_charge_entity):void 0;return{solar:n,battery:l,grid:c,load:d,flowParams:{solar:n,battery:l,load:d,gridCombined:c,gridImport:r.import_entity?e(r.import_entity):void 0,gridExport:h,gridToBattery:p,batteryToGrid:r.from_battery_entity?e(r.from_battery_entity):void 0,gridBatteryCombined:r.battery_entity?e(r.battery_entity):void 0}}}const wt="M7,2V13H10V22L17,10H13L17,2H7Z",kt=17;let St=class extends dt{constructor(){super(...arguments),this.solar=0,this.battery=0,this.grid=0,this.load=0,this.socPercent=0,this.wattThreshold=1e3,this.solarName="Solar",this.gridName="Grid",this.homeName="Home",this.batteryName="Battery",this.solarSecondary="",this.gridSecondary="",this.homeSecondary="",this.batterySecondary="",this.flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this.diagramDevices=[],this.backgroundImage="",this.editMode=!1,this.textColor="#ffffff",this.nodeStyle="circle",this.showFlowLines=!0,this.nodeIconSize=18,this.nodeSize=32,this.solarColor="",this.gridColor="",this.homeColor="",this.batteryNodeColor="",this._pos={solar:{x:150,y:50},grid:{x:50,y:150},home:{x:250,y:150},battery:{x:150,y:250}},this._dragging=null,this._dragStartClient={x:0,y:0},this._dragStartPos={x:0,y:0}}willUpdate(t){var e,i,o,r,s;if(t.has("nodePositions")){const t=null!==(e=this.nodePositions)&&void 0!==e?e:{};this._pos={solar:{x:150,y:50,...null!==(i=t.solar)&&void 0!==i?i:{}},grid:{x:50,y:150,...null!==(o=t.grid)&&void 0!==o?o:{}},home:{x:250,y:150,...null!==(r=t.home)&&void 0!==r?r:{}},battery:{x:150,y:250,...null!==(s=t.battery)&&void 0!==s?s:{}}}}}_onNodePointerDown(t,e){this.editMode&&(t.preventDefault(),t.stopPropagation(),this._dragging=e,this._dragStartClient={x:t.clientX,y:t.clientY},this._dragStartPos={...this._pos[e]},t.currentTarget.setPointerCapture(t.pointerId))}_onPointerMove(t){if(!this._dragging)return;const e=this.shadowRoot.querySelector("svg").getScreenCTM();if(!e)return;const i=(t.clientX-this._dragStartClient.x)/e.a,o=(t.clientY-this._dragStartClient.y)/e.d;this._pos={...this._pos,[this._dragging]:{x:Math.round(this._dragStartPos.x+i),y:Math.round(this._dragStartPos.y+o)}}}_onPointerUp(){this._dragging&&(this._dragging=null,this.dispatchEvent(new CustomEvent("nodes-moved",{detail:{positions:{...this._pos}},bubbles:!0,composed:!0})))}get _scale(){return this.nodeSize/32}get _nodeR(){return this.nodeSize}get _cardW(){return 82*this._scale}get _cardH(){return 46*this._scale}get _cardHalf(){return this._cardH/2}get _cardR(){return 10*this._scale}get _halfHeight(){return"card"===this.nodeStyle?this._cardHalf:this._nodeR}_bgFill(t){return t.startsWith("rgb(")?t.replace("rgb(","rgba(").replace(")",", 0.15)"):`${t}26`}get _nodeMargin(){return this._halfHeight+("card"===this.nodeStyle?6:4)}_batteryColor(){const t=Math.max(0,Math.min(100,this.socPercent));let e,i,o;if(t>=50){const r=(t-50)/50;e=Math.round(16+229*r),i=Math.round(185+-27*r),o=Math.round(129+-118*r)}else{const r=t/50;e=Math.round(239+6*r),i=Math.round(68+90*r),o=Math.round(68+-57*r)}return`rgb(${e},${i},${o})`}_lineWidth(t){return t<=0?2:Math.min(8,Math.max(2,t/1e3*4+2))}_trim(t,e,i,o,r){const s=null!=r?r:this._nodeR+4,a=i-t,n=o-e,l=Math.sqrt(a*a+n*n);return 0===l?{x1:t,y1:e,x2:i,y2:o}:{x1:t+a/l*s,y1:e+n/l*s,x2:i-a/l*s,y2:o-n/l*s}}_flowLine(t,e,i,o,r,s,a=!1){const n=r>1,{x1:l,y1:d,x2:c,y2:h}=this._trim(t,e,i,o,this._nodeMargin),p=this._lineWidth(r),u=n?a?"flow-active-rev":"flow-active":"";return W`
       <line
         x1="${l}" y1="${d}" x2="${c}" y2="${h}"
         stroke="${s}" stroke-width="${p}" stroke-linecap="round"
         stroke-dasharray="${n?"8 6":"4 6"}"
         stroke-dashoffset="0"
         opacity="${n?function(t,e){return e<=0?1:Math.min(1,Math.max(.2,Math.abs(t)/e))}(r,5e3):.13}"
-        class="${v}"
+        class="${u}"
       />
-    `}_deviceLine(t,e,i,o,r,s){const a=r>5,{x1:n,y1:l,x2:d,y2:c}=this._trim(t,e,i,o,35),h=d-n,p=c-l,v=Math.sqrt(h*h+p*p);return W`
+    `}_deviceLine(t,e,i,o,r,s){const a=r>5,{x1:n,y1:l,x2:d,y2:c}=this._trim(t,e,i,o,this._nodeR+3),h=d-n,p=c-l,u=Math.sqrt(h*h+p*p);return W`
       <line
-        x1="${n}" y1="${l}" x2="${v>0?d-h/v*20:d}" y2="${v>0?c-p/v*20:c}"
+        x1="${n}" y1="${l}" x2="${u>0?d-h/u*20:d}" y2="${u>0?c-p/u*20:c}"
         stroke="${s}" stroke-width="${a?2:1.5}" stroke-linecap="round"
         stroke-dasharray="${a?"6 5":"3 5"}" stroke-dashoffset="0"
         opacity="${a?.85:.2}"
         class="${a?"flow-active":""}"
       />
-    `}_node(t,e,i,o,r,s,a,n,l){const d=this.textColor,c=this.editMode&&this._dragging===l,h="card"===this.nodeStyle,p=h?23:kt,v=this.editMode?W`
-      ${h?W`<rect x="${t-41-6}" y="${e-p-6}"
-            width="${94}" height="${58}" rx="${14}"
+    `}_node(t,e,i,o,r,s,a,n,l){const d=this.textColor,c=this.editMode&&this._dragging===l,h="card"===this.nodeStyle,p=this._halfHeight,u=this.editMode?W`
+      ${h?W`<rect x="${t-this._cardW/2-6}" y="${e-p-6}"
+            width="${this._cardW+12}" height="${this._cardH+12}" rx="${this._cardR+4}"
             fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
-            stroke-dasharray="4 3" opacity="${c?1:.6}" />`:W`<circle cx="${t}" cy="${e}" r="${38}"
+            stroke-dasharray="4 3" opacity="${c?1:.6}" />`:W`<circle cx="${t}" cy="${e}" r="${this._nodeR+6}"
             fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
             stroke-dasharray="4 3" opacity="${c?1:.6}" />`}
-    `:"",u=h?W`<rect x="${t-41}" y="${e-p}"
-          width="${82}" height="${46}" rx="${10}"
-          fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />`:W`<circle cx="${t}" cy="${e}" r="${kt}"
+    `:"",v=h?W`<rect x="${t-this._cardW/2}" y="${e-p}"
+          width="${this._cardW}" height="${this._cardH}" rx="${this._cardR}"
+          fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />`:W`<circle cx="${t}" cy="${e}" r="${this._nodeR}"
           fill="${a}" stroke="${s}" stroke-width="${c?3:2}" />`,g=this.nodeIconSize,y=W`
       <g transform="translate(${t-g}, ${e-g}) scale(${2*g/24})">
         <path d="${i}" fill="${s}" />
@@ -362,8 +362,8 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         @pointermove="${t=>this._onPointerMove(t)}"
         @pointerup="${()=>this._onPointerUp()}"
       >
-        ${v}
         ${u}
+        ${v}
         ${y}
         <text x="${t}" y="${e+p+14}" text-anchor="middle"
           font-size="10" font-family="Roboto, sans-serif"
@@ -379,27 +379,27 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       </g>
     `}_deviceNode(t,e,i){const o=i.color||"#6366f1",r=o.startsWith("rgb")?o.replace("rgb(","rgba(").replace(")",", 0.15)"):`${o}26`,s=i.name.length>10?i.name.slice(0,9)+"…":i.name,a=i.watts>5,n=this.textColor;return W`
       <g class="device-node" opacity="${a?1:.45}">
-        <circle cx="${t}" cy="${e}" r="${St}"
+        <circle cx="${t}" cy="${e}" r="${kt}"
           fill="${r}" stroke="${o}" stroke-width="${a?2:1}" />
         <g transform="translate(${t-9}, ${e-9}) scale(${.75})">
           <path d="${"M7,2V13H10V22L17,10H13L17,2H7Z"}" fill="${o}" />
         </g>
-        <text x="${t}" y="${e+St+11}" text-anchor="middle"
+        <text x="${t}" y="${e+kt+11}" text-anchor="middle"
           font-size="8.5" font-family="Roboto, sans-serif"
           fill="${n}" opacity="0.65">${s}</text>
-        <text x="${t}" y="${e+St+21}" text-anchor="middle"
+        <text x="${t}" y="${e+kt+21}" text-anchor="middle"
           font-size="9" font-weight="700" font-family="Roboto, sans-serif"
           fill="${n}">${ft(i.watts,this.wattThreshold)}</text>
       </g>
-    `}_socRing(t,e){const i=this._batteryColor(),o=e+("card"===this.nodeStyle?23:kt)+(this.batterySecondary?50:38);if("card"===this.nodeStyle)return W`
+    `}_socRing(t,e){const i=this._batteryColor(),o=e+this._halfHeight+(this.batterySecondary?50:38);if("card"===this.nodeStyle)return W`
         <text x="${t}" y="${o}"
           text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
           fill="${i}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
-      `;const r=2*Math.PI*37,s=this.socPercent/100*r;return W`
+      `;const r=this._nodeR+5,s=2*Math.PI*r,a=this.socPercent/100*s;return W`
       <circle
-        cx="${t}" cy="${e}" r="${37}"
+        cx="${t}" cy="${e}" r="${r}"
         fill="none" stroke="${i}" stroke-width="3"
-        stroke-dasharray="${s} ${r-s}"
+        stroke-dasharray="${a} ${s-a}"
         stroke-dashoffset="0"
         transform="rotate(-90 ${t} ${e})"
         opacity="0.85" stroke-linecap="round"
@@ -407,9 +407,9 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       <text x="${t}" y="${o}"
         text-anchor="middle" font-size="9" font-family="Roboto, sans-serif"
         fill="${i}" font-weight="600">${this.socPercent.toFixed(0)}%</text>
-    `}render(){var t;const e=this.flows,i=this._pos,o=this.solarColor||"#f59e0b",r=this.gridColor||"#8b5cf6",s=this.homeColor||"#3b82f6",a=this.batteryNodeColor||this._batteryColor();this._batteryColor();const n=this._bgFill(a),l=null!==(t=this.diagramDevices)&&void 0!==t?t:[],d=l.length,c=d>0,h=i.home.x+82,p=52*(d-1),v=i.home.y-p/2,u=l.map((t,e)=>({d:t,x:h,y:v+52*e})),g=[i.solar.x,i.grid.x,i.home.x,i.battery.x,...u.map(t=>t.x)],y=[i.solar.y,i.grid.y,i.home.y,i.battery.y,...u.map(t=>t.y)],f=Math.min(...g)-92,_=Math.min(...y)-92,m=Math.max(...g)+92+(c?47:0)-f,b=Math.max(...y)+92-_;return G`
+    `}render(){var t;const e=this.flows,i=this._pos,o=this.solarColor||"#f59e0b",r=this.gridColor||"#8b5cf6",s=this.homeColor||"#3b82f6",a=this.batteryNodeColor||this._batteryColor();this._batteryColor();const n=this._bgFill(a),l=null!==(t=this.diagramDevices)&&void 0!==t?t:[],d=l.length,c=d>0,h=i.home.x+82,p=52*(d-1),u=i.home.y-p/2,v=l.map((t,e)=>({d:t,x:h,y:u+52*e})),g=this._nodeR+60,y=[i.solar.x,i.grid.x,i.home.x,i.battery.x,...v.map(t=>t.x)],f=[i.solar.y,i.grid.y,i.home.y,i.battery.y,...v.map(t=>t.y)],_=Math.min(...y)-g,m=Math.min(...f)-g,b=Math.max(...y)+g+(c?47:0)-_,$=Math.max(...f)+g-m;return G`
       <svg
-        viewBox="${`${f} ${_} ${m} ${b}`}"
+        viewBox="${`${_} ${m} ${b} ${$}`}"
         xmlns="http://www.w3.org/2000/svg"
         aria-label="Solar power flow diagram"
         role="img"
@@ -421,15 +421,15 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         ${this.backgroundImage?W`
           <image
             href="${this.backgroundImage}"
-            x="${f}" y="${_}"
-            width="${m}" height="${b}"
+            x="${_}" y="${m}"
+            width="${b}" height="${$}"
             preserveAspectRatio="xMidYMid slice"
           />
         `:""}
 
         <!-- Edit mode hint -->
         ${this.editMode?W`
-          <text x="${f+m/2}" y="${_+18}"
+          <text x="${_+b/2}" y="${m+18}"
             text-anchor="middle" font-size="10" font-family="Roboto, sans-serif"
             fill="rgba(255,255,255,0.5)">drag nodes to reposition</text>
         `:""}
@@ -442,7 +442,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           ${this._flowLine(i.grid.x,i.grid.y,i.home.x,i.home.y,e.gridToHome,"#8b5cf6")}
           ${this._flowLine(i.battery.x,i.battery.y,i.home.x,i.home.y,e.batteryToHome,a)}
           ${e.batteryToGrid>e.gridToBattery?this._flowLine(i.battery.x,i.battery.y,i.grid.x,i.grid.y,e.batteryToGrid,"#10b981"):this._flowLine(i.grid.x,i.grid.y,i.battery.x,i.battery.y,e.gridToBattery,"#8b5cf6")}
-          ${u.map(({d:t,x:e,y:o})=>this._deviceLine(i.home.x,i.home.y,e,o,t.watts,t.color||"#6366f1"))}
+          ${v.map(({d:t,x:e,y:o})=>this._deviceLine(i.home.x,i.home.y,e,o,t.watts,t.color||"#6366f1"))}
         `:""}
 
         <!-- SOC ring / text -->
@@ -455,9 +455,9 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         ${this._node(i.battery.x,i.battery.y,"M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z",this.batteryName,this.battery,a,n,this.batterySecondary,"battery")}
 
         <!-- Device satellite nodes -->
-        ${u.map(({d:t,x:e,y:i})=>this._deviceNode(e,i,t))}
+        ${v.map(({d:t,x:e,y:i})=>this._deviceNode(e,i,t))}
       </svg>
-    `}updated(t){super.updated(t)}};Ct.styles=a`
+    `}updated(t){super.updated(t)}};St.styles=a`
     :host { display: block; }
     @keyframes flow-anim     { to { stroke-dashoffset: -20; } }
     @keyframes flow-anim-rev { to { stroke-dashoffset:  20; } }
@@ -465,8 +465,15 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
     .flow-active-rev { animation: flow-anim-rev 0.8s linear infinite; }
     .draggable { cursor: grab; }
     .draggable:active { cursor: grabbing; }
-  `,t([ut({type:Number})],Ct.prototype,"solar",void 0),t([ut({type:Number})],Ct.prototype,"battery",void 0),t([ut({type:Number})],Ct.prototype,"grid",void 0),t([ut({type:Number})],Ct.prototype,"load",void 0),t([ut({type:Number})],Ct.prototype,"socPercent",void 0),t([ut({type:Number})],Ct.prototype,"wattThreshold",void 0),t([ut({type:String})],Ct.prototype,"solarName",void 0),t([ut({type:String})],Ct.prototype,"gridName",void 0),t([ut({type:String})],Ct.prototype,"homeName",void 0),t([ut({type:String})],Ct.prototype,"batteryName",void 0),t([ut({type:String})],Ct.prototype,"solarSecondary",void 0),t([ut({type:String})],Ct.prototype,"gridSecondary",void 0),t([ut({type:String})],Ct.prototype,"homeSecondary",void 0),t([ut({type:String})],Ct.prototype,"batterySecondary",void 0),t([ut({type:Object})],Ct.prototype,"flows",void 0),t([ut({type:Array})],Ct.prototype,"diagramDevices",void 0),t([ut({type:String})],Ct.prototype,"backgroundImage",void 0),t([ut({type:Boolean})],Ct.prototype,"editMode",void 0),t([ut({type:Object})],Ct.prototype,"nodePositions",void 0),t([ut({type:String})],Ct.prototype,"textColor",void 0),t([ut({type:String})],Ct.prototype,"nodeStyle",void 0),t([ut({type:Boolean})],Ct.prototype,"showFlowLines",void 0),t([ut({type:Number})],Ct.prototype,"nodeIconSize",void 0),t([ut({type:String})],Ct.prototype,"solarColor",void 0),t([ut({type:String})],Ct.prototype,"gridColor",void 0),t([ut({type:String})],Ct.prototype,"homeColor",void 0),t([ut({type:String})],Ct.prototype,"batteryNodeColor",void 0),t([gt()],Ct.prototype,"_pos",void 0),t([gt()],Ct.prototype,"_dragging",void 0),Ct=t([ht("flow-diagram")],Ct);let Pt=class extends dt{constructor(){super(...arguments),this.entityId="",this.name="",this.icon="",this.value=0,this.unit="W",this.stateLabel="",this.stateColor="#3b82f6",this.panelClass="",this.badgeClass="",this.showSparkline=!0,this.sparklineHistory=[],this.displayValue=""}updated(t){super.updated(t),this.showSparkline&&t.has("sparklineHistory")&&this._drawSparkline(),t.has("showSparkline")&&this.showSparkline&&this.updateComplete.then(()=>this._drawSparkline())}_drawSparkline(){var t;const e=null===(t=this.shadowRoot)||void 0===t?void 0:t.querySelector("canvas");if(!e)return;const i=this.sparklineHistory;if(!i||i.length<2)return;const o=window.devicePixelRatio||1,r=e.getBoundingClientRect(),s=r.width||200,a=r.height||48;e.width=s*o,e.height=a*o;const n=e.getContext("2d");if(!n)return;n.scale(o,o),n.clearRect(0,0,s,a);const l=i.slice(-60),d=l.map(t=>t.value),c=Math.min(...d),h=Math.max(...d)-c||1,p=t=>t/(l.length-1)*s,v=t=>a-4-(t-c)/h*(a-8),u=n.createLinearGradient(0,0,0,a);u.addColorStop(0,this.stateColor+"55"),u.addColorStop(1,this.stateColor+"00"),n.beginPath(),n.moveTo(p(0),a),l.forEach((t,e)=>n.lineTo(p(e),v(t.value))),n.lineTo(p(l.length-1),a),n.closePath(),n.fillStyle=u,n.fill(),n.beginPath(),n.strokeStyle=this.stateColor,n.lineWidth=1.5,n.lineJoin="round",n.lineCap="round",l.forEach((t,e)=>{0===e?n.moveTo(p(e),v(t.value)):n.lineTo(p(e),v(t.value))}),n.stroke()}render(){var t;const e=this.displayValue||`${Math.round(Math.abs(this.value))} W`;return G`
-      <div class="panel ${this.panelClass}">
+  `,t([vt({type:Number})],St.prototype,"solar",void 0),t([vt({type:Number})],St.prototype,"battery",void 0),t([vt({type:Number})],St.prototype,"grid",void 0),t([vt({type:Number})],St.prototype,"load",void 0),t([vt({type:Number})],St.prototype,"socPercent",void 0),t([vt({type:Number})],St.prototype,"wattThreshold",void 0),t([vt({type:String})],St.prototype,"solarName",void 0),t([vt({type:String})],St.prototype,"gridName",void 0),t([vt({type:String})],St.prototype,"homeName",void 0),t([vt({type:String})],St.prototype,"batteryName",void 0),t([vt({type:String})],St.prototype,"solarSecondary",void 0),t([vt({type:String})],St.prototype,"gridSecondary",void 0),t([vt({type:String})],St.prototype,"homeSecondary",void 0),t([vt({type:String})],St.prototype,"batterySecondary",void 0),t([vt({type:Object})],St.prototype,"flows",void 0),t([vt({type:Array})],St.prototype,"diagramDevices",void 0),t([vt({type:String})],St.prototype,"backgroundImage",void 0),t([vt({type:Boolean})],St.prototype,"editMode",void 0),t([vt({type:Object})],St.prototype,"nodePositions",void 0),t([vt({type:String})],St.prototype,"textColor",void 0),t([vt({type:String})],St.prototype,"nodeStyle",void 0),t([vt({type:Boolean})],St.prototype,"showFlowLines",void 0),t([vt({type:Number})],St.prototype,"nodeIconSize",void 0),t([vt({type:Number})],St.prototype,"nodeSize",void 0),t([vt({type:String})],St.prototype,"solarColor",void 0),t([vt({type:String})],St.prototype,"gridColor",void 0),t([vt({type:String})],St.prototype,"homeColor",void 0),t([vt({type:String})],St.prototype,"batteryNodeColor",void 0),t([gt()],St.prototype,"_pos",void 0),t([gt()],St.prototype,"_dragging",void 0),St=t([ht("flow-diagram")],St);let Pt=class extends dt{constructor(){super(...arguments),this.entityId="",this.name="",this.icon="",this.value=0,this.unit="W",this.stateLabel="",this.stateColor="#3b82f6",this.panelClass="",this.badgeClass="",this.showSparkline=!0,this.sparklineHistory=[],this.displayValue=""}updated(t){super.updated(t),this.showSparkline&&t.has("sparklineHistory")&&this._drawSparkline(),t.has("showSparkline")&&this.showSparkline&&this.updateComplete.then(()=>this._drawSparkline())}_drawSparkline(){var t;const e=null===(t=this.shadowRoot)||void 0===t?void 0:t.querySelector("canvas");if(!e)return;const i=this.sparklineHistory;if(!i||i.length<2)return;const o=window.devicePixelRatio||1,r=e.getBoundingClientRect(),s=r.width||200,a=r.height||48;e.width=s*o,e.height=a*o;const n=e.getContext("2d");if(!n)return;n.scale(o,o),n.clearRect(0,0,s,a);const l=i.slice(-60),d=l.map(t=>t.value),c=Math.min(...d),h=Math.max(...d)-c||1,p=t=>t/(l.length-1)*s,u=t=>a-4-(t-c)/h*(a-8),v=n.createLinearGradient(0,0,0,a);v.addColorStop(0,this.stateColor+"55"),v.addColorStop(1,this.stateColor+"00"),n.beginPath(),n.moveTo(p(0),a),l.forEach((t,e)=>n.lineTo(p(e),u(t.value))),n.lineTo(p(l.length-1),a),n.closePath(),n.fillStyle=v,n.fill(),n.beginPath(),n.strokeStyle=this.stateColor,n.lineWidth=1.5,n.lineJoin="round",n.lineCap="round",l.forEach((t,e)=>{0===e?n.moveTo(p(e),u(t.value)):n.lineTo(p(e),u(t.value))}),n.stroke()}_openMoreInfo(){this.entityId&&this.dispatchEvent(new CustomEvent("hass-more-info",{detail:{entityId:this.entityId},bubbles:!0,composed:!0}))}render(){var t;const e=this.displayValue||`${Math.round(Math.abs(this.value))} W`;return G`
+      <div
+        class="panel ${this.panelClass}"
+        ?data-clickable="${!!this.entityId}"
+        role="${this.entityId?"button":"presentation"}"
+        tabindex="${this.entityId?0:-1}"
+        @click="${this._openMoreInfo}"
+        @keydown="${t=>{"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this._openMoreInfo())}}"
+      >
         <div class="header">
           <div class="icon-wrap">
             ${(null===(t=this.icon)||void 0===t?void 0:t.startsWith("mdi:"))?G`<ha-icon icon="${this.icon}" style="color:${this.stateColor};"></ha-icon>`:G`<svg viewBox="0 0 24 24" fill="${this.stateColor}" aria-hidden="true">
@@ -489,6 +496,21 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       </div>
     `}};Pt.styles=a`
     :host { display: block; }
+
+    .panel[data-clickable] {
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .panel[data-clickable]:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .panel[data-clickable]:focus-visible {
+      outline: 2px solid var(--primary-color, #3b82f6);
+      outline-offset: 2px;
+    }
 
     .panel {
       background: rgba(255,255,255,0.03);
@@ -569,14 +591,17 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       border-radius: 4px;
       display: block;
     }
-  `,t([ut({type:String})],Pt.prototype,"entityId",void 0),t([ut({type:String})],Pt.prototype,"name",void 0),t([ut({type:String})],Pt.prototype,"icon",void 0),t([ut({type:Number})],Pt.prototype,"value",void 0),t([ut({type:String})],Pt.prototype,"unit",void 0),t([ut({type:String})],Pt.prototype,"stateLabel",void 0),t([ut({type:String})],Pt.prototype,"stateColor",void 0),t([ut({type:String})],Pt.prototype,"panelClass",void 0),t([ut({type:String})],Pt.prototype,"badgeClass",void 0),t([ut({type:Boolean})],Pt.prototype,"showSparkline",void 0),t([ut({type:Array})],Pt.prototype,"sparklineHistory",void 0),t([ut({type:String})],Pt.prototype,"displayValue",void 0),Pt=t([ht("stat-panel")],Pt);let Ht=class extends dt{constructor(){super(...arguments),this.devices=[],this.wattThreshold=1e3,this._defaultIconPath="M7,2V13H10V22L17,10H13L17,2H7Z"}render(){if(!this.devices||0===this.devices.length)return G`<div class="row"><span class="empty">No devices configured</span></div>`;const t=[...this.devices].sort((t,e)=>e.watts-t.watts);return G`
+  `,t([vt({type:String})],Pt.prototype,"entityId",void 0),t([vt({type:String})],Pt.prototype,"name",void 0),t([vt({type:String})],Pt.prototype,"icon",void 0),t([vt({type:Number})],Pt.prototype,"value",void 0),t([vt({type:String})],Pt.prototype,"unit",void 0),t([vt({type:String})],Pt.prototype,"stateLabel",void 0),t([vt({type:String})],Pt.prototype,"stateColor",void 0),t([vt({type:String})],Pt.prototype,"panelClass",void 0),t([vt({type:String})],Pt.prototype,"badgeClass",void 0),t([vt({type:Boolean})],Pt.prototype,"showSparkline",void 0),t([vt({type:Array})],Pt.prototype,"sparklineHistory",void 0),t([vt({type:String})],Pt.prototype,"displayValue",void 0),Pt=t([ht("stat-panel")],Pt);let Ct=class extends dt{constructor(){super(...arguments),this.devices=[],this.wattThreshold=1e3,this._defaultIconPath="M7,2V13H10V22L17,10H13L17,2H7Z"}_openMoreInfo(t){t&&this.dispatchEvent(new CustomEvent("hass-more-info",{detail:{entityId:t},bubbles:!0,composed:!0}))}render(){if(!this.devices||0===this.devices.length)return G`<div class="row"><span class="empty">No devices configured</span></div>`;const t=[...this.devices].sort((t,e)=>e.watts-t.watts);return G`
       <div class="row" role="list" aria-label="Device power consumption">
         ${t.map(t=>{var e;return G`
             <div
               class="chip ${t.watts<5?"dim":""}"
               role="listitem"
+              tabindex="0"
               title="${t.name}: ${ft(t.watts,this.wattThreshold)}"
               style="${t.color?`border-color: ${t.color}33;`:""}"
+              @click="${()=>this._openMoreInfo(t.entityId)}"
+              @keydown="${e=>{"Enter"!==e.key&&" "!==e.key||(e.preventDefault(),this._openMoreInfo(t.entityId))}}"
             >
               ${(null===(e=t.icon)||void 0===e?void 0:e.startsWith("mdi:"))?G`<ha-icon icon="${t.icon}" style="${t.color?`color:${t.color};`:""}"></ha-icon>`:G`<svg viewBox="0 0 24 24" aria-hidden="true"
                     style="${t.color?`fill:${t.color};`:""}">
@@ -587,7 +612,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `})}
       </div>
-    `}};Ht.styles=a`
+    `}};Ct.styles=a`
     :host { display: block; }
 
     .row {
@@ -618,12 +643,17 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       padding: 4px 10px 4px 7px;
       white-space: nowrap;
       flex-shrink: 0;
-      cursor: default;
+      cursor: pointer;
       transition: opacity 0.2s, background 0.15s;
     }
 
     .chip:hover {
       background: rgba(255,255,255,0.09);
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--primary-color, #3b82f6);
+      outline-offset: 2px;
     }
 
     .chip.dim {
@@ -659,7 +689,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       color: var(--secondary-text-color, #9ca3af);
       font-style: italic;
     }
-  `,t([ut({type:Array})],Ht.prototype,"devices",void 0),t([ut({type:Number})],Ht.prototype,"wattThreshold",void 0),Ht=t([ht("device-row")],Ht);const At=[{key:"solar",enabled:!0},{key:"battery",enabled:!0},{key:"grid",enabled:!0},{key:"load",enabled:!0}];let Et=class extends dt{constructor(){super(...arguments),this._solar=0,this._battery=0,this._grid=0,this._load=0,this._soc=0,this._solarExport=0,this._gridToBattery=0,this._flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this._sparklines={},this._error=null,this._lastSparklineFetch=0,this._sparklineDebounceMs=3e5}get hass(){return this._hass}static getStubConfig(){return{solar:{entity:"sensor.solar_power"},battery:{entity:"sensor.battery_power",soc_entity:"sensor.battery_soc"},grid:{entity:"sensor.grid_power"},load:{entity:"sensor.load_power"}}}static getConfigElement(){return document.createElement("solar-overview-card-editor")}setConfig(t){var e,i,o;if(!(null===(e=t.solar)||void 0===e?void 0:e.entity))throw new Error('solar-overview-card: "solar.entity" required');if(!(null===(i=t.battery)||void 0===i?void 0:i.entity))throw new Error('solar-overview-card: "battery.entity" required');const r=t.grid,s=!!(null===(o=t.load)||void 0===o?void 0:o.entity),a=!!((null==r?void 0:r.entity)||(null==r?void 0:r.import_entity)||(null==r?void 0:r.export_entity)||(null==r?void 0:r.battery_entity));if(!s&&!a)throw new Error("solar-overview-card: at least one of load.entity or a grid entity is required");this._config={watt_threshold:1e3,show_sparklines:!0,theme:"auto",show_flow:!0,show_stats:!0,show_devices:!0,...t},this._error=null}getCardSize(){return 4}set hass(t){if(this._hass=t,this._config)try{const t=xt(this._config,t=>this._readEntity(t));this._solar=t.solar,this._battery=t.battery,this._grid=t.grid,this._load=t.load,this._soc=this._config.battery.soc_entity?this._readEntity(this._config.battery.soc_entity):0,this._flows=bt(t.flowParams),this._error=null;const e=Date.now();!1!==this._config.show_sparklines&&e-this._lastSparklineFetch>this._sparklineDebounceMs&&(this._lastSparklineFetch=e,this._fetchSparklines())}catch(t){this._error=t.message}}_readEntity(t){var e;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return 0;const i=this._hass.states[t];return i?_t(i.state,i.attributes.unit_of_measurement):0}async _fetchSparklines(){var t,e,i,o;if(!this._config||!(null===(t=this._hass)||void 0===t?void 0:t.callApi))return;const r=(null!==(e=this._config.panels)&&void 0!==e?e:[]).filter(t=>!t.key&&t.entity).map(t=>t.entity),s=[this._config.solar.entity,this._config.battery.entity,null!==(i=this._config.grid.entity)&&void 0!==i?i:this._config.grid.import_entity,this._config.load.entity,...r].filter(t=>!!t),a=new Date,n=null!==(o=this._config.sparkline_hours)&&void 0!==o?o:2,l=new Date(a.getTime()-60*n*60*1e3).toISOString(),d={};await Promise.allSettled(s.map(async t=>{try{const e=`history/period/${l}?filter_entity_id=${t}&minimal_response=true&no_attributes=true`,i=await this._hass.callApi("GET",e);if(!Array.isArray(i)||0===i.length)return;d[t]=i[0].map(t=>{const e=mt(t.state);return isNaN(e)?null:{time:new Date(t.last_updated).getTime(),value:e}}).filter(t=>null!==t)}catch{}})),this._sparklines={...this._sparklines,...d}}_threshold(){var t,e;return null!==(e=null===(t=this._config)||void 0===t?void 0:t.watt_threshold)&&void 0!==e?e:1e3}_secondaryLabel(t){var e,i;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return"";const o=this._hass.states[t];if(!o)return"";const r=null!==(i=o.attributes.unit_of_measurement)&&void 0!==i?i:"";return"W"===r?ft(mt(o.state),this._threshold()):"kW"===r?ft(1e3*mt(o.state),this._threshold()):r?`${o.state} ${r}`:o.state}_customPanel(t){var e,i,o,r,s,a,n,l,d;const c=t.entity,h=null===(e=this._hass)||void 0===e?void 0:e.states[c],p=mt(null==h?void 0:h.state),v=null!==(o=null===(i=null==h?void 0:h.attributes)||void 0===i?void 0:i.unit_of_measurement)&&void 0!==o?o:"",u=this._threshold(),g="W"===v||"kW"===v?ft(p,u):v?`${Number.isInteger(p)?p:p.toFixed(1)} ${v}`:`${Math.round(p)}`,y=null!==(r=t.color)&&void 0!==r?r:"#6366f1",f=null!==(n=null!==(s=t.name)&&void 0!==s?s:null===(a=null==h?void 0:h.attributes)||void 0===a?void 0:a.friendly_name)&&void 0!==n?n:c,_=t.icon||wt;return G`
+  `,t([vt({type:Array})],Ct.prototype,"devices",void 0),t([vt({type:Number})],Ct.prototype,"wattThreshold",void 0),Ct=t([ht("device-row")],Ct);const Ht=[{key:"solar",enabled:!0},{key:"battery",enabled:!0},{key:"grid",enabled:!0},{key:"load",enabled:!0}];function At(t){return Math.round((null!=t?t:32)/32*18)}let Et=class extends dt{constructor(){super(...arguments),this._solar=0,this._battery=0,this._grid=0,this._load=0,this._soc=0,this._solarExport=0,this._gridToBattery=0,this._flows={solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0},this._sparklines={},this._error=null,this._lastSparklineFetch=0,this._sparklineDebounceMs=3e5}get hass(){return this._hass}static getStubConfig(){return{solar:{entity:"sensor.solar_power"},battery:{entity:"sensor.battery_power",soc_entity:"sensor.battery_soc"},grid:{entity:"sensor.grid_power"},load:{entity:"sensor.load_power"}}}static getConfigElement(){return document.createElement("solar-overview-card-editor")}setConfig(t){var e,i,o;if(!(null===(e=t.solar)||void 0===e?void 0:e.entity))throw new Error('solar-overview-card: "solar.entity" required');if(!(null===(i=t.battery)||void 0===i?void 0:i.entity))throw new Error('solar-overview-card: "battery.entity" required');const r=t.grid,s=!!(null===(o=t.load)||void 0===o?void 0:o.entity),a=!!((null==r?void 0:r.entity)||(null==r?void 0:r.import_entity)||(null==r?void 0:r.export_entity)||(null==r?void 0:r.battery_entity));if(!s&&!a)throw new Error("solar-overview-card: at least one of load.entity or a grid entity is required");this._config={watt_threshold:1e3,show_sparklines:!0,theme:"auto",show_flow:!0,show_stats:!0,show_devices:!0,...t},this._error=null}getCardSize(){return 4}set hass(t){if(this._hass=t,this._config)try{const t=xt(this._config,t=>this._readEntity(t));this._solar=t.solar,this._battery=t.battery,this._grid=t.grid,this._load=t.load,this._soc=this._config.battery.soc_entity?this._readEntity(this._config.battery.soc_entity):0,this._flows=bt(t.flowParams),this._error=null;const e=Date.now();!1!==this._config.show_sparklines&&e-this._lastSparklineFetch>this._sparklineDebounceMs&&(this._lastSparklineFetch=e,this._fetchSparklines())}catch(t){this._error=t.message}}_readEntity(t){var e;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return 0;const i=this._hass.states[t];return i?_t(i.state,i.attributes.unit_of_measurement):0}async _fetchSparklines(){var t,e,i,o;if(!this._config||!(null===(t=this._hass)||void 0===t?void 0:t.callApi))return;const r=(null!==(e=this._config.panels)&&void 0!==e?e:[]).filter(t=>!t.key&&t.entity).map(t=>t.entity),s=[this._config.solar.entity,this._config.battery.entity,null!==(i=this._config.grid.entity)&&void 0!==i?i:this._config.grid.import_entity,this._config.load.entity,...r].filter(t=>!!t),a=new Date,n=null!==(o=this._config.sparkline_hours)&&void 0!==o?o:2,l=new Date(a.getTime()-60*n*60*1e3).toISOString(),d={};await Promise.allSettled(s.map(async t=>{try{const e=`history/period/${l}?filter_entity_id=${t}&minimal_response=true&no_attributes=true`,i=await this._hass.callApi("GET",e);if(!Array.isArray(i)||0===i.length)return;d[t]=i[0].map(t=>{const e=mt(t.state);return isNaN(e)?null:{time:new Date(t.last_updated).getTime(),value:e}}).filter(t=>null!==t)}catch{}})),this._sparklines={...this._sparklines,...d}}_threshold(){var t,e;return null!==(e=null===(t=this._config)||void 0===t?void 0:t.watt_threshold)&&void 0!==e?e:1e3}_secondaryLabel(t){var e,i;if(!t||!(null===(e=this._hass)||void 0===e?void 0:e.states))return"";const o=this._hass.states[t];if(!o)return"";const r=null!==(i=o.attributes.unit_of_measurement)&&void 0!==i?i:"";return"W"===r?ft(mt(o.state),this._threshold()):"kW"===r?ft(1e3*mt(o.state),this._threshold()):r?`${o.state} ${r}`:o.state}_customPanel(t){var e,i,o,r,s,a,n,l,d;const c=t.entity,h=null===(e=this._hass)||void 0===e?void 0:e.states[c],p=mt(null==h?void 0:h.state),u=null!==(o=null===(i=null==h?void 0:h.attributes)||void 0===i?void 0:i.unit_of_measurement)&&void 0!==o?o:"",v=this._threshold(),g="W"===u||"kW"===u?ft(p,v):u?`${Number.isInteger(p)?p:p.toFixed(1)} ${u}`:`${Math.round(p)}`,y=null!==(r=t.color)&&void 0!==r?r:"#6366f1",f=null!==(n=null!==(s=t.name)&&void 0!==s?s:null===(a=null==h?void 0:h.attributes)||void 0===a?void 0:a.friendly_name)&&void 0!==n?n:c,_=t.icon||wt;return G`
       <stat-panel
         .entityId="${c}"
         .name="${f}"
@@ -673,19 +703,19 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         .panelClass="panel--custom"
         .badgeClass="badge--custom"
       ></stat-panel>
-    `}_deviceItems(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.map(t=>{var e,i;return{entityId:t.entity,name:null!==(e=t.name)&&void 0!==e?e:t.entity,icon:null!==(i=t.icon)&&void 0!==i?i:wt,watts:this._readEntity(t.entity),color:t.color}}):[]}_diagramDevices(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.filter(t=>t.show_on_diagram).map(t=>{var e,i;return{name:null!==(e=t.name)&&void 0!==e?e:t.entity,watts:this._readEntity(t.entity),color:null!==(i=t.color)&&void 0!==i?i:"#6366f1"}}):[]}_panelProps(t,e,i,o,r,s,a){var n,l,d,c;const h=this._threshold(),p=this._config[t];return{entityId:s,name:null!==(n=null==p?void 0:p.name)&&void 0!==n?n:i,icon:null!==(l=null==p?void 0:p.icon)&&void 0!==l?l:o,value:e,displayValue:ft(e,h),stateLabel:null!=a?a:$t(t,e),stateColor:r,showSparkline:!1!==(null===(d=this._config)||void 0===d?void 0:d.show_sparklines),sparklineHistory:null!==(c=this._sparklines[s])&&void 0!==c?c:[],panelClass:`panel--${t}`,badgeClass:`badge--${t}`}}render(){var t,e,i,o,r,s,a,n,l,d,c,h,p,v,u,g,y,f,_,m;if(!this._config)return G`<ha-card><div class="error-card">solar-overview-card: no config.</div></ha-card>`;if(this._error)return G`<ha-card><div class="error-card">Error: ${this._error}</div></ha-card>`;const b=this._threshold(),$=!1!==this._config.show_flow,x=!1!==this._config.show_stats,w=!1!==this._config.show_devices,k=this._panelProps("solar",this._solar,"Solar","M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M5,5H11V11H5V5M13,5H19V11H13V5M5,13H11V19H5V13M13,13H19V19H13V13Z","#f59e0b",this._config.solar.entity),S=this._config.battery.status_entity&&null!==(i=null===(e=null===(t=this._hass)||void 0===t?void 0:t.states[this._config.battery.status_entity])||void 0===e?void 0:e.state)&&void 0!==i?i:void 0,C=this._panelProps("battery",this._battery,"Battery","M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z","#10b981",this._config.battery.entity,S),P=this._config.grid.entity?this._grid:this._flows.gridToHome+this._flows.gridToBattery-(this._flows.solarToGrid+this._flows.batteryToGrid),H=this._panelProps("grid",P,"Grid","M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z","#8b5cf6",null!==(r=null!==(o=this._config.grid.entity)&&void 0!==o?o:this._config.grid.import_entity)&&void 0!==r?r:""),A=this._flows.solarToHome+this._flows.batteryToHome+this._flows.gridToHome,E=this._config.load.entity?this._load:A,M=this._panelProps("load",E,"Home","M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z","#3b82f6",null!==(s=this._config.load.entity)&&void 0!==s?s:""),T=this._deviceItems();return G`
+    `}_deviceItems(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.map(t=>{var e,i;return{entityId:t.entity,name:null!==(e=t.name)&&void 0!==e?e:t.entity,icon:null!==(i=t.icon)&&void 0!==i?i:wt,watts:this._readEntity(t.entity),color:t.color}}):[]}_diagramDevices(){var t,e;return(null===(t=this._config)||void 0===t?void 0:t.devices)&&(null===(e=this._hass)||void 0===e?void 0:e.states)?this._config.devices.filter(t=>t.show_on_diagram).map(t=>{var e,i;return{name:null!==(e=t.name)&&void 0!==e?e:t.entity,watts:this._readEntity(t.entity),color:null!==(i=t.color)&&void 0!==i?i:"#6366f1"}}):[]}_panelProps(t,e,i,o,r,s,a){var n,l,d,c;const h=this._threshold(),p=this._config[t];return{entityId:s,name:null!==(n=null==p?void 0:p.name)&&void 0!==n?n:i,icon:null!==(l=null==p?void 0:p.icon)&&void 0!==l?l:o,value:e,displayValue:ft(e,h),stateLabel:null!=a?a:$t(t,e),stateColor:r,showSparkline:!1!==(null===(d=this._config)||void 0===d?void 0:d.show_sparklines),sparklineHistory:null!==(c=this._sparklines[s])&&void 0!==c?c:[],panelClass:`panel--${t}`,badgeClass:`badge--${t}`}}render(){var t,e,i,o,r,s,a,n,l,d,c,h,p,u,v,g,y,f,_,m,b;if(!this._config)return G`<ha-card><div class="error-card">solar-overview-card: no config.</div></ha-card>`;if(this._error)return G`<ha-card><div class="error-card">Error: ${this._error}</div></ha-card>`;const $=this._threshold(),x=!1!==this._config.show_flow,w=!1!==this._config.show_stats,k=!1!==this._config.show_devices,S=this._panelProps("solar",this._solar,"Solar","M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M5,5H11V11H5V5M13,5H19V11H13V5M5,13H11V19H5V13M13,13H19V19H13V13Z","#f59e0b",this._config.solar.entity),P=this._config.battery.status_entity&&null!==(i=null===(e=null===(t=this._hass)||void 0===t?void 0:t.states[this._config.battery.status_entity])||void 0===e?void 0:e.state)&&void 0!==i?i:void 0,C=this._panelProps("battery",this._battery,"Battery","M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z","#10b981",this._config.battery.entity,P),H=this._config.grid.entity?this._grid:this._flows.gridToHome+this._flows.gridToBattery-(this._flows.solarToGrid+this._flows.batteryToGrid),A=this._panelProps("grid",H,"Grid","M11.5,3.5L10.5,6H13.5L12.5,3.5H11.5M10,7L8.5,10H15.5L14,7H10M8,11L5,17H8L9,14H15L16,17H19L16,11H8M8,18L11,21H13L16,18H8Z","#8b5cf6",null!==(r=null!==(o=this._config.grid.entity)&&void 0!==o?o:this._config.grid.import_entity)&&void 0!==r?r:""),E=this._flows.solarToHome+this._flows.batteryToHome+this._flows.gridToHome,M=this._config.load.entity?this._load:E,T=this._panelProps("load",M,"Home","M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z","#3b82f6",null!==(s=this._config.load.entity)&&void 0!==s?s:""),N=this._deviceItems();return G`
       <ha-card>
         <div class="card" theme="${null!==(a=this._config.theme)&&void 0!==a?a:"auto"}">
 
-          ${$?G`
+          ${x?G`
             <div class="flow-diagram">
               <flow-diagram
                 .solar="${this._solar}"
                 .battery="${this._battery}"
-                .grid="${P}"
-                .load="${A}"
+                .grid="${H}"
+                .load="${E}"
                 .socPercent="${this._soc}"
-                .wattThreshold="${b}"
+                .wattThreshold="${$}"
                 .flows="${this._flows}"
                 .diagramDevices="${this._diagramDevices()}"
                 .solarName="${null!==(n=this._config.solar.name)&&void 0!==n?n:"Solar"}"
@@ -694,12 +724,13 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                 .batteryName="${null!==(c=this._config.battery.name)&&void 0!==c?c:"Battery"}"
                 .solarColor="${null!==(h=this._config.solar.color)&&void 0!==h?h:""}"
                 .gridColor="${null!==(p=this._config.grid.color)&&void 0!==p?p:""}"
-                .homeColor="${null!==(v=this._config.load.color)&&void 0!==v?v:""}"
-                .batteryNodeColor="${null!==(u=this._config.battery.color)&&void 0!==u?u:""}"
+                .homeColor="${null!==(u=this._config.load.color)&&void 0!==u?u:""}"
+                .batteryNodeColor="${null!==(v=this._config.battery.color)&&void 0!==v?v:""}"
                 .backgroundImage="${null!==(g=this._config.flow_background)&&void 0!==g?g:""}"
                 .textColor="${null!==(y=this._config.diagram_text_color)&&void 0!==y?y:"#ffffff"}"
                 .nodeStyle="${null!==(f=this._config.node_style)&&void 0!==f?f:"circle"}"
-                .nodeIconSize="${null!==(_=this._config.node_icon_size)&&void 0!==_?_:18}"
+                .nodeSize="${null!==(_=this._config.node_size)&&void 0!==_?_:32}"
+                .nodeIconSize="${null!==(m=this._config.node_icon_size)&&void 0!==m?m:At(this._config.node_size)}"
                 .showFlowLines="${!1!==this._config.show_flow_lines}"
                 .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
@@ -710,9 +741,9 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `:""}
 
-          ${x?G`
+          ${w?G`
             <div class="stat-grid">
-              ${(null!==(m=this._config.panels)&&void 0!==m?m:At).filter(t=>!1!==t.enabled).map(t=>{if(t.key){const e={solar:k,battery:C,grid:H,load:M}[t.key];return G`
+              ${(null!==(b=this._config.panels)&&void 0!==b?b:Ht).filter(t=>!1!==t.enabled).map(t=>{if(t.key){const e={solar:S,battery:C,grid:A,load:T}[t.key];return G`
                       <stat-panel
                         .entityId="${e.entityId}"
                         .name="${e.name}"
@@ -730,19 +761,19 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
             </div>
           `:""}
 
-          ${w&&this._config.devices&&this._config.devices.length>0?G`
+          ${k&&this._config.devices&&this._config.devices.length>0?G`
             <div class="devices-section">
               <div class="devices-label">Devices</div>
               <device-row
-                .devices="${T}"
-                .wattThreshold="${b}"
+                .devices="${N}"
+                .wattThreshold="${$}"
               ></device-row>
             </div>
           `:""}
 
         </div>
       </ha-card>
-    `}updated(t){super.updated(t)}};Et.styles=[yt,a`:host { display: block; } ha-card { overflow: hidden; }`],t([gt()],Et.prototype,"_config",void 0),t([gt()],Et.prototype,"_solar",void 0),t([gt()],Et.prototype,"_battery",void 0),t([gt()],Et.prototype,"_grid",void 0),t([gt()],Et.prototype,"_load",void 0),t([gt()],Et.prototype,"_soc",void 0),t([gt()],Et.prototype,"_solarExport",void 0),t([gt()],Et.prototype,"_gridToBattery",void 0),t([gt()],Et.prototype,"_flows",void 0),t([gt()],Et.prototype,"_sparklines",void 0),t([gt()],Et.prototype,"_error",void 0),Et=t([ht("solar-overview-card")],Et);let Mt=class extends dt{constructor(){super(...arguments),this._page="main",this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1},this._editingIndex=null,this._editingDevice={entity:"",name:"",icon:"",color:"#6366f1",show_on_diagram:!1},this._newPanel={entity:"",name:"",icon:"",color:"#6366f1"}}setConfig(t){this._config=t}_setValue(t,e){var i;if(!this._config)return;const o=t.split("."),r=JSON.parse(JSON.stringify(this._config)),s=r;if(2===o.length){const[t,r]=o,a={...null!==(i=s[t])&&void 0!==i?i:{}};""===e||null==e?delete a[r]:a[r]=e,s[t]=a}else""===e||null==e?delete s[o[0]]:s[o[0]]=e;this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:r}}))}_computeCurrentFlows(){if(!this.hass||!this._config)return null;try{const t=t=>{if(!t)return 0;const e=this.hass.states[t];return e?_t(e.state,e.attributes.unit_of_measurement):0};return bt(xt(this._config,t).flowParams)}catch{return null}}_pageHeader(t,e){return G`
+    `}updated(t){super.updated(t)}};Et.styles=[yt,a`:host { display: block; } ha-card { overflow: hidden; }`],t([gt()],Et.prototype,"_config",void 0),t([gt()],Et.prototype,"_solar",void 0),t([gt()],Et.prototype,"_battery",void 0),t([gt()],Et.prototype,"_grid",void 0),t([gt()],Et.prototype,"_load",void 0),t([gt()],Et.prototype,"_soc",void 0),t([gt()],Et.prototype,"_solarExport",void 0),t([gt()],Et.prototype,"_gridToBattery",void 0),t([gt()],Et.prototype,"_flows",void 0),t([gt()],Et.prototype,"_sparklines",void 0),t([gt()],Et.prototype,"_error",void 0),Et=t([ht("solar-overview-card")],Et);let Mt=class extends dt{constructor(){super(...arguments),this._page="main",this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1},this._editingIndex=null,this._editingDevice={entity:"",name:"",icon:"",color:"#6366f1",show_on_diagram:!1},this._newPanel={entity:"",name:"",icon:"",color:"#6366f1"},this._editingPanel={name:"",icon:"",color:"#6366f1"},this._editingPanelIndex=null}setConfig(t){this._config=t}_setValue(t,e){var i;if(!this._config)return;const o=t.split("."),r=JSON.parse(JSON.stringify(this._config)),s=r;if(2===o.length){const[t,r]=o,a={...null!==(i=s[t])&&void 0!==i?i:{}};""===e||null==e?delete a[r]:a[r]=e,s[t]=a}else""===e||null==e?delete s[o[0]]:s[o[0]]=e;this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:r}}))}_computeCurrentFlows(){if(!this.hass||!this._config)return null;try{const t=t=>{if(!t)return 0;const e=this.hass.states[t];return e?_t(e.state,e.attributes.unit_of_measurement):0};return bt(xt(this._config,t).flowParams)}catch{return null}}_pageHeader(t,e){return G`
       <div class="page-header">
         <button class="back-btn" @click="${()=>{this._page="main",this._editingIndex=null}}">‹</button>
         <span class="page-icon">${t}</span>
@@ -810,7 +841,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           <button class="clear-btn" title="Clear" @click="${()=>this._setValue(e,"")}">✕</button>
         `:""}
       </div>
-    `}_renderMain(){var t,e,i,o,r,s,a,n,l,d,c,h,p;if(!this._config)return G``;const v=this._config,u=null!==(e=null===(t=v.devices)||void 0===t?void 0:t.length)&&void 0!==e?e:0,g=(t,e,i,o,r)=>G`
+    `}_renderMain(){var t,e,i,o,r,s,a,n,l,d,c,h,p;if(!this._config)return G``;const u=this._config,v=null!==(e=null===(t=u.devices)||void 0===t?void 0:t.length)&&void 0!==e?e:0,g=(t,e,i,o,r)=>G`
       <div class="nav-item" @click="${()=>{this._page=t}}">
         <div class="nav-icon" style="background:${r}">${e}</div>
         <div class="nav-text">
@@ -819,62 +850,69 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
         </div>
         <span class="nav-arrow">›</span>
       </div>
-    `,y=(null!==(i=v.panels)&&void 0!==i?i:At).filter(t=>!1!==t.enabled).length;return G`
+    `,y=(null!==(i=u.panels)&&void 0!==i?i:Ht).filter(t=>!1!==t.enabled).length;return G`
       <div class="nav-list">
         ${g("setup","⚙️","Setup","Visibility & sparklines","rgba(107,114,128,0.18)")}
-        ${g("solar","☀️","Solar",null!==(r=null===(o=v.solar)||void 0===o?void 0:o.entity)&&void 0!==r?r:"Not configured","rgba(245,158,11,0.18)")}
-        ${g("battery","🔋","Battery",null!==(a=null===(s=v.battery)||void 0===s?void 0:s.entity)&&void 0!==a?a:"Not configured","rgba(16,185,129,0.18)")}
-        ${g("grid","⚡","Grid",null!==(c=null!==(l=null===(n=v.grid)||void 0===n?void 0:n.entity)&&void 0!==l?l:null===(d=v.grid)||void 0===d?void 0:d.import_entity)&&void 0!==c?c:"Not configured","rgba(139,92,246,0.18)")}
-        ${g("house","🏠","House",null!==(p=null===(h=v.load)||void 0===h?void 0:h.entity)&&void 0!==p?p:"Not configured","rgba(59,130,246,0.18)")}
+        ${g("solar","☀️","Solar",null!==(r=null===(o=u.solar)||void 0===o?void 0:o.entity)&&void 0!==r?r:"Not configured","rgba(245,158,11,0.18)")}
+        ${g("battery","🔋","Battery",null!==(a=null===(s=u.battery)||void 0===s?void 0:s.entity)&&void 0!==a?a:"Not configured","rgba(16,185,129,0.18)")}
+        ${g("grid","⚡","Grid",null!==(c=null!==(l=null===(n=u.grid)||void 0===n?void 0:n.entity)&&void 0!==l?l:null===(d=u.grid)||void 0===d?void 0:d.import_entity)&&void 0!==c?c:"Not configured","rgba(139,92,246,0.18)")}
+        ${g("house","🏠","House",null!==(p=null===(h=u.load)||void 0===h?void 0:h.entity)&&void 0!==p?p:"Not configured","rgba(59,130,246,0.18)")}
         ${g("panels","📊","Panels",`${y} of 4 shown`,"rgba(6,182,212,0.18)")}
-        ${g("outlets","🔌","Outlets",u>0?`${u} device${1!==u?"s":""}`:"No devices added","rgba(99,102,241,0.18)")}
+        ${g("outlets","🔌","Outlets",v>0?`${v} device${1!==v?"s":""}`:"No devices added","rgba(99,102,241,0.18)")}
         ${g("layout","🗺️","Layout","Drag nodes to reposition","rgba(16,185,129,0.18)")}
       </div>
-    `}_renderSetupPage(){var t,e,i,o;if(!this._config)return G``;const r=this._config;return G`
+    `}_renderSetupPage(){var t,e,i,o,r;if(!this._config)return G``;const s=this._config;return G`
       ${this._pageHeader("⚙️","Setup")}
       <div class="form-col">
         <div class="section-label" style="margin-top:0;">Sections</div>
-        ${this._boolField("Show flow diagram","show_flow",!1!==r.show_flow)}
-        ${this._boolField("Show stat panels","show_stats",!1!==r.show_stats)}
-        ${this._boolField("Show devices row","show_devices",!1!==r.show_devices)}
-        ${this._boolField("Show sparklines","show_sparklines",!1!==r.show_sparklines)}
+        ${this._boolField("Show flow diagram","show_flow",!1!==s.show_flow)}
+        ${this._boolField("Show stat panels","show_stats",!1!==s.show_stats)}
+        ${this._boolField("Show devices row","show_devices",!1!==s.show_devices)}
+        ${this._boolField("Show sparklines","show_sparklines",!1!==s.show_sparklines)}
         <div class="section-label">Flow diagram style</div>
         <div class="bool-row">
           <span class="bool-label">Node style</span>
           <ha-selector
             .selector=${{select:{options:["circle","card"],mode:"list"}}}
-            .value="${null!==(t=r.node_style)&&void 0!==t?t:"circle"}"
+            .value="${null!==(t=s.node_style)&&void 0!==t?t:"circle"}"
             @value-changed="${t=>this._setValue("node_style",t.detail.value)}"
           ></ha-selector>
         </div>
-        ${this._boolField("Show animated flow lines","show_flow_lines",!1!==r.show_flow_lines)}
+        ${this._boolField("Show animated flow lines","show_flow_lines",!1!==s.show_flow_lines)}
         <ha-selector
-          .label="Node icon size (default: 18)"
-          .selector=${{number:{min:10,max:26,step:1,mode:"slider"}}}
-          .value="${null!==(e=r.node_icon_size)&&void 0!==e?e:18}"
+          .label="Node size (default: 32)"
+          .selector=${{number:{min:20,max:64,step:2,mode:"slider"}}}
+          .value="${null!==(e=s.node_size)&&void 0!==e?e:32}"
+          @value-changed="${t=>this._setValue("node_size",t.detail.value)}"
+        ></ha-selector>
+        <p class="hint">Scales the diagram nodes. Card-style nodes grow to match. The diagram re-fits itself, so bigger nodes mean a tighter layout.</p>
+        <ha-selector
+          .label="Node icon size (default: scales with node size)"
+          .selector=${{number:{min:10,max:40,step:1,mode:"slider"}}}
+          .value="${null!==(i=s.node_icon_size)&&void 0!==i?i:At(s.node_size)}"
           @value-changed="${t=>this._setValue("node_icon_size",t.detail.value)}"
         ></ha-selector>
-        <p class="hint">Max ~22 before icons clip the circle edge.</p>
+        <p class="hint">Keep it under ~70% of the node size or icons clip the edge.</p>
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
           <input type="color"
-            .value="${null!==(i=r.diagram_text_color)&&void 0!==i?i:"#ffffff"}"
+            .value="${null!==(o=s.diagram_text_color)&&void 0!==o?o:"#ffffff"}"
             @input="${t=>this._setValue("diagram_text_color",t.target.value)}"
           />
-          ${r.diagram_text_color&&"#ffffff"!==r.diagram_text_color?G`
+          ${s.diagram_text_color&&"#ffffff"!==s.diagram_text_color?G`
             <button class="clear-btn" title="Reset to white" @click="${()=>this._setValue("diagram_text_color","")}">✕</button>
           `:""}
         </div>
         <p class="hint">Default: white. Applies to all node labels and values.</p>
         <div class="section-label">Flow diagram background</div>
-        ${this._textField("Background image URL or /local/ path","flow_background",r.flow_background)}
+        ${this._textField("Background image URL or /local/ path","flow_background",s.flow_background)}
         <p class="hint">e.g. /local/solar-bg.png or https://… — image fills diagram area.</p>
         <div class="section-label">Sparkline history</div>
         <ha-selector
           .label="Hours of history to display (default: 2)"
           .selector=${{number:{min:1,max:48,step:1,mode:"box"}}}
-          .value="${null!==(o=r.sparkline_hours)&&void 0!==o?o:2}"
+          .value="${null!==(r=s.sparkline_hours)&&void 0!==r?r:2}"
           @value-changed="${t=>this._setValue("sparkline_hours",t.detail.value)}"
         ></ha-selector>
         <p class="hint">Applies to all sparklines. Larger values fetch more history from HA.</p>
@@ -938,44 +976,45 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           </div>
         `:""}
       </div>
-    `}_renderLayoutPage(){var t,e,i,o,r,s,a,n,l,d,c,h;if(!this._config)return G``;const p=this._config,v=p.grid,u=t=>{var e,i,o;return t?mt(null!==(o=null===(i=null===(e=this.hass)||void 0===e?void 0:e.states[t])||void 0===i?void 0:i.state)&&void 0!==o?o:"0"):0},g="discharging"===p.battery.positive_means||!0===p.battery.invert,y="exporting"===v.positive_means||!0===v.invert,f=u(p.solar.entity)*(p.solar.invert?-1:1),_=u(p.battery.entity)*(g?-1:1),m=u(null===(t=p.load)||void 0===t?void 0:t.entity)*((null===(e=p.load)||void 0===e?void 0:e.invert)?-1:1),b=v.entity?u(v.entity)*(y?-1:1):0,$=u(p.battery.soc_entity),x=(()=>{try{return bt({solar:f,battery:_,load:m,gridCombined:b,gridImport:v.import_entity?u(v.import_entity):void 0,gridExport:v.export_entity?u(v.export_entity):void 0,gridToBattery:v.to_battery_entity?u(v.to_battery_entity):void 0,batteryToGrid:v.from_battery_entity?u(v.from_battery_entity):void 0,gridBatteryCombined:v.battery_entity?u(v.battery_entity):void 0})}catch{return{solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0}}})(),w=!!p.node_positions&&Object.keys(p.node_positions).length>0;return G`
+    `}_renderLayoutPage(){var t,e,i,o,r,s,a,n,l,d,c,h,p;if(!this._config)return G``;const u=this._config,v=u.grid,g=t=>{var e,i,o;return t?mt(null!==(o=null===(i=null===(e=this.hass)||void 0===e?void 0:e.states[t])||void 0===i?void 0:i.state)&&void 0!==o?o:"0"):0},y="discharging"===u.battery.positive_means||!0===u.battery.invert,f="exporting"===v.positive_means||!0===v.invert,_=g(u.solar.entity)*(u.solar.invert?-1:1),m=g(u.battery.entity)*(y?-1:1),b=g(null===(t=u.load)||void 0===t?void 0:t.entity)*((null===(e=u.load)||void 0===e?void 0:e.invert)?-1:1),$=v.entity?g(v.entity)*(f?-1:1):0,x=g(u.battery.soc_entity),w=(()=>{try{return bt({solar:_,battery:m,load:b,gridCombined:$,gridImport:v.import_entity?g(v.import_entity):void 0,gridExport:v.export_entity?g(v.export_entity):void 0,gridToBattery:v.to_battery_entity?g(v.to_battery_entity):void 0,batteryToGrid:v.from_battery_entity?g(v.from_battery_entity):void 0,gridBatteryCombined:v.battery_entity?g(v.battery_entity):void 0})}catch{return{solarToHome:0,solarToBattery:0,solarToGrid:0,gridToHome:0,batteryToHome:0,gridToBattery:0,batteryToGrid:0}}})(),k=!!u.node_positions&&Object.keys(u.node_positions).length>0;return G`
       ${this._pageHeader("🗺️","Layout")}
       <div class="form-col">
         <p class="hint" style="margin:0 0 8px;">Drag nodes to reposition. Changes save automatically.</p>
         <div style="border:1px solid var(--divider-color,rgba(255,255,255,0.1));border-radius:10px;overflow:hidden;">
           <flow-diagram
-            .solar="${f}"
-            .battery="${_}"
-            .grid="${b}"
-            .load="${m}"
-            .socPercent="${$}"
-            .wattThreshold="${null!==(i=p.watt_threshold)&&void 0!==i?i:1e3}"
-            .flows="${x}"
-            .solarName="${null!==(o=p.solar.name)&&void 0!==o?o:"Solar"}"
-            .gridName="${null!==(r=p.grid.name)&&void 0!==r?r:"Grid"}"
-            .homeName="${null!==(a=null===(s=p.load)||void 0===s?void 0:s.name)&&void 0!==a?a:"Home"}"
-            .batteryName="${null!==(n=p.battery.name)&&void 0!==n?n:"Battery"}"
-            .textColor="${null!==(l=p.diagram_text_color)&&void 0!==l?l:"#ffffff"}"
-            .nodeStyle="${null!==(d=p.node_style)&&void 0!==d?d:"circle"}"
-            .nodeIconSize="${null!==(c=p.node_icon_size)&&void 0!==c?c:18}"
-            .showFlowLines="${!1!==p.show_flow_lines}"
-            .nodePositions="${p.node_positions}"
-            .backgroundImage="${null!==(h=p.flow_background)&&void 0!==h?h:""}"
+            .solar="${_}"
+            .battery="${m}"
+            .grid="${$}"
+            .load="${b}"
+            .socPercent="${x}"
+            .wattThreshold="${null!==(i=u.watt_threshold)&&void 0!==i?i:1e3}"
+            .flows="${w}"
+            .solarName="${null!==(o=u.solar.name)&&void 0!==o?o:"Solar"}"
+            .gridName="${null!==(r=u.grid.name)&&void 0!==r?r:"Grid"}"
+            .homeName="${null!==(a=null===(s=u.load)||void 0===s?void 0:s.name)&&void 0!==a?a:"Home"}"
+            .batteryName="${null!==(n=u.battery.name)&&void 0!==n?n:"Battery"}"
+            .textColor="${null!==(l=u.diagram_text_color)&&void 0!==l?l:"#ffffff"}"
+            .nodeStyle="${null!==(d=u.node_style)&&void 0!==d?d:"circle"}"
+            .nodeSize="${null!==(c=u.node_size)&&void 0!==c?c:32}"
+            .nodeIconSize="${null!==(h=u.node_icon_size)&&void 0!==h?h:At(u.node_size)}"
+            .showFlowLines="${!1!==u.show_flow_lines}"
+            .nodePositions="${u.node_positions}"
+            .backgroundImage="${null!==(p=u.flow_background)&&void 0!==p?p:""}"
             .editMode="${!0}"
             @nodes-moved="${t=>this._setValue("node_positions",t.detail.positions)}"
           ></flow-diagram>
         </div>
-        ${w?G`
+        ${k?G`
           <button class="add-btn" style="align-self:flex-start;background:rgba(239,68,68,0.15);color:#ef4444;"
             @click="${()=>this._setValue("node_positions",void 0)}">
             Reset to default positions
           </button>
         `:""}
       </div>
-    `}_renderPanelsPage(){var t;if(!this._config)return G``;const e=null!==(t=this._config.panels)&&void 0!==t?t:At,i={solar:{icon:"☀️",label:"Solar"},battery:{icon:"🔋",label:"Battery"},grid:{icon:"⚡",label:"Grid"},load:{icon:"🏠",label:"House"}};return G`
+    `}_renderPanelsPage(){var t;if(!this._config)return G``;const e=null!==(t=this._config.panels)&&void 0!==t?t:Ht,i={solar:{icon:"☀️",label:"Solar"},battery:{icon:"🔋",label:"Battery"},grid:{icon:"⚡",label:"Grid"},load:{icon:"🏠",label:"House"}};return G`
       ${this._pageHeader("📊","Stat Panels")}
       <div class="form-col">
-        ${e.map((t,o)=>{var r,s,a,n;const l=!!t.key,d=l?i[t.key].icon:"📈",c=l?i[t.key].label:null!==(s=null!==(r=t.name)&&void 0!==r?r:t.entity)&&void 0!==s?s:"Custom",h=!l&&t.entity?G`<span class="nav-sub" style="margin:0;">${t.entity}</span>`:"";return G`
+        ${e.map((t,o)=>{var r,s,a;const n=!!t.key,l=n?i[t.key].icon:"📈",d=n?i[t.key].label:null!==(s=null!==(r=t.name)&&void 0!==r?r:t.entity)&&void 0!==s?s:"Custom",c=!n&&t.entity?G`<span class="nav-sub" style="margin:0;">${t.entity}</span>`:"";return G`
             <div class="panel-item">
               <div class="panel-move">
                 <button class="move-btn" ?disabled="${0===o}"
@@ -983,14 +1022,11 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                 <button class="move-btn" ?disabled="${o===e.length-1}"
                   @click="${()=>this._movePanel(o,1)}">▼</button>
               </div>
-              ${l?G`<span style="font-size:1.1rem;">${d}</span>`:G`<span style="width:10px;height:10px;border-radius:50%;background:${null!==(a=t.color)&&void 0!==a?a:"#6366f1"};flex-shrink:0;"></span>`}
-              <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${c}${h}</span>
-              ${l?"":G`
-                <div style="width:150px;flex-shrink:0;">
-                  <ha-selector .label="Icon" .selector=${{icon:{}}} .value="${null!==(n=t.icon)&&void 0!==n?n:""}"
-                    @value-changed="${t=>{var e;return this._setPanelIcon(o,null!==(e=t.detail.value)&&void 0!==e?e:"")}}"
-                  ></ha-selector>
-                </div>
+              ${n?G`<span style="font-size:1.1rem;">${l}</span>`:G`<span style="width:10px;height:10px;border-radius:50%;background:${null!==(a=t.color)&&void 0!==a?a:"#6366f1"};flex-shrink:0;"></span>`}
+              <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${d}${c}</span>
+              ${n?"":G`
+                <button class="device-btn" title="Edit"
+                  @click="${()=>this._editingPanelIndex===o?this._cancelPanelEdit():this._startPanelEdit(o)}">✏️</button>
                 <button class="device-btn danger" title="Remove" @click="${()=>this._removeCustomPanel(o)}">✕</button>
               `}
               <ha-selector
@@ -999,6 +1035,7 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
                 @value-changed="${t=>this._togglePanel(o,t.detail.value)}"
               ></ha-selector>
             </div>
+            ${this._editingPanelIndex===o?this._panelEditForm():""}
           `})}
 
         <div class="section-label" style="margin-top:8px;">Add custom panel</div>
@@ -1026,9 +1063,30 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
           </div>
         </div>
 
-        <p class="hint">Reorder with ▲▼. Custom panels support any HA entity, with their own icon and colour.</p>
+        <p class="hint">Reorder with ▲▼. Edit a custom panel's name, icon and colour with ✏️.</p>
       </div>
-    `}_addCustomPanel(){var t;if(!this._config||!this._newPanel.entity)return;const e=[...null!==(t=this._config.panels)&&void 0!==t?t:At,{entity:this._newPanel.entity,name:this._newPanel.name||void 0,icon:this._newPanel.icon||void 0,color:this._newPanel.color||"#6366f1",enabled:!0}];this._setPanels(e),this._newPanel={entity:"",name:"",icon:"",color:"#6366f1"}}_removeCustomPanel(t){var e,i;const o=[...null!==(i=null===(e=this._config)||void 0===e?void 0:e.panels)&&void 0!==i?i:At];o.splice(t,1),this._setPanels(o)}_setPanels(t){this._config&&this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,panels:t}}}))}_setPanelIcon(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:At];r[t]={...r[t],icon:e||void 0},this._setPanels(r)}_togglePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:At];r[t]={...r[t],enabled:e},this._setPanels(r)}_movePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:At],s=t+e;s<0||s>=r.length||([r[t],r[s]]=[r[s],r[t]],this._setPanels(r))}_startEdit(t){var e,i,o,r;const s=this._config.devices[t];this._editingDevice={entity:s.entity,name:null!==(e=s.name)&&void 0!==e?e:"",icon:null!==(i=s.icon)&&void 0!==i?i:"",color:null!==(o=s.color)&&void 0!==o?o:"#6366f1",show_on_diagram:null!==(r=s.show_on_diagram)&&void 0!==r&&r},this._editingIndex=t}_saveEdit(){var t;if(null===this._editingIndex||!this._config)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[]];e[this._editingIndex]={...this._editingDevice},this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._editingIndex=null}_cancelEdit(){this._editingIndex=null}_deleteDevice(t){var e;if(!this._config)return;const i=[...null!==(e=this._config.devices)&&void 0!==e?e:[]];i.splice(t,1),this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:i}}}))}_addDevice(){var t;if(!this._config||!this._newDevice.entity)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[],{...this._newDevice}];this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1}}_deviceForm(t,e,i,o,r){return G`
+    `}_addCustomPanel(){var t;if(!this._config||!this._newPanel.entity)return;const e=[...null!==(t=this._config.panels)&&void 0!==t?t:Ht,{entity:this._newPanel.entity,name:this._newPanel.name||void 0,icon:this._newPanel.icon||void 0,color:this._newPanel.color||"#6366f1",enabled:!0}];this._setPanels(e),this._newPanel={entity:"",name:"",icon:"",color:"#6366f1"}}_removeCustomPanel(t){var e,i;const o=[...null!==(i=null===(e=this._config)||void 0===e?void 0:e.panels)&&void 0!==i?i:Ht];o.splice(t,1),this._setPanels(o)}_setPanels(t){this._config&&this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,panels:t}}}))}_startPanelEdit(t){var e,i,o,r,s;const a=(null!==(i=null===(e=this._config)||void 0===e?void 0:e.panels)&&void 0!==i?i:Ht)[t];this._editingPanel={name:null!==(o=a.name)&&void 0!==o?o:"",icon:null!==(r=a.icon)&&void 0!==r?r:"",color:null!==(s=a.color)&&void 0!==s?s:"#6366f1"},this._editingPanelIndex=t}_cancelPanelEdit(){this._editingPanelIndex=null}_savePanelEdit(){var t;if(null===this._editingPanelIndex||!this._config)return;const e=[...null!==(t=this._config.panels)&&void 0!==t?t:Ht];e[this._editingPanelIndex]={...e[this._editingPanelIndex],name:this._editingPanel.name||void 0,icon:this._editingPanel.icon||void 0,color:this._editingPanel.color||void 0},this._editingPanelIndex=null,this._setPanels(e)}_panelEditForm(){const t=this._editingPanel,e=e=>{this._editingPanel={...t,...e}};return G`
+      <div class="add-device-form">
+        <div class="add-device-row">
+          <ha-selector .label="Name" .selector=${{text:{}}} .value="${t.name}"
+            @value-changed="${t=>{var i;return e({name:null!==(i=t.detail.value)&&void 0!==i?i:""})}}"
+          ></ha-selector>
+          <ha-selector .label="Icon" .selector=${{icon:{}}} .value="${t.icon}"
+            @value-changed="${t=>{var i;return e({icon:null!==(i=t.detail.value)&&void 0!==i?i:""})}}"
+          ></ha-selector>
+        </div>
+        <div class="color-row">
+          <label>Colour</label>
+          <input type="color" .value="${t.color}"
+            @input="${t=>e({color:t.target.value})}"
+          />
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="device-btn" @click="${()=>this._cancelPanelEdit()}">Cancel</button>
+          <button class="add-btn" @click="${()=>this._savePanelEdit()}">Save</button>
+        </div>
+      </div>
+    `}_togglePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht];r[t]={...r[t],enabled:e},this._setPanels(r)}_movePanel(t,e){var i,o;const r=[...null!==(o=null===(i=this._config)||void 0===i?void 0:i.panels)&&void 0!==o?o:Ht],s=t+e;s<0||s>=r.length||([r[t],r[s]]=[r[s],r[t]],this._setPanels(r))}_startEdit(t){var e,i,o,r;const s=this._config.devices[t];this._editingDevice={entity:s.entity,name:null!==(e=s.name)&&void 0!==e?e:"",icon:null!==(i=s.icon)&&void 0!==i?i:"",color:null!==(o=s.color)&&void 0!==o?o:"#6366f1",show_on_diagram:null!==(r=s.show_on_diagram)&&void 0!==r&&r},this._editingIndex=t}_saveEdit(){var t;if(null===this._editingIndex||!this._config)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[]];e[this._editingIndex]={...this._editingDevice},this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._editingIndex=null}_cancelEdit(){this._editingIndex=null}_deleteDevice(t){var e;if(!this._config)return;const i=[...null!==(e=this._config.devices)&&void 0!==e?e:[]];i.splice(t,1),this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:i}}}))}_addDevice(){var t;if(!this._config||!this._newDevice.entity)return;const e=[...null!==(t=this._config.devices)&&void 0!==t?t:[],{...this._newDevice}];this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this._config,devices:e}}})),this._newDevice={entity:"",name:"",icon:"mdi:power-socket",color:"#6366f1",show_on_diagram:!1}}_deviceForm(t,e,i,o,r){return G`
       <ha-selector .hass="${this.hass}" .label="Entity"
         .selector=${{entity:{}}} .value="${t.entity}"
         @value-changed="${t=>{var i;return e({entity:null!==(i=t.detail.value)&&void 0!==i?i:""})}}"
@@ -1243,4 +1301,4 @@ const ht=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       font-weight: 600; align-self: flex-end;
     }
     .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  `,t([ut({attribute:!1})],Mt.prototype,"hass",void 0),t([gt()],Mt.prototype,"_config",void 0),t([gt()],Mt.prototype,"_page",void 0),t([gt()],Mt.prototype,"_newDevice",void 0),t([gt()],Mt.prototype,"_editingIndex",void 0),t([gt()],Mt.prototype,"_editingDevice",void 0),t([gt()],Mt.prototype,"_newPanel",void 0),Mt=t([ht("solar-overview-card-editor")],Mt),window.customCards=window.customCards||[],window.customCards.push({type:"solar-overview-card",name:"Solar Overview Card",description:"Animated solar energy overview with power flow diagram",preview:!0});export{Et as SolarOverviewCard,Mt as SolarOverviewCardEditor};
+  `,t([vt({attribute:!1})],Mt.prototype,"hass",void 0),t([gt()],Mt.prototype,"_config",void 0),t([gt()],Mt.prototype,"_page",void 0),t([gt()],Mt.prototype,"_newDevice",void 0),t([gt()],Mt.prototype,"_editingIndex",void 0),t([gt()],Mt.prototype,"_editingDevice",void 0),t([gt()],Mt.prototype,"_newPanel",void 0),t([gt()],Mt.prototype,"_editingPanel",void 0),t([gt()],Mt.prototype,"_editingPanelIndex",void 0),Mt=t([ht("solar-overview-card-editor")],Mt),window.customCards=window.customCards||[],window.customCards.push({type:"solar-overview-card",name:"Solar Overview Card",description:"Animated solar energy overview with power flow diagram",preview:!0});export{Et as SolarOverviewCard,Mt as SolarOverviewCardEditor};

@@ -116,6 +116,8 @@ export interface SolarCardConfig {
   flow_background?: string;
   diagram_text_color?: string;
   node_style?: 'circle' | 'card';
+  /** Diagram node radius in viewBox units (default: 32). Card-style nodes scale to match. */
+  node_size?: number;
   node_icon_size?: number;
   show_flow_lines?: boolean;
   node_positions?: {

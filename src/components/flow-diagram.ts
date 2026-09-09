@@ -26,6 +26,7 @@ const GRID_X    = CX - ARM; const GRID_Y    = CY;
 const HOME_X    = CX + ARM; const HOME_Y    = CY;
 const BATTERY_X = CX;       const BATTERY_Y = CY + ARM;
 
+/** Default node radius. `nodeSize` overrides it and scales the card style to match. */
 const NODE_R = 32;
 const ICON_S = 18;
 
@@ -37,7 +38,6 @@ const DEVICE_GAP  = 52;
 // Card-style node dims
 const CARD_W      = 82;
 const CARD_H      = 46;
-const CARD_H_HALF = CARD_H / 2;  // used like NODE_R for text offsets
 const CARD_R      = 10;          // border-radius
 
 export type NodeKey = 'solar' | 'grid' | 'home' | 'battery';
@@ -95,6 +95,8 @@ export class FlowDiagram extends LitElement {
   @property({ type: String }) nodeStyle: 'circle' | 'card' = 'circle';
   @property({ type: Boolean }) showFlowLines = true;
   @property({ type: Number }) nodeIconSize = 18;
+  /** Circle radius in viewBox units. Card-style nodes scale proportionally. */
+  @property({ type: Number }) nodeSize = NODE_R;
   // Node accent colours — empty string = use built-in default
   @property({ type: String }) solarColor = '';
   @property({ type: String }) gridColor = '';
@@ -169,13 +171,27 @@ export class FlowDiagram extends LitElement {
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
+  /** How much the node has been scaled away from the built-in default. */
+  private get _scale(): number { return this.nodeSize / NODE_R; }
+
+  private get _nodeR(): number    { return this.nodeSize; }
+  private get _cardW(): number    { return CARD_W * this._scale; }
+  private get _cardH(): number    { return CARD_H * this._scale; }
+  private get _cardHalf(): number { return this._cardH / 2; }
+  private get _cardR(): number    { return CARD_R * this._scale; }
+
+  /** Half-height of a node, whichever style is in use. */
+  private get _halfHeight(): number {
+    return this.nodeStyle === 'card' ? this._cardHalf : this._nodeR;
+  }
+
   private _bgFill(color: string): string {
     if (color.startsWith('rgb(')) return color.replace('rgb(', 'rgba(').replace(')', ', 0.15)');
     return `${color}26`;
   }
 
   private get _nodeMargin(): number {
-    return this.nodeStyle === 'card' ? CARD_H_HALF + 6 : NODE_R + 4;
+    return this._halfHeight + (this.nodeStyle === 'card' ? 6 : 4);
   }
 
   private _batteryColor(): string {
@@ -199,15 +215,16 @@ export class FlowDiagram extends LitElement {
     return watts <= 0 ? 2 : Math.min(8, Math.max(2, (watts / 1000) * 4 + 2));
   }
 
-  private _trim(ax: number, ay: number, bx: number, by: number, margin = NODE_R + 4) {
+  private _trim(ax: number, ay: number, bx: number, by: number, margin?: number) {
+    const m = margin ?? this._nodeR + 4;
     const dx = bx - ax, dy = by - ay;
     const len = Math.sqrt(dx * dx + dy * dy);
     if (len === 0) return { x1: ax, y1: ay, x2: bx, y2: by };
     return {
-      x1: ax + (dx / len) * margin,
-      y1: ay + (dy / len) * margin,
-      x2: bx - (dx / len) * margin,
-      y2: by - (dy / len) * margin,
+      x1: ax + (dx / len) * m,
+      y1: ay + (dy / len) * m,
+      x2: bx - (dx / len) * m,
+      y2: by - (dy / len) * m,
     };
   }
 
@@ -233,7 +250,7 @@ export class FlowDiagram extends LitElement {
 
   private _deviceLine(hx: number, hy: number, dx: number, dy: number, watts: number, color: string) {
     const active = watts > 5;
-    const { x1, y1, x2, y2 } = this._trim(hx, hy, dx, dy, NODE_R + 3);
+    const { x1, y1, x2, y2 } = this._trim(hx, hy, dx, dy, this._nodeR + 3);
     const ddx = x2 - x1, ddy = y2 - y1;
     const dlen = Math.sqrt(ddx * ddx + ddy * ddy);
     const fx2 = dlen > 0 ? x2 - (ddx / dlen) * (DEVICE_R + 3) : x2;
@@ -257,16 +274,16 @@ export class FlowDiagram extends LitElement {
     const tc = this.textColor;
     const dragging = this.editMode && this._dragging === nodeKey;
     const isCard = this.nodeStyle === 'card';
-    const R = isCard ? CARD_H_HALF : NODE_R;
+    const R = this._halfHeight;
 
     // Edit-mode drag handle (dashed outline)
     const editRing = this.editMode ? svg`
       ${isCard
-        ? svg`<rect x="${cx - CARD_W / 2 - 6}" y="${cy - R - 6}"
-            width="${CARD_W + 12}" height="${CARD_H + 12}" rx="${CARD_R + 4}"
+        ? svg`<rect x="${cx - this._cardW / 2 - 6}" y="${cy - R - 6}"
+            width="${this._cardW + 12}" height="${this._cardH + 12}" rx="${this._cardR + 4}"
             fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
             stroke-dasharray="4 3" opacity="${dragging ? 1 : 0.6}" />`
-        : svg`<circle cx="${cx}" cy="${cy}" r="${NODE_R + 6}"
+        : svg`<circle cx="${cx}" cy="${cy}" r="${this._nodeR + 6}"
             fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
             stroke-dasharray="4 3" opacity="${dragging ? 1 : 0.6}" />`
       }
@@ -274,10 +291,10 @@ export class FlowDiagram extends LitElement {
 
     // Shape (circle or card)
     const shape = isCard
-      ? svg`<rect x="${cx - CARD_W / 2}" y="${cy - R}"
-          width="${CARD_W}" height="${CARD_H}" rx="${CARD_R}"
+      ? svg`<rect x="${cx - this._cardW / 2}" y="${cy - R}"
+          width="${this._cardW}" height="${this._cardH}" rx="${this._cardR}"
           fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />`
-      : svg`<circle cx="${cx}" cy="${cy}" r="${NODE_R}"
+      : svg`<circle cx="${cx}" cy="${cy}" r="${this._nodeR}"
           fill="${bgFill}" stroke="${fill}" stroke-width="${dragging ? 3 : 2}" />`;
 
     // Icon — centered in shape
@@ -341,7 +358,7 @@ export class FlowDiagram extends LitElement {
 
   private _socRing(bx: number, by: number) {
     const color = this._batteryColor();
-    const R = this.nodeStyle === 'card' ? CARD_H_HALF : NODE_R;
+    const R = this._halfHeight;
     const socTextY = by + R + (this.batterySecondary ? 50 : 38);
 
     // Card style: no ring arc, just SOC% text
@@ -353,7 +370,7 @@ export class FlowDiagram extends LitElement {
       `;
     }
 
-    const r = NODE_R + 5;
+    const r = this._nodeR + 5;
     const circ = 2 * Math.PI * r;
     const filled = (this.socPercent / 100) * circ;
     return svg`
@@ -393,7 +410,7 @@ export class FlowDiagram extends LitElement {
     }));
 
     // ── Dynamic viewBox from node positions ──────────────────────────────
-    const pad = NODE_R + 60;
+    const pad = this._nodeR + 60;
     const allX = [p.solar.x, p.grid.x, p.home.x, p.battery.x, ...devicePositions.map(d => d.x)];
     const allY = [p.solar.y, p.grid.y, p.home.y, p.battery.y, ...devicePositions.map(d => d.y)];
     const vbMinX = Math.min(...allX) - pad;

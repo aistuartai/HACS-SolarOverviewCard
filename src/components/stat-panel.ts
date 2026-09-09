@@ -26,6 +26,21 @@ export class StatPanel extends LitElement {
   static styles = css`
     :host { display: block; }
 
+    .panel[data-clickable] {
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .panel[data-clickable]:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .panel[data-clickable]:focus-visible {
+      outline: 2px solid var(--primary-color, #3b82f6);
+      outline-offset: 2px;
+    }
+
     .panel {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.07);
@@ -173,11 +188,30 @@ export class StatPanel extends LitElement {
     ctx.stroke();
   }
 
+  /** Opens Home Assistant's more-info dialog for this panel's entity. */
+  private _openMoreInfo(): void {
+    if (!this.entityId) return;
+    this.dispatchEvent(new CustomEvent('hass-more-info', {
+      detail: { entityId: this.entityId },
+      bubbles: true,
+      composed: true,
+    }));
+  }
+
   protected render() {
     const display = this.displayValue || `${Math.round(Math.abs(this.value))} W`;
 
     return html`
-      <div class="panel ${this.panelClass}">
+      <div
+        class="panel ${this.panelClass}"
+        ?data-clickable="${!!this.entityId}"
+        role="${this.entityId ? 'button' : 'presentation'}"
+        tabindex="${this.entityId ? 0 : -1}"
+        @click="${this._openMoreInfo}"
+        @keydown="${(e: KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._openMoreInfo(); }
+        }}"
+      >
         <div class="header">
           <div class="icon-wrap">
             ${this.icon?.startsWith('mdi:')

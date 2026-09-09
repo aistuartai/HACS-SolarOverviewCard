@@ -18,6 +18,11 @@ const DEFAULT_PANELS: PanelConfig[] = [
   { key: 'load',    enabled: true },
 ];
 
+/** Icons keep their proportion to the node unless the user sets a size explicitly. */
+function defaultIconSize(nodeSize?: number): number {
+  return Math.round(((nodeSize ?? 32) / 32) * 18);
+}
+
 interface HassHistoryEntry {
   last_updated: string;
   state: string;
@@ -318,7 +323,8 @@ export class SolarOverviewCard extends LitElement {
                 .backgroundImage="${this._config.flow_background ?? ''}"
                 .textColor="${this._config.diagram_text_color ?? '#ffffff'}"
                 .nodeStyle="${this._config.node_style ?? 'circle'}"
-                .nodeIconSize="${this._config.node_icon_size ?? 18}"
+                .nodeSize="${this._config.node_size ?? 32}"
+                .nodeIconSize="${this._config.node_icon_size ?? defaultIconSize(this._config.node_size)}"
                 .showFlowLines="${this._config.show_flow_lines !== false}"
                 .nodePositions="${this._config.node_positions}"
                 .solarSecondary="${this._secondaryLabel(this._config.solar.secondary_entity)}"
@@ -393,6 +399,8 @@ export class SolarOverviewCardEditor extends LitElement {
   @state() private _editingIndex: number | null = null;
   @state() private _editingDevice = { entity: '', name: '', icon: '', color: '#6366f1', show_on_diagram: false };
   @state() private _newPanel = { entity: '', name: '', icon: '', color: '#6366f1' };
+  @state() private _editingPanel = { name: '', icon: '', color: '#6366f1' };
+  @state() private _editingPanelIndex: number | null = null;
 
   static styles = css`
     :host { display: block; padding: 16px; }
@@ -726,12 +734,19 @@ export class SolarOverviewCardEditor extends LitElement {
         </div>
         ${this._boolField('Show animated flow lines', 'show_flow_lines', c.show_flow_lines !== false)}
         <ha-selector
-          .label="Node icon size (default: 18)"
-          .selector=${{ number: { min: 10, max: 26, step: 1, mode: 'slider' } }}
-          .value="${c.node_icon_size ?? 18}"
+          .label="Node size (default: 32)"
+          .selector=${{ number: { min: 20, max: 64, step: 2, mode: 'slider' } }}
+          .value="${c.node_size ?? 32}"
+          @value-changed="${(e: CustomEvent) => this._setValue('node_size', e.detail.value)}"
+        ></ha-selector>
+        <p class="hint">Scales the diagram nodes. Card-style nodes grow to match. The diagram re-fits itself, so bigger nodes mean a tighter layout.</p>
+        <ha-selector
+          .label="Node icon size (default: scales with node size)"
+          .selector=${{ number: { min: 10, max: 40, step: 1, mode: 'slider' } }}
+          .value="${c.node_icon_size ?? defaultIconSize(c.node_size)}"
           @value-changed="${(e: CustomEvent) => this._setValue('node_icon_size', e.detail.value)}"
         ></ha-selector>
-        <p class="hint">Max ~22 before icons clip the circle edge.</p>
+        <p class="hint">Keep it under ~70% of the node size or icons clip the edge.</p>
         <div class="section-label">Flow diagram text</div>
         <div class="color-row">
           <label>Text colour</label>
@@ -922,7 +937,8 @@ export class SolarOverviewCardEditor extends LitElement {
             .batteryName="${c.battery.name ?? 'Battery'}"
             .textColor="${c.diagram_text_color ?? '#ffffff'}"
             .nodeStyle="${c.node_style ?? 'circle'}"
-            .nodeIconSize="${c.node_icon_size ?? 18}"
+            .nodeSize="${c.node_size ?? 32}"
+            .nodeIconSize="${c.node_icon_size ?? defaultIconSize(c.node_size)}"
             .showFlowLines="${c.show_flow_lines !== false}"
             .nodePositions="${c.node_positions}"
             .backgroundImage="${c.flow_background ?? ''}"
@@ -970,11 +986,8 @@ export class SolarOverviewCardEditor extends LitElement {
                 : html`<span style="font-size:1.1rem;">${icon}</span>`}
               <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${label}${sub}</span>
               ${!isBuiltin ? html`
-                <div style="width:150px;flex-shrink:0;">
-                  <ha-selector .label="Icon" .selector=${{ icon: {} }} .value="${p.icon ?? ''}"
-                    @value-changed="${(e: CustomEvent) => this._setPanelIcon(i, e.detail.value ?? '')}"
-                  ></ha-selector>
-                </div>
+                <button class="device-btn" title="Edit"
+                  @click="${() => this._editingPanelIndex === i ? this._cancelPanelEdit() : this._startPanelEdit(i)}">✏️</button>
                 <button class="device-btn danger" title="Remove" @click="${() => this._removeCustomPanel(i)}">✕</button>
               ` : ''}
               <ha-selector
@@ -983,6 +996,7 @@ export class SolarOverviewCardEditor extends LitElement {
                 @value-changed="${(e: CustomEvent) => this._togglePanel(i, e.detail.value)}"
               ></ha-selector>
             </div>
+            ${this._editingPanelIndex === i ? this._panelEditForm() : ''}
           `;
         })}
 
@@ -1011,7 +1025,7 @@ export class SolarOverviewCardEditor extends LitElement {
           </div>
         </div>
 
-        <p class="hint">Reorder with ▲▼. Custom panels support any HA entity, with their own icon and colour.</p>
+        <p class="hint">Reorder with ▲▼. Edit a custom panel's name, icon and colour with ✏️.</p>
       </div>
     `;
   }
@@ -1044,10 +1058,56 @@ export class SolarOverviewCardEditor extends LitElement {
     }));
   }
 
-  private _setPanelIcon(index: number, icon: string): void {
-    const panels = [...(this._config?.panels ?? DEFAULT_PANELS)];
-    panels[index] = { ...panels[index], icon: icon || undefined };
+  private _startPanelEdit(index: number): void {
+    const p = (this._config?.panels ?? DEFAULT_PANELS)[index];
+    this._editingPanel = {
+      name:  p.name  ?? '',
+      icon:  p.icon  ?? '',
+      color: p.color ?? '#6366f1',
+    };
+    this._editingPanelIndex = index;
+  }
+
+  private _cancelPanelEdit(): void { this._editingPanelIndex = null; }
+
+  private _savePanelEdit(): void {
+    if (this._editingPanelIndex === null || !this._config) return;
+    const panels = [...(this._config.panels ?? DEFAULT_PANELS)];
+    panels[this._editingPanelIndex] = {
+      ...panels[this._editingPanelIndex],
+      name:  this._editingPanel.name  || undefined,
+      icon:  this._editingPanel.icon  || undefined,
+      color: this._editingPanel.color || undefined,
+    };
+    this._editingPanelIndex = null;
     this._setPanels(panels);
+  }
+
+  private _panelEditForm() {
+    const v = this._editingPanel;
+    const patch = (p: Partial<typeof v>) => { this._editingPanel = { ...v, ...p }; };
+    return html`
+      <div class="add-device-form">
+        <div class="add-device-row">
+          <ha-selector .label="Name" .selector=${{ text: {} }} .value="${v.name}"
+            @value-changed="${(e: CustomEvent) => patch({ name: e.detail.value ?? '' })}"
+          ></ha-selector>
+          <ha-selector .label="Icon" .selector=${{ icon: {} }} .value="${v.icon}"
+            @value-changed="${(e: CustomEvent) => patch({ icon: e.detail.value ?? '' })}"
+          ></ha-selector>
+        </div>
+        <div class="color-row">
+          <label>Colour</label>
+          <input type="color" .value="${v.color}"
+            @input="${(e: Event) => patch({ color: (e.target as HTMLInputElement).value })}"
+          />
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="device-btn" @click="${() => this._cancelPanelEdit()}">Cancel</button>
+          <button class="add-btn" @click="${() => this._savePanelEdit()}">Save</button>
+        </div>
+      </div>
+    `;
   }
 
   private _togglePanel(index: number, value: boolean): void {

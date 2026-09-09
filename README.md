@@ -27,6 +27,8 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 | **Section toggles** | Show/hide the flow diagram, stat panels, device row, and sparklines independently. |
 | **Draggable node layout** | Drag nodes in the visual editor to reposition them; positions are saved to config. |
 | **Node style** | Choose `circle` (default) or `card` style for all diagram nodes. |
+| **Tap for more info** | Stat panels and device chips open Home Assistant's more-info dialog. |
+| **Resizable diagram nodes** | `node_size` scales the flow diagram nodes; icons scale with them. |
 | **Unit-aware sensors** | Sensors reporting kW or MW are scaled to watts automatically. |
 | **Visual config editor** | Full GUI editor with entity pickers, icon selector, colour picker, and device add/edit/delete. |
 | **Responsive** | Scales from a narrow sidebar card to a full-width dashboard view. |
@@ -149,6 +151,9 @@ flow_background: /local/solar-bg.png   # Background image for the flow diagram
                                        # Accepts /local/ paths or any URL
 diagram_text_color: "#ffffff"          # Colour for all node labels/values (default: white)
 node_style: circle                     # circle (default) or card
+node_size: 32                          # Node radius (default: 32, useful range 20-64)
+                                       # Card-style nodes scale to match
+node_icon_size: 18                     # Icon size (default: scales with node_size)
 show_flow_lines: true                  # Animated dashed flow lines (default: true)
 
 # ── Node colour overrides ───────────────────────────────────────────────────────
