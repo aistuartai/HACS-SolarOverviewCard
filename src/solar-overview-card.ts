@@ -18,6 +18,18 @@ const DEFAULT_PANELS: PanelConfig[] = [
   { key: 'load',    enabled: true },
 ];
 
+/** Built-in panel accent colours, also the editor's colour-picker defaults. */
+const BUILTIN_COLORS: Record<'solar' | 'battery' | 'grid' | 'load', string> = {
+  solar: '#f59e0b', battery: '#10b981', grid: '#8b5cf6', load: '#3b82f6',
+};
+
+/** Clamps background_opacity to 0–100; undefined when the card should stay opaque. */
+function bgOpacity(value: unknown): number | undefined {
+  const n = Number(value);
+  if (value === undefined || value === null || value === '' || isNaN(n) || n >= 100) return undefined;
+  return Math.max(0, n);
+}
+
 /** Icons keep their proportion to the node unless the user sets a size explicitly. */
 function defaultIconSize(nodeSize?: number): number {
   return Math.round(((nodeSize ?? 32) / 32) * 18);
@@ -276,30 +288,35 @@ export class SolarOverviewCard extends LitElement {
     const showStats   = this._config.show_stats   !== false;
     const showDevices = this._config.show_devices !== false;
 
-    const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   '#f59e0b', this._config.solar.entity!);
+    const solar   = this._panelProps('solar',   this._solar,   'Solar',   MDI_SOLAR,   BUILTIN_COLORS.solar, this._config.solar.entity!);
 
     // Battery: use status_entity text as state label when available (e.g. "Charging" / "Discharging" / "Idle")
     const batteryStatusText = this._config.battery.status_entity
       ? (this._hass?.states[this._config.battery.status_entity]?.state ?? undefined)
       : undefined;
-    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, '#10b981', this._config.battery.entity!, batteryStatusText);
+    const battery = this._panelProps('battery', this._battery, 'Battery', MDI_BATTERY, BUILTIN_COLORS.battery, this._config.battery.entity!, batteryStatusText);
 
     // When no combined grid entity, derive net grid from flows (+ import, − export)
     const gridNetDisplay = this._config.grid.entity
       ? this._grid
       : (this._flows.gridToHome + this._flows.gridToBattery) - (this._flows.solarToGrid + this._flows.batteryToGrid);
-    const grid    = this._panelProps('grid', gridNetDisplay, 'Grid', MDI_GRID, '#8b5cf6', this._config.grid.entity ?? this._config.grid.import_entity ?? '');
+    const grid    = this._panelProps('grid', gridNetDisplay, 'Grid', MDI_GRID, BUILTIN_COLORS.grid, this._config.grid.entity ?? this._config.grid.import_entity ?? '');
 
     // Home consumption: prefer load.entity when configured (most accurate), else sum flows.
     const homeDelivered = this._flows.solarToHome + this._flows.batteryToHome + this._flows.gridToHome;
     const homeDisplay = this._config.load.entity ? this._load : homeDelivered;
-    const load    = this._panelProps('load', homeDisplay, 'Home', MDI_HOME, '#3b82f6', this._config.load.entity ?? '');
+    const load    = this._panelProps('load', homeDisplay, 'Home', MDI_HOME, BUILTIN_COLORS.load, this._config.load.entity ?? '');
 
     const devices = this._deviceItems();
+    const opacity = bgOpacity(this._config.background_opacity);
 
     return html`
-      <ha-card>
-        <div class="card" theme="${this._config.theme ?? 'auto'}">
+      <ha-card
+        theme="${this._config.theme ?? 'auto'}"
+        ?data-bg-opacity="${opacity !== undefined}"
+        style="${opacity !== undefined ? `--soc-bg-opacity: ${opacity}%` : ''}"
+      >
+        <div class="card">
 
           ${showFlow ? html`
             <div class="flow-diagram">
@@ -346,12 +363,12 @@ export class SolarOverviewCard extends LitElement {
                     return html`
                       <stat-panel
                         .entityId="${p.entityId}"
-                        .name="${p.name}"
-                        .icon="${p.icon}"
+                        .name="${panel.name || p.name}"
+                        .icon="${panel.icon || p.icon}"
                         .value="${p.value}"
                         .displayValue="${p.displayValue}"
                         .stateLabel="${p.stateLabel}"
-                        .stateColor="${p.stateColor}"
+                        .stateColor="${panel.color || p.stateColor}"
                         .showSparkline="${p.showSparkline}"
                         .sparklineHistory="${p.sparklineHistory}"
                         .panelClass="${p.panelClass}"
@@ -698,15 +715,16 @@ export class SolarOverviewCardEditor extends LitElement {
       </div>
     `;
 
-    const activePanels = (c.panels ?? DEFAULT_PANELS).filter(p => p.enabled !== false).length;
+    const allPanels = c.panels ?? DEFAULT_PANELS;
+    const activePanels = allPanels.filter(p => p.enabled !== false).length;
     return html`
       <div class="nav-list">
-        ${navItem('setup',   '⚙️', 'Setup',   'Visibility & sparklines',                                    'rgba(107,114,128,0.18)')}
+        ${navItem('setup',   '⚙️', 'Setup',   'Appearance & visibility',                                    'rgba(107,114,128,0.18)')}
         ${navItem('solar',   '☀️', 'Solar',   c.solar?.entity   ?? 'Not configured',                        'rgba(245,158,11,0.18)')}
         ${navItem('battery', '🔋', 'Battery', c.battery?.entity ?? 'Not configured',                        'rgba(16,185,129,0.18)')}
         ${navItem('grid',    '⚡', 'Grid',    c.grid?.entity ?? c.grid?.import_entity ?? 'Not configured',   'rgba(139,92,246,0.18)')}
         ${navItem('house',   '🏠', 'House',   c.load?.entity    ?? 'Not configured',                        'rgba(59,130,246,0.18)')}
-        ${navItem('panels',  '📊', 'Panels',  `${activePanels} of 4 shown`,                                 'rgba(6,182,212,0.18)')}
+        ${navItem('panels',  '📊', 'Panels',  `${activePanels} of ${allPanels.length} shown`,                                 'rgba(6,182,212,0.18)')}
         ${navItem('outlets', '🔌', 'Outlets', deviceCount > 0 ? `${deviceCount} device${deviceCount !== 1 ? 's' : ''}` : 'No devices added', 'rgba(99,102,241,0.18)')}
         ${navItem('layout',  '🗺️', 'Layout',  'Drag nodes to reposition',                                                                       'rgba(16,185,129,0.18)')}
       </div>
@@ -724,6 +742,23 @@ export class SolarOverviewCardEditor extends LitElement {
         ${this._boolField('Show stat panels',   'show_stats',      c.show_stats      !== false)}
         ${this._boolField('Show devices row',   'show_devices',    c.show_devices    !== false)}
         ${this._boolField('Show sparklines',    'show_sparklines', c.show_sparklines !== false)}
+        <div class="section-label">Card appearance</div>
+        <div class="bool-row">
+          <span class="bool-label">Theme</span>
+          <ha-selector
+            .selector=${{ select: { options: ['auto', 'light', 'dark'], mode: 'list' } }}
+            .value="${c.theme ?? 'auto'}"
+            @value-changed="${(e: CustomEvent) => this._setValue('theme', e.detail.value)}"
+          ></ha-selector>
+        </div>
+        <p class="hint">Auto follows your Home Assistant theme.</p>
+        <ha-selector
+          .label="Background opacity % (default: 100)"
+          .selector=${{ number: { min: 0, max: 100, step: 5, mode: 'slider', unit_of_measurement: '%' } }}
+          .value="${c.background_opacity ?? 100}"
+          @value-changed="${(e: CustomEvent) => this._setValue('background_opacity', e.detail.value === 100 ? undefined : e.detail.value)}"
+        ></ha-selector>
+        <p class="hint">Lower it to let the dashboard background show through. Text, nodes and panels stay solid.</p>
         <div class="section-label">Flow diagram style</div>
         <div class="bool-row">
           <span class="bool-label">Node style</span>
@@ -980,7 +1015,7 @@ export class SolarOverviewCardEditor extends LitElement {
         ${panels.map((p, i) => {
           const isBuiltin = !!p.key;
           const icon  = isBuiltin ? meta[p.key!].icon : '📈';
-          const label = isBuiltin ? meta[p.key!].label : (p.name ?? p.entity ?? 'Custom');
+          const label = p.name ?? (isBuiltin ? meta[p.key!].label : (p.entity ?? 'Custom'));
           const sub   = !isBuiltin && p.entity ? html`<span class="nav-sub" style="margin:0;">${p.entity}</span>` : '';
           return html`
             <div class="panel-item">
@@ -994,9 +1029,9 @@ export class SolarOverviewCardEditor extends LitElement {
                 ? html`<span style="width:10px;height:10px;border-radius:50%;background:${p.color ?? '#6366f1'};flex-shrink:0;"></span>`
                 : html`<span style="font-size:1.1rem;">${icon}</span>`}
               <span class="panel-label" style="display:flex;flex-direction:column;gap:1px;">${label}${sub}</span>
+              <button class="device-btn" title="Edit"
+                @click="${() => this._editingPanelIndex === i ? this._cancelPanelEdit() : this._startPanelEdit(i)}">✏️</button>
               ${!isBuiltin ? html`
-                <button class="device-btn" title="Edit"
-                  @click="${() => this._editingPanelIndex === i ? this._cancelPanelEdit() : this._startPanelEdit(i)}">✏️</button>
                 <button class="device-btn danger" title="Remove" @click="${() => this._removeCustomPanel(i)}">✕</button>
               ` : ''}
               <ha-selector
@@ -1034,7 +1069,7 @@ export class SolarOverviewCardEditor extends LitElement {
           </div>
         </div>
 
-        <p class="hint">Reorder with ▲▼. Edit a custom panel's name, icon and colour with ✏️.</p>
+        <p class="hint">Reorder with ▲▼. Change any panel's name, icon and colour with ✏️; leave a field blank to keep the default.</p>
       </div>
     `;
   }
@@ -1072,7 +1107,7 @@ export class SolarOverviewCardEditor extends LitElement {
     this._editingPanel = {
       name:  p.name  ?? '',
       icon:  p.icon  ?? '',
-      color: p.color ?? '#6366f1',
+      color: p.color ?? (p.key ? BUILTIN_COLORS[p.key] : '#6366f1'),
     };
     this._editingPanelIndex = index;
   }
@@ -1082,11 +1117,15 @@ export class SolarOverviewCardEditor extends LitElement {
   private _savePanelEdit(): void {
     if (this._editingPanelIndex === null || !this._config) return;
     const panels = [...(this._config.panels ?? DEFAULT_PANELS)];
+    const current = panels[this._editingPanelIndex];
+    // An untouched built-in colour stays unset so it keeps tracking the default.
+    const builtinColor = current.key ? BUILTIN_COLORS[current.key] : undefined;
+    const color = this._editingPanel.color === builtinColor ? undefined : this._editingPanel.color;
     panels[this._editingPanelIndex] = {
-      ...panels[this._editingPanelIndex],
+      ...current,
       name:  this._editingPanel.name  || undefined,
       icon:  this._editingPanel.icon  || undefined,
-      color: this._editingPanel.color || undefined,
+      color: color || undefined,
     };
     this._editingPanelIndex = null;
     this._setPanels(panels);

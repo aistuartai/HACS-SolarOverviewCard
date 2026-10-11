@@ -12,41 +12,41 @@ export const cardStyles = css`
     --color-battery-bg: rgba(16,  185, 129, 0.12);
     --color-grid-bg:    rgba(139, 92,  246, 0.12);
     --color-home-bg:    rgba(59,  130, 246, 0.12);
-
-    /* Fallbacks when HA CSS vars are absent (unit-tests / preview) */
-    --card-background-color: #1c1c1e;
-    --primary-text-color: #e5e7eb;
-    --secondary-text-color: #9ca3af;
-    --primary-color: #3b82f6;
-    --ha-card-border-radius: 12px;
-    --ha-card-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   }
 
-  /* ─── Light theme overrides ───────────────────────────────────── */
-  :host([theme='light']),
-  :host([data-theme='light']) {
+  /*
+   * HA theme variables (--card-background-color, --primary-text-color…) are
+   * inherited, not redefined here, so the card follows the active HA theme.
+   * theme: light | dark pins a palette by redefining them on ha-card.
+   */
+  ha-card[theme='light'] {
+    --ha-card-background: #ffffff;
     --card-background-color: #ffffff;
     --primary-text-color: #111827;
     --secondary-text-color: #6b7280;
-    --ha-card-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
 
-  @media (prefers-color-scheme: light) {
-    :host([theme='auto']) {
-      --card-background-color: #ffffff;
-      --primary-text-color: #111827;
-      --secondary-text-color: #6b7280;
-      --ha-card-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
+  ha-card[theme='dark'] {
+    --ha-card-background: #1c1c1e;
+    --card-background-color: #1c1c1e;
+    --primary-text-color: #e5e7eb;
+    --secondary-text-color: #9ca3af;
+  }
+
+  /* background_opacity: fade only the card surface, never its content. */
+  ha-card[data-bg-opacity] {
+    background: color-mix(
+      in srgb,
+      var(--ha-card-background, var(--card-background-color, #1c1c1e)) var(--soc-bg-opacity),
+      transparent
+    );
   }
 
   /* ─── Card shell ──────────────────────────────────────────────── */
+  /* ha-card paints the background, border and shadow; this is layout only. */
   .card {
-    background: var(--card-background-color);
-    border-radius: var(--ha-card-border-radius, 12px);
-    box-shadow: var(--ha-card-box-shadow);
     padding: 16px;
-    color: var(--primary-text-color);
+    color: var(--primary-text-color, #e5e7eb);
     font-family: var(--paper-font-body1_-_font-family, 'Roboto', sans-serif);
     overflow: hidden;
     box-sizing: border-box;

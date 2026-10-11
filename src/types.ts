@@ -92,6 +92,7 @@ export interface DeviceConfig extends EntityConfig {
 export interface PanelConfig {
   key?: 'solar' | 'battery' | 'grid' | 'load';  // built-in panel
   entity?: string;   // custom panel entity
+  /** Panel title. For built-ins this overrides the section name on the panel only. */
   name?: string;
   /** MDI name ("mdi:meter-electric") or a raw SVG path. Falls back to a lightning bolt. */
   icon?: string;
@@ -110,6 +111,8 @@ export interface SolarCardConfig {
   show_sparklines?: boolean;
   sparkline_hours?: number;
   theme?: 'auto' | 'light' | 'dark';
+  /** Card background opacity, 0–100 (default: 100). The content stays fully opaque. */
+  background_opacity?: number;
   show_flow?: boolean;
   show_stats?: boolean;
   show_devices?: boolean;

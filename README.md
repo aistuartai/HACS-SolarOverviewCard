@@ -17,9 +17,10 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 | **Animated flow diagram** | SVG nodes for Solar, Grid, Home, Battery with dashed flow lines that animate in the direction of current power movement. Line thickness scales with wattage. |
 | **Custom background image** | Set any image (local `/local/` path or URL) as the flow diagram background via `flow_background`. |
 | **Dynamic battery SOC** | SOC % shown on the battery node. In `circle` mode: animated arc ring transitioning red → amber → green. In `card` mode: colour-coded percentage text. |
-| **Device satellite nodes** | Individual device nodes fan out from the Home node on the diagram — toggle per-device. |
+| **Device satellite nodes** | Individual device nodes fan out from the Home node on the diagram — toggle per-device. Idle devices (< 5 W) dim. |
 | **2 × 2 stat panels** | Large current value, colour-coded state badge (Generating / Charging / Importing…), optional sparkline history. |
-| **Device chip row** | Horizontal scrollable chips for individual devices, sorted by wattage. Dim when idle. |
+| **Device chip row** | Horizontal scrollable chips for individual devices, sorted by wattage. Dim when idle (< 5 W). |
+| **Custom stat panels** | Reorder, hide or add panels for any entity; rename and recolour any panel, built-in or custom, via `panels`. |
 | **4 independent grid sensors** | Separate entities for Grid→Home, Solar/Battery→Grid, Grid→Battery, Battery→Grid. Combined fallback also supported. |
 | **Sign-convention declaration** | `positive_means: charging\|discharging` on battery and `positive_means: importing\|exporting` on grid — explicit semantic declaration replaces the binary `invert` flag. The old `invert` flag still works for backward compatibility. |
 | **Battery status entity** | Optional `battery.status_entity` reads a text sensor (e.g. "Charging" / "Discharging" / "Idle") and uses it as the state label instead of inferring from power value. |
@@ -32,7 +33,8 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 | **Unit-aware sensors** | Sensors reporting kW or MW are scaled to watts automatically. |
 | **Visual config editor** | Full GUI editor with entity pickers, icon selector, colour picker, and device add/edit/delete. |
 | **Responsive** | Scales from a narrow sidebar card to a full-width dashboard view. |
-| **Theme-aware** | Follows HA CSS variables; override with `theme: light \| dark`. |
+| **Theme-aware** | Follows the active HA theme; pin a palette with `theme: light \| dark`. |
+| **Transparent background** | `background_opacity` (0–100) fades the card surface so the dashboard background shows through. Content stays solid. |
 
 ---
 
@@ -81,8 +83,8 @@ type: custom:solar-overview-card
 # ── Solar ──────────────────────────────────────────────────────────────────────
 solar:
   entity: sensor.solar_power        # Generation (W ≥ 0)
-  name: Solar                       # Optional display name
-  icon: mdi:solar-panel             # Optional MDI icon
+  name: Solar                       # Optional: diagram node + stat panel name
+  icon: mdi:solar-panel             # Optional: stat panel icon
   export_entity: sensor.solar_export  # Explicit Solar → Grid sensor (W ≥ 0)
 
 # ── Battery ────────────────────────────────────────────────────────────────────
@@ -105,6 +107,7 @@ grid:
                                     # Replaces the old invert flag — invert still works
 
   # Individual flow sensors (each optional — override the combined entity):
+  import_entity: sensor.grid_import         # Grid → Home  (W ≥ 0)
   export_entity: sensor.grid_export         # Solar/Battery → Grid  (W ≥ 0)
   battery_entity: sensor.grid_battery       # Grid ↔ Battery combined
                                             #   + = grid charges battery
@@ -139,7 +142,8 @@ devices:
 watt_threshold: 1000      # Switch to kW above this wattage (default: 1000)
 show_sparklines: true     # Sparkline history in stat panels (default: true)
 sparkline_hours: 2        # Hours of history to fetch for sparklines (default: 2)
-theme: auto               # auto | light | dark  (default: auto)
+theme: auto               # auto | light | dark  (default: auto = follow HA theme)
+background_opacity: 100   # Card background opacity 0–100 (default: 100)
 
 # ── Section visibility ──────────────────────────────────────────────────────────
 show_flow: true           # Animated flow diagram (default: true)
@@ -196,10 +200,9 @@ panels:
   - key: grid
     enabled: true
   - key: load
-    enabled: true
-  - key: load
-    name: Consumption           # Optional: rename a built-in panel
+    name: Consumption           # Optional: rename a built-in panel (panel only)
     icon: mdi:home-lightning-bolt   # Optional: override its icon
+    color: "#3b82f6"            # Optional: override its accent colour
     enabled: true
   - entity: sensor.house_temperature   # Custom panel — any HA entity
     name: Temperature
@@ -208,11 +211,16 @@ panels:
     enabled: true
 ```
 
+List each built-in key once. Leaving `panels` out shows the four built-ins in
+the order above.
+
 Panel names are displayed in capitals, so `name: Meter` renders as **METER**.
 
 Icons accept any MDI name (`mdi:meter-electric`) or a raw SVG path. Both
 built-in and custom panels support `name`, `icon` and `color`; all three are
-editable in the visual editor's **Stat Panels** page.
+editable with ✏️ in the visual editor's **Stat Panels** page. On a built-in
+panel they win over the section's `name` / `icon` (e.g. `load.name`), which
+also labels the diagram node.
 
 ---
 
@@ -226,6 +234,9 @@ Most installations have a single combined grid sensor. Use `grid.entity` as the 
 | Solar/Battery → Grid | `grid.entity < 0` when `solar > 0` | `grid.export_entity` |
 | Grid → Battery | **auto-derived**: `batteryCharging − solarToBattery` | `grid.to_battery_entity` or `grid.battery_entity > 0` |
 | Battery → Grid | not derivable from combined | `grid.from_battery_entity` or `grid.battery_entity < 0` |
+
+`solar.export_entity` is used for Solar → Grid when `grid.export_entity` is not set.
+The Solar → Grid line is only drawn while solar is generating, even with an explicit export sensor.
 
 ---
 
@@ -249,6 +260,10 @@ grid:
 ```
 
 The old `invert: true` flag still works as an alias for `positive_means: discharging` / `positive_means: exporting`.
+`solar` and `load` have no `positive_means`; use `invert: true` on them if their sensor reads negative.
+The visual editor's **Invert sign** toggles write the `invert` flag.
+
+`battery.grid_charge_entity` is a deprecated alias for `grid.to_battery_entity`.
 
 ---
 
@@ -285,9 +300,26 @@ Set via the **Setup → Flow diagram background** field in the visual editor, or
 
 ---
 
+## Card background and theme
+
+By default the card follows your Home Assistant theme. `theme: light` or `theme: dark` pins the card's own palette regardless of the HA theme.
+
+`background_opacity` (0–100, default 100) fades the card surface so the dashboard background shows through. Text, diagram nodes and stat panels stay fully opaque.
+
+```yaml
+theme: dark
+background_opacity: 40   # 0 = fully transparent, 100 = solid
+```
+
+Both are on the editor's **Setup → Card appearance** section. The card's border and shadow come from your theme (`ha-card-border-*`, `ha-card-box-shadow`) and are not faded; set those in the theme or with card-mod if you want a fully frameless card.
+
+The flow diagram's text defaults to white (`diagram_text_color`). On a light background, set it to a dark colour.
+
+---
+
 ## Devices on the flow diagram
 
-Set `show_on_diagram: true` on any device to render it as a smaller satellite node connected to the Home node. Nodes are positioned automatically to the right of Home and scale/dim based on current wattage.
+Set `show_on_diagram: true` on any device to render it as a smaller satellite node connected to the Home node. Nodes are positioned automatically to the right of Home, stacked vertically, and dim when the device draws under 5 W.
 
 ```yaml
 devices:
