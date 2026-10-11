@@ -32,7 +32,7 @@ export class StatPanel extends LitElement {
     }
 
     .panel[data-clickable]:hover {
-      background: rgba(255,255,255,0.06);
+      background: color-mix(in srgb, var(--soc-surface) 94%, white);
       border-color: rgba(255,255,255,0.14);
     }
 
@@ -41,8 +41,16 @@ export class StatPanel extends LitElement {
       outline-offset: 2px;
     }
 
+    /*
+     * Solid card colour (with the old 3% white tint) rather than a translucent
+     * tint, so text stays readable when background_opacity fades the card.
+     */
+    :host {
+      --soc-surface: var(--ha-card-background, var(--card-background-color, #1c1c1e));
+    }
+
     .panel {
-      background: rgba(255,255,255,0.03);
+      background: color-mix(in srgb, var(--soc-surface) 97%, white);
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 10px;
       padding: 12px 14px 10px;

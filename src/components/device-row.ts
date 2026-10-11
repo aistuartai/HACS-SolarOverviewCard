@@ -20,7 +20,11 @@ export class DeviceRow extends LitElement {
   @property({ type: Number }) wattThreshold = 1000;
 
   static styles = css`
-    :host { display: block; }
+    /* Solid like the stat panels, so chips stay readable on a faded card. */
+    :host {
+      display: block;
+      --soc-surface: var(--ha-card-background, var(--card-background-color, #1c1c1e));
+    }
 
     .row {
       display: flex;
@@ -44,7 +48,7 @@ export class DeviceRow extends LitElement {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(255,255,255,0.05);
+      background: color-mix(in srgb, var(--soc-surface) 95%, white);
       border: 1px solid rgba(255,255,255,0.09);
       border-radius: 99px;
       padding: 4px 10px 4px 7px;
@@ -55,7 +59,7 @@ export class DeviceRow extends LitElement {
     }
 
     .chip:hover {
-      background: rgba(255,255,255,0.09);
+      background: color-mix(in srgb, var(--soc-surface) 91%, white);
     }
 
     .chip:focus-visible {

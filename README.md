@@ -34,7 +34,7 @@ A real-time solar energy overview card for Home Assistant Lovelace. Shows an ani
 | **Visual config editor** | Full GUI editor with entity pickers, icon selector, colour picker, and device add/edit/delete. |
 | **Responsive** | Scales from a narrow sidebar card to a full-width dashboard view. |
 | **Theme-aware** | Follows the active HA theme; pin a palette with `theme: light \| dark`. |
-| **Transparent background** | `background_opacity` (0–100) fades the card surface so the dashboard background shows through. Content stays solid. |
+| **Transparent background** | `background_opacity` (0–100) fades the card surface so the dashboard background shows through. Stat panels and device chips stay solid. |
 
 ---
 
@@ -304,7 +304,9 @@ Set via the **Setup → Flow diagram background** field in the visual editor, or
 
 By default the card follows your Home Assistant theme. `theme: light` or `theme: dark` pins the card's own palette regardless of the HA theme.
 
-`background_opacity` (0–100, default 100) fades the card surface so the dashboard background shows through. Text, diagram nodes and stat panels stay fully opaque.
+`background_opacity` (0–100, default 100) fades the card surface so the dashboard background shows through. Stat panels and device chips keep a solid background so their text stays readable.
+
+Text that sits directly on the card surface (the flow diagram labels and the **Devices** heading) is drawn over whatever is behind the card. Pick `theme` and `diagram_text_color` to contrast with your dashboard background.
 
 ```yaml
 theme: dark
